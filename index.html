@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/redux@4.2.1/dist/redux.min.js"></script>
 <style>
 /* ========================================================
    GITHUB PRIMER & PRISM UI DESIGN SYSTEM
@@ -1709,6 +1710,10 @@ html.dark .cred-state-pill.state-saved {
   <div class="dock-left">
     <span class="dock-count" id="dock-counter">0 skills active</span>
     <span class="dock-path">Target: ~/.gemini/config/rules/active-skills.md</span>
+    <span class="dock-path" id="dock-state-badge" style="display:inline-flex;align-items:center;gap:4px;color:var(--accent-green);font-size:11px;" title="Redux state persists across page refreshes">
+      <svg class="octicon" width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="8"/></svg>
+      State Persisted
+    </span>
   </div>
   <div class="dock-right">
     <button class="btn-gh" onclick="clearAllSelections()">Reset</button>
@@ -4030,15 +4035,6 @@ const REPOS = [
 // Flat array derived dynamically from REPOS (Zero duplication)
 const ALL_SKILLS = REPOS.flatMap(r => r.subskills);
 
-let sel = new Set();
-let curMainCat = 'all';
-let curSubCat = 'all';
-let curCat = 'all'; // Compatibility with existing helpers
-let searchQuery = '';
-let repoFilterQuery = '';
-let selectedRepoId = null;
-let activeModalId = null;
-
 // Subcategory Hierarchical Definitions
 const SUBCATEGORIES = {
   frontend: [
@@ -4053,8 +4049,393 @@ const SUBCATEGORIES = {
   ]
 };
 
-// ALL REPOSITORIES IN HOME SECTION ARE COLLAPSED BY DEFAULT
+// ========================================================
+// REDUX STATE MANAGEMENT & LOCALSTORAGE PERSISTENCE ENGINE
+// ========================================================
+
+const REDUX_PERSIST_KEY = 'SKILL_SWITCHER_REDUX_STATE_V1';
+
+// Standalone Redux Store Factory (Works 100% offline & without external CDN)
+const createReduxStore = (typeof Redux !== 'undefined' && Redux.createStore)
+  ? Redux.createStore
+  : function(reducer, preloadedState) {
+      let currentReducer = reducer;
+      let currentState = preloadedState !== undefined ? preloadedState : currentReducer(undefined, { type: '@@redux/INIT' });
+      let currentListeners = [];
+      let nextListeners = currentListeners;
+
+      function ensureCanMutateNextListeners() {
+        if (nextListeners === currentListeners) {
+          nextListeners = currentListeners.slice();
+        }
+      }
+
+      return {
+        getState: () => currentState,
+        dispatch: (action) => {
+          if (!action || typeof action.type !== 'string') {
+            throw new Error('Actions must have a string type property');
+          }
+          currentState = currentReducer(currentState, action);
+          const listeners = (currentListeners = nextListeners);
+          for (let i = 0; i < listeners.length; i++) {
+            listeners[i]();
+          }
+          return action;
+        },
+        subscribe: (listener) => {
+          if (typeof listener !== 'function') {
+            throw new Error('Expected the listener to be a function');
+          }
+          let isSubscribed = true;
+          ensureCanMutateNextListeners();
+          nextListeners.push(listener);
+          return function unsubscribe() {
+            if (!isSubscribed) return;
+            isSubscribed = false;
+            ensureCanMutateNextListeners();
+            const index = nextListeners.indexOf(listener);
+            nextListeners.splice(index, 1);
+          };
+        }
+      };
+    };
+
+// Action Types
+const ActionTypes = {
+  TOGGLE_SKILL: 'skills/toggleSkill',
+  SELECT_REPO_DIRECT: 'skills/selectRepoDirect',
+  BATCH_SELECT_CATEGORY: 'skills/batchSelectCategory',
+  SELECT_ALL_VISIBLE: 'skills/selectAllVisible',
+  CLEAR_ALL_SELECTIONS: 'skills/clearAllSelections',
+
+  SET_CATEGORY: 'navigation/setCategory',
+  SET_SELECTED_REPO: 'navigation/setSelectedRepo',
+  TOGGLE_REPO_COLLAPSE: 'navigation/toggleRepoCollapse',
+  TOGGLE_ALL_REPOS_COLLAPSE: 'navigation/toggleAllReposCollapse',
+  EXPAND_ALL_REPOS: 'navigation/expandAllRepos',
+  COLLAPSE_ALL_REPOS: 'navigation/collapseAllRepos',
+
+  SET_SEARCH_QUERY: 'search/setSearchQuery',
+  SET_REPO_FILTER_QUERY: 'search/setRepoFilterQuery',
+
+  HYDRATE_STATE: 'system/hydrateState',
+  RESET_PERSISTENCE: 'system/resetPersistence'
+};
+
+// Initial Redux State
+const initialReduxState = {
+  skills: {
+    selectedIds: []
+  },
+  navigation: {
+    mainCat: 'all',
+    subCat: 'all',
+    selectedRepoId: null,
+    collapsedRepoIds: REPOS.map(r => r.id)
+  },
+  search: {
+    searchQuery: '',
+    repoFilterQuery: ''
+  }
+};
+
+// Root Reducer
+function rootReducer(state = initialReduxState, action) {
+  switch (action.type) {
+    case ActionTypes.TOGGLE_SKILL: {
+      const id = action.payload.id;
+      const exists = state.skills.selectedIds.includes(id);
+      const newSelected = exists
+        ? state.skills.selectedIds.filter(x => x !== id)
+        : [...state.skills.selectedIds, id];
+      return {
+        ...state,
+        skills: { ...state.skills, selectedIds: newSelected }
+      };
+    }
+
+    case ActionTypes.SELECT_REPO_DIRECT: {
+      const repoId = action.payload.repoId;
+      const repo = REPOS.find(r => r.id === repoId);
+      if (!repo) return state;
+      const subIds = repo.subskills.map(s => s.id);
+      const allSelected = subIds.length > 0 && subIds.every(id => state.skills.selectedIds.includes(id));
+      
+      let newSelected;
+      if (allSelected) {
+        newSelected = state.skills.selectedIds.filter(id => !subIds.includes(id));
+      } else {
+        const toAdd = subIds.filter(id => !state.skills.selectedIds.includes(id));
+        newSelected = [...state.skills.selectedIds, ...toAdd];
+      }
+      return {
+        ...state,
+        skills: { ...state.skills, selectedIds: newSelected }
+      };
+    }
+
+    case ActionTypes.BATCH_SELECT_CATEGORY: {
+      const cat = action.payload.cat;
+      const matchingIds = ALL_SKILLS.filter(s => s.cat === cat).map(s => s.id);
+      const allSelected = matchingIds.length > 0 && matchingIds.every(id => state.skills.selectedIds.includes(id));
+
+      let newSelected;
+      if (allSelected) {
+        newSelected = state.skills.selectedIds.filter(id => !matchingIds.includes(id));
+      } else {
+        const toAdd = matchingIds.filter(id => !state.skills.selectedIds.includes(id));
+        newSelected = [...state.skills.selectedIds, ...toAdd];
+      }
+      return {
+        ...state,
+        skills: { ...state.skills, selectedIds: newSelected }
+      };
+    }
+
+    case ActionTypes.SELECT_ALL_VISIBLE: {
+      const visibleIds = action.payload.visibleSkillIds || [];
+      const allSelected = visibleIds.length > 0 && visibleIds.every(id => state.skills.selectedIds.includes(id));
+
+      let newSelected;
+      if (allSelected) {
+        newSelected = state.skills.selectedIds.filter(id => !visibleIds.includes(id));
+      } else {
+        const toAdd = visibleIds.filter(id => !state.skills.selectedIds.includes(id));
+        newSelected = [...state.skills.selectedIds, ...toAdd];
+      }
+      return {
+        ...state,
+        skills: { ...state.skills, selectedIds: newSelected }
+      };
+    }
+
+    case ActionTypes.CLEAR_ALL_SELECTIONS: {
+      return {
+        ...state,
+        skills: { ...state.skills, selectedIds: [] }
+      };
+    }
+
+    case ActionTypes.SET_CATEGORY: {
+      const { mainCat, subCat } = action.payload;
+      return {
+        ...state,
+        navigation: {
+          ...state.navigation,
+          mainCat: mainCat || 'all',
+          subCat: subCat || 'all',
+          selectedRepoId: null
+        }
+      };
+    }
+
+    case ActionTypes.SET_SELECTED_REPO: {
+      const repoId = action.payload.repoId;
+      const newCollapsed = state.navigation.collapsedRepoIds.filter(id => id !== repoId);
+      return {
+        ...state,
+        navigation: {
+          ...state.navigation,
+          selectedRepoId: repoId,
+          collapsedRepoIds: newCollapsed
+        }
+      };
+    }
+
+    case ActionTypes.TOGGLE_REPO_COLLAPSE: {
+      const repoId = action.payload.repoId;
+      const isCollapsed = state.navigation.collapsedRepoIds.includes(repoId);
+      const newCollapsed = isCollapsed
+        ? state.navigation.collapsedRepoIds.filter(id => id !== repoId)
+        : [...state.navigation.collapsedRepoIds, repoId];
+      return {
+        ...state,
+        navigation: {
+          ...state.navigation,
+          collapsedRepoIds: newCollapsed
+        }
+      };
+    }
+
+    case ActionTypes.TOGGLE_ALL_REPOS_COLLAPSE: {
+      const visibleRepoIds = action.payload.visibleRepoIds || [];
+      const allExpanded = visibleRepoIds.length > 0 && visibleRepoIds.every(id => !state.navigation.collapsedRepoIds.includes(id));
+      
+      let newCollapsed;
+      if (allExpanded) {
+        const toAdd = visibleRepoIds.filter(id => !state.navigation.collapsedRepoIds.includes(id));
+        newCollapsed = [...state.navigation.collapsedRepoIds, ...toAdd];
+      } else {
+        newCollapsed = state.navigation.collapsedRepoIds.filter(id => !visibleRepoIds.includes(id));
+      }
+      return {
+        ...state,
+        navigation: {
+          ...state.navigation,
+          collapsedRepoIds: newCollapsed
+        }
+      };
+    }
+
+    case ActionTypes.EXPAND_ALL_REPOS: {
+      return {
+        ...state,
+        navigation: {
+          ...state.navigation,
+          collapsedRepoIds: []
+        }
+      };
+    }
+
+    case ActionTypes.COLLAPSE_ALL_REPOS: {
+      const allIds = action.payload.allRepoIds || REPOS.map(r => r.id);
+      return {
+        ...state,
+        navigation: {
+          ...state.navigation,
+          collapsedRepoIds: [...allIds]
+        }
+      };
+    }
+
+    case ActionTypes.SET_SEARCH_QUERY: {
+      const q = action.payload.query;
+      return {
+        ...state,
+        search: {
+          ...state.search,
+          searchQuery: q
+        },
+        navigation: {
+          ...state.navigation,
+          collapsedRepoIds: q ? [] : state.navigation.collapsedRepoIds
+        }
+      };
+    }
+
+    case ActionTypes.SET_REPO_FILTER_QUERY: {
+      return {
+        ...state,
+        search: {
+          ...state.search,
+          repoFilterQuery: action.payload.query
+        }
+      };
+    }
+
+    case ActionTypes.HYDRATE_STATE: {
+      const saved = action.payload.savedState;
+      if (!saved) return state;
+      return {
+        skills: {
+          selectedIds: Array.isArray(saved.skills?.selectedIds) ? saved.skills.selectedIds : state.skills.selectedIds
+        },
+        navigation: {
+          mainCat: saved.navigation?.mainCat || state.navigation.mainCat,
+          subCat: saved.navigation?.subCat || state.navigation.subCat,
+          selectedRepoId: saved.navigation?.selectedRepoId !== undefined ? saved.navigation.selectedRepoId : state.navigation.selectedRepoId,
+          collapsedRepoIds: Array.isArray(saved.navigation?.collapsedRepoIds) ? saved.navigation.collapsedRepoIds : state.navigation.collapsedRepoIds
+        },
+        search: {
+          searchQuery: saved.search?.searchQuery || '',
+          repoFilterQuery: saved.search?.repoFilterQuery || ''
+        }
+      };
+    }
+
+    case ActionTypes.RESET_PERSISTENCE: {
+      return { ...initialReduxState };
+    }
+
+    default:
+      return state;
+  }
+}
+
+// LocalStorage Persistence Helpers
+function saveReduxStateToStorage(state) {
+  try {
+    const toSave = {
+      skills: {
+        selectedIds: state.skills.selectedIds
+      },
+      navigation: {
+        mainCat: state.navigation.mainCat,
+        subCat: state.navigation.subCat,
+        selectedRepoId: state.navigation.selectedRepoId,
+        collapsedRepoIds: state.navigation.collapsedRepoIds
+      },
+      search: {
+        searchQuery: state.search.searchQuery,
+        repoFilterQuery: state.search.repoFilterQuery
+      }
+    };
+    localStorage.setItem(REDUX_PERSIST_KEY, JSON.stringify(toSave));
+  } catch (err) {
+    console.warn('Could not persist Redux state to localStorage:', err);
+  }
+}
+
+function loadReduxStateFromStorage() {
+  try {
+    const raw = localStorage.getItem(REDUX_PERSIST_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.skills && Array.isArray(parsed.skills.selectedIds)) {
+      return parsed;
+    }
+  } catch (err) {
+    console.warn('Could not read Redux state from localStorage:', err);
+  }
+  return null;
+}
+
+// Global state references kept in sync with Redux store
+let sel = new Set();
+let curMainCat = 'all';
+let curSubCat = 'all';
+let curCat = 'all';
+let searchQuery = '';
+let repoFilterQuery = '';
+let selectedRepoId = null;
+let activeModalId = null;
 let collapsedRepos = new Set(REPOS.map(r => r.id));
+
+// Instantiate Redux Store
+const store = createReduxStore(rootReducer);
+window.store = store;
+window.__REDUX_STORE__ = store;
+
+// Synchronize Redux Store with Global Variables & DOM
+store.subscribe(() => {
+  const state = store.getState();
+  
+  sel = new Set(state.skills.selectedIds);
+  curMainCat = state.navigation.mainCat;
+  curSubCat = state.navigation.subCat;
+  selectedRepoId = state.navigation.selectedRepoId;
+  collapsedRepos = new Set(state.navigation.collapsedRepoIds);
+  searchQuery = state.search.searchQuery;
+  repoFilterQuery = state.search.repoFilterQuery;
+
+  if (curMainCat === 'frontend') {
+    curCat = curSubCat === 'all' ? 'design' : curSubCat;
+  } else if (curMainCat === 'data_media') {
+    curCat = curSubCat === 'all' ? 'data' : curSubCat;
+  } else {
+    curCat = curMainCat;
+  }
+
+  saveReduxStateToStorage(state);
+
+  // Sync Subnav Tabs
+  document.querySelectorAll('.subnav-tab').forEach(t => t.classList.remove('active'));
+  const tabEl = document.getElementById(curMainCat === 'data_media' ? 'tab-data-media' : 'tab-' + curMainCat);
+  if (tabEl) tabEl.classList.add('active');
+
+  updateUI();
+});
 
 // Category SVG Icons mapping (Professional GitHub SVGs, ZERO emojis)
 function getCategoryIcon(cat) {
@@ -4139,17 +4520,11 @@ document.addEventListener('keydown', (e) => {
 });
 
 function handleSearch(q) {
-  searchQuery = (q || '').trim().toLowerCase();
-  // Auto expand matching repos on search
-  if (searchQuery) {
-    collapsedRepos.clear();
-  }
-  renderCenter();
+  store.dispatch({ type: ActionTypes.SET_SEARCH_QUERY, payload: { query: (q || '').trim().toLowerCase() } });
 }
 
 function handleRepoFilter(q) {
-  repoFilterQuery = (q || '').trim().toLowerCase();
-  renderLeftNav();
+  store.dispatch({ type: ActionTypes.SET_REPO_FILTER_QUERY, payload: { query: (q || '').trim().toLowerCase() } });
 }
 
 
@@ -4249,44 +4624,11 @@ function renderSubcategoryStrip() {
 }
 
 function filterMainCategory(mainCat, subCat = 'all') {
-  curMainCat = mainCat;
-  curSubCat = subCat;
-  selectedRepoId = null;
-
-  // Sync curCat for legacy compatibility
-  if (mainCat === 'frontend') {
-    curCat = subCat === 'all' ? 'design' : subCat;
-  } else if (mainCat === 'data_media') {
-    curCat = subCat === 'all' ? 'data' : subCat;
-  } else {
-    curCat = mainCat;
-  }
-
-  // Update Main Tabs active state
-  document.querySelectorAll('.subnav-tab').forEach(t => t.classList.remove('active'));
-  const tabEl = document.getElementById(mainCat === 'data_media' ? 'tab-data-media' : 'tab-' + mainCat);
-  if (tabEl) tabEl.classList.add('active');
-
-  renderSubcategoryStrip();
-  renderSidebarCatPills();
-  renderLeftNav();
-  renderCenter();
+  store.dispatch({ type: ActionTypes.SET_CATEGORY, payload: { mainCat, subCat } });
 }
 
 function filterSubCategory(subCat) {
-  curSubCat = subCat;
-  selectedRepoId = null;
-
-  if (curMainCat === 'frontend') {
-    curCat = subCat === 'all' ? 'design' : subCat;
-  } else if (curMainCat === 'data_media') {
-    curCat = subCat === 'all' ? 'data' : subCat;
-  }
-
-  renderSubcategoryStrip();
-  renderSidebarCatPills();
-  renderLeftNav();
-  renderCenter();
+  store.dispatch({ type: ActionTypes.SET_CATEGORY, payload: { mainCat: curMainCat, subCat } });
 }
 
 // Router to support 1-click calls from sidebar pills or batch buttons
@@ -4927,11 +5269,7 @@ function switchGuideTab(tabId) {
 }
 
 function selectRepoNav(id) {
-  selectedRepoId = id;
-  // Automatically expand the chosen repo in the accordion
-  collapsedRepos.delete(id);
-  renderLeftNav();
-  renderCenter();
+  store.dispatch({ type: ActionTypes.SET_SELECTED_REPO, payload: { repoId: id } });
   const target = document.getElementById('repo-sec-' + id);
   if (target) {
     target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -4943,77 +5281,44 @@ function selectRepoNav(id) {
 // Accordion Collapsing
 function toggleRepoCollapse(repoId, e) {
   if (e) e.stopPropagation();
-  if (collapsedRepos.has(repoId)) {
-    collapsedRepos.delete(repoId);
-  } else {
-    collapsedRepos.add(repoId);
-  }
-  renderCenter();
+  store.dispatch({ type: ActionTypes.TOGGLE_REPO_COLLAPSE, payload: { repoId } });
 }
 
 function toggleAllReposCollapse() {
   const visible = getFilteredRepos();
-  const allExpanded = visible.length > 0 && visible.every(r => !collapsedRepos.has(r.id));
-  if (allExpanded) {
-    visible.forEach(r => collapsedRepos.add(r.id));
-  } else {
-    visible.forEach(r => collapsedRepos.delete(r.id));
-  }
-  renderCenter();
+  store.dispatch({ type: ActionTypes.TOGGLE_ALL_REPOS_COLLAPSE, payload: { visibleRepoIds: visible.map(r => r.id) } });
 }
 
 function expandAllRepos() {
-  collapsedRepos.clear();
-  renderCenter();
+  store.dispatch({ type: ActionTypes.EXPAND_ALL_REPOS });
 }
 
 function collapseAllRepos() {
-  collapsedRepos = new Set(REPOS.map(r => r.id));
-  renderCenter();
+  store.dispatch({ type: ActionTypes.COLLAPSE_ALL_REPOS, payload: { allRepoIds: REPOS.map(r => r.id) } });
 }
 
 // Direct Selection from Header / Sidebar
 function toggleSelectRepoDirect(repoId, e) {
   if (e) e.stopPropagation();
-  const r = REPOS.find(x => x.id === repoId);
-  if (!r) return;
-  const subIds = r.subskills.map(s => s.id);
-  const allSel = subIds.every(id => sel.has(id));
-  subIds.forEach(id => {
-    if (allSel) sel.delete(id);
-    else sel.add(id);
-  });
-  updateUI();
+  store.dispatch({ type: ActionTypes.SELECT_REPO_DIRECT, payload: { repoId } });
 }
 
 function toggleSkill(id) {
-  sel.has(id) ? sel.delete(id) : sel.add(id);
-  updateUI();
+  store.dispatch({ type: ActionTypes.TOGGLE_SKILL, payload: { id } });
 }
 
 function selectAllVisibleSkills() {
   const visible = getFilteredSkills();
-  const allSel = visible.every(s => sel.has(s.id));
-  visible.forEach(s => {
-    if (allSel) sel.delete(s.id);
-    else sel.add(s.id);
-  });
-  updateUI();
+  store.dispatch({ type: ActionTypes.SELECT_ALL_VISIBLE, payload: { visibleSkillIds: visible.map(s => s.id) } });
 }
 
 function selectBatchCategory(cat) {
-  const matching = ALL_SKILLS.filter(s => s.cat === cat);
-  const allSel = matching.every(s => sel.has(s.id));
-  matching.forEach(s => {
-    if (allSel) sel.delete(s.id);
-    else sel.add(s.id);
-  });
-  updateUI();
+  store.dispatch({ type: ActionTypes.BATCH_SELECT_CATEGORY, payload: { cat } });
 }
 
 function clearAllSelections() {
-  sel.clear();
-  updateUI();
+  store.dispatch({ type: ActionTypes.CLEAR_ALL_SELECTIONS });
+  showToast('Reset all selections', false);
 }
 
 function getFilteredRepos() {
@@ -5460,8 +5765,13 @@ function toggleModalActiveSkill() {
   updateModalBtn();
 }
 
-// Initial Boot
-updateUI();
+// Initial Boot: Hydrate Redux state from localStorage or perform initial render
+const persistedState = loadReduxStateFromStorage();
+if (persistedState) {
+  store.dispatch({ type: ActionTypes.HYDRATE_STATE, payload: { savedState: persistedState } });
+} else {
+  updateUI();
+}
 </script>
 </body>
 </html>
