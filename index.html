@@ -1000,99 +1000,131 @@ html.dark .repo-nav-list::-webkit-scrollbar-thumb:hover {
 
 
 /* ========================================================
-   SKILL CARD CREDENTIAL BAR & PASSWORD SYMBOLS
+   SKILL CARD CREDENTIAL BADGES (GITHUB PRIMER / SHADCN)
    ======================================================== */
-.card-cred-bar {
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.card-cred-badge {
+.skill-key-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 6px;
+  gap: 5px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 9999px;
   font-size: 11px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   cursor: pointer;
-  transition: all 0.15s ease;
-  user-select: none;
   border: 1px solid var(--border-default);
   background: var(--bg-subtle);
-  color: var(--fg-default);
-}
-.card-cred-badge:hover {
-  border-color: var(--accent-blue);
-  background: var(--accent-blue-bg);
-}
-.card-cred-badge.need {
-  border-color: #d4a72c;
-  background: rgba(212, 167, 44, 0.08);
-  color: #9a6700;
-}
-html.dark .card-cred-badge.need {
-  border-color: #bb8009;
-  background: rgba(187, 128, 9, 0.15);
-  color: #d29922;
-}
-.card-cred-badge.saved {
-  border-color: var(--accent-green-border);
-  background: var(--accent-green-bg);
-  color: var(--accent-green);
+  color: var(--fg-muted);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  user-select: none;
+  line-height: 1;
+  text-decoration: none;
 }
 
-.cred-sym {
-  font-size: 13px;
-  line-height: 1;
+.skill-key-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
-.cred-name {
-  font-family: 'Geist Mono', monospace;
-  font-size: 11px;
+
+.skill-key-badge:active {
+  transform: translateY(0);
 }
+
+/* Needed Key State (Subtle Warm Amber) */
+.skill-key-badge.needed {
+  background: rgba(217, 119, 6, 0.08);
+  border-color: rgba(217, 119, 6, 0.35);
+  color: #92400e;
+}
+.skill-key-badge.needed:hover {
+  background: rgba(217, 119, 6, 0.15);
+  border-color: rgba(217, 119, 6, 0.55);
+  color: #78350f;
+}
+html.dark .skill-key-badge.needed {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+html.dark .skill-key-badge.needed:hover {
+  background: rgba(245, 158, 11, 0.22);
+  border-color: rgba(245, 158, 11, 0.6);
+  color: #fde68a;
+}
+
+/* Needed Password State (Subtle Indigo/Purple) */
+.skill-key-badge.needed.pass {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.35);
+  color: #4338ca;
+}
+.skill-key-badge.needed.pass:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.55);
+  color: #3730a3;
+}
+html.dark .skill-key-badge.needed.pass {
+  background: rgba(129, 140, 248, 0.14);
+  border-color: rgba(129, 140, 248, 0.35);
+  color: #a5b4fc;
+}
+html.dark .skill-key-badge.needed.pass:hover {
+  background: rgba(129, 140, 248, 0.24);
+  border-color: rgba(129, 140, 248, 0.6);
+  color: #c7d2fe;
+}
+
+/* Saved / Configured State (Subtle Fresh Emerald) */
+.skill-key-badge.saved {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #047857;
+}
+.skill-key-badge.saved:hover {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.55);
+  color: #065f46;
+}
+html.dark .skill-key-badge.saved {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.35);
+  color: #34d399;
+}
+html.dark .skill-key-badge.saved:hover {
+  background: rgba(52, 211, 153, 0.22);
+  border-color: rgba(52, 211, 153, 0.6);
+  color: #6ee7b7;
+}
+
 .cred-state-pill {
   font-size: 10px;
   font-weight: 600;
-  padding: 1px 6px;
+  padding: 2px 7px;
   border-radius: 9999px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 .cred-state-pill.state-need {
-  background: rgba(212, 167, 44, 0.2);
+  background: rgba(212, 167, 44, 0.15);
   color: #7d4e00;
+  border: 1px solid rgba(212, 167, 44, 0.3);
 }
 html.dark .cred-state-pill.state-need {
-  background: rgba(187, 128, 9, 0.3);
+  background: rgba(187, 128, 9, 0.25);
   color: #f0b72f;
+  border: 1px solid rgba(187, 128, 9, 0.4);
 }
 .cred-state-pill.state-saved {
-  background: var(--accent-green);
-  color: #ffffff;
+  background: rgba(16, 185, 129, 0.15);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.35);
 }
-
-/* Card Footer Credential Button */
-.btn-cred-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--fg-muted);
-  border-color: var(--border-default);
-  background: var(--bg-subtle);
-}
-.btn-cred-trigger:hover {
-  color: var(--accent-blue);
-  border-color: var(--accent-blue-border);
-  background: var(--accent-blue-bg);
-}
-.btn-cred-trigger.configured {
-  color: var(--accent-green);
-  border-color: var(--accent-green-border);
-  background: var(--accent-green-bg);
+html.dark .cred-state-pill.state-saved {
+  background: rgba(52, 211, 153, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.4);
 }
 
 /* Circular Selection Checkmark Badge on Subskill Card */
@@ -4263,67 +4295,55 @@ function filterCategory(cat) {
 // ========================================================
 
 
-// Comprehensive Mapping of Known Skills to API Keys & Passwords
+// Strict Whitelist of Skills Genuine Cloud API / Database Requirements
 const SKILL_CRED_MAP = {
-  // Appllama Mobile Suite
-  'appllama-design': { keyVar: 'APPLAMA_TOKEN', passVar: 'APPLAMA_SECRET', keyLabel: 'Appllama / Figma API Key', passLabel: 'Client Secret', isRequired: true },
+  // Appllama Mobile Suite (MCP Server Token)
   'appllama-mcp': { keyVar: 'APPLAMA_TOKEN', passVar: 'APPLAMA_MCP_SECRET', keyLabel: 'Appllama API Token', passLabel: 'MCP Secret', isRequired: true },
   
-  // MCP Systems
-  'typesafe-mcp': { keyVar: 'TYPESAFE_MCP_KEY', passVar: 'TYPESAFE_MCP_AUTH', keyLabel: 'TypeSafe MCP Server Key', passLabel: 'Server Auth Password', isRequired: true },
-  'decision': { keyVar: 'JEV_MCP_KEY', passVar: 'JEV_DECISION_SECRET', keyLabel: 'JEV Decision Loop Key', passLabel: 'Auth Secret', isRequired: true },
-  'jev-mcp': { keyVar: 'JEV_MCP_KEY', passVar: 'JEV_MCP_TOKEN', keyLabel: 'JEV MCP Knowledge Key', passLabel: 'Bearer Token', isRequired: true },
-  
-  // Agent & Automation
+  // Agent Desktop (Anthropic Computer-Use for OS automation)
   'agent-desktop': { keyVar: 'COMPUTER_USE_KEY', passVar: 'OS_DESKTOP_PASSWORD', keyLabel: 'Anthropic Computer-Use Key', passLabel: 'VNC / OS Password', isRequired: true },
   
-  // Knowledge Graph & Database
+  // Neo4J Graph Database (Database credentials)
   'neo4jev': { keyVar: 'NEO4J_URI', passVar: 'NEO4J_PASSWORD', keyLabel: 'Neo4j Bolt URL', passLabel: 'Database Password', isPasswordPrimary: true, isRequired: true },
   
-  // Trading & Web3
+  // JEV Trader (Exchange API & Secret)
   'jev-trader': { keyVar: 'EXCHANGE_API_KEY', passVar: 'EXCHANGE_SECRET', keyLabel: 'Exchange API Key', passLabel: 'Exchange Secret / Password', isRequired: true },
-  'prism': { keyVar: 'PRISM_API_KEY', passVar: 'PRISM_WALLET_SECRET', keyLabel: 'Prism Persona Key', passLabel: 'Wallet Secret / Password', isRequired: true },
-  'onevonejev': { keyVar: 'ONEVONE_API_KEY', passVar: 'REFEREE_PASSWORD', keyLabel: 'Referee API Key', passLabel: 'Judge Auth Password', isRequired: true },
   
-  // Media & Video Generative
-  'higgsfield-video-explainer': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield Video Key', passLabel: 'Secret', isRequired: true },
-  'higgsfield-brandkit': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
-  'higgsfield-websites': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
-  'higgsfield-youtube-thumbnail': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
-  'higgsfield-marketplace-cards': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
-  'higgsfield-product-photoshoot': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
-  'higgsfield-generate': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield CLI Key', passLabel: 'Secret', isRequired: true },
-  'higgsfield-soul-id': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Soul-ID Key', passLabel: 'Secret', isRequired: true },
-  'seedance2-skill': { keyVar: 'SEEDANCE_API_KEY', passVar: 'SEEDANCE_SECRET', keyLabel: 'SeeDance 2.0 API Key', passLabel: 'Cinematic Secret', isRequired: true },
+  // TypeSafe MCP Server (Remote MCP auth)
+  'typesafe-mcp': { keyVar: 'TYPESAFE_MCP_KEY', passVar: 'TYPESAFE_MCP_AUTH', keyLabel: 'TypeSafe MCP Server Key', passLabel: 'Server Auth Password', isRequired: true },
   
-  // Design, GPT & Vision
+  // GPT-4o Multi-modal Vision & Landing
   'gpt-tasteskill': { keyVar: 'OPENAI_API_KEY', passVar: 'OPENAI_ORG_ID', keyLabel: 'OpenAI API Key', passLabel: 'Organization ID', isRequired: true },
   'image-to-code-skill': { keyVar: 'OPENAI_API_KEY', passVar: 'VISION_API_KEY', keyLabel: 'GPT-4o Vision Key', passLabel: 'Vision Secret', isRequired: true },
-  'json-render': { keyVar: 'OPENAI_API_KEY', passVar: 'ANTHROPIC_API_KEY', keyLabel: 'OpenAI Key', passLabel: 'Anthropic Key', isRequired: true },
-  'maptoposter': { keyVar: 'MAPBOX_TOKEN', passVar: 'GEO_API_KEY', keyLabel: 'Mapbox Access Token', passLabel: 'Vector Secret', isRequired: true },
   
-  // Review, Gate & Verifiers
-  'semdecide': { keyVar: 'SEMDECIDE_API_KEY', passVar: 'DECISION_SECRET', keyLabel: 'SemDecide API Key', passLabel: 'Cluster Secret', isRequired: true },
-  'canny-verifier': { keyVar: 'CANNY_API_KEY', passVar: 'CANNY_SECRET', keyLabel: 'Canny Guardrail Key', passLabel: 'Policy Password', isRequired: true },
-  'killmyidea': { keyVar: 'KILLMYIDEA_KEY', passVar: 'GATE_SECRET', keyLabel: 'Feature Gate Key', passLabel: 'Gatekeeper Password', isRequired: true },
-  'winnow': { keyVar: 'WINNOW_API_KEY', passVar: 'TOKEN_PRUNER_SECRET', keyLabel: 'Winnow Token Key', passLabel: 'Secret', isRequired: true },
-  'blink': { keyVar: 'BLINK_API_KEY', passVar: 'INSTANT_FIX_KEY', keyLabel: 'Blink API Key', passLabel: 'Secret', isRequired: true },
-  'jev-review': { keyVar: 'JEV_REVIEW_KEY', passVar: 'DIFF_AUDIT_SECRET', keyLabel: 'JEV Review Key', passLabel: 'Audit Password', isRequired: true },
-  'jev-ultrafast': { keyVar: 'BROWSER_USE_KEY', passVar: 'PLAYWRIGHT_AUTH', keyLabel: 'Browser-Use Key', passLabel: 'Remote CDP Password', isRequired: true },
-  'fast-jev-compaction': { keyVar: 'COMPACTION_API_KEY', passVar: 'CACHE_SECRET', keyLabel: 'Compactor Key', passLabel: 'Cache Password', isRequired: true },
-  'impeccable': { keyVar: 'DESIGN_CRITIQUE_KEY', passVar: 'AI_CRITIQUE_PASS', keyLabel: 'Critique API Key', passLabel: 'Audit Password', isRequired: true }
+  // SeeDance 2.0 Cinematic Engine (AI Video Platform)
+  'seedance2-skill': { keyVar: 'SEEDANCE_API_KEY', passVar: 'SEEDANCE_SECRET', keyLabel: 'SeeDance 2.0 API Key', passLabel: 'Cinematic Secret', isRequired: true },
+  
+  // Higgsfield AI Media (Cloud Generation Pipelines)
+  'higgsfield-brandkit': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
+  'higgsfield-generate': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield CLI Key', passLabel: 'Secret', isRequired: true },
+  
+  // Prism Engine (Wallet credentials)
+  'prism': { keyVar: 'PRISM_API_KEY', passVar: 'PRISM_WALLET_SECRET', keyLabel: 'Prism Persona Key', passLabel: 'Wallet Secret / Password', isRequired: true }
 };
 
 let activeSkillCredTarget = null;
 
 function getSkillCredentialInfo(s) {
-  const custom = SKILL_CRED_MAP[s.id] || {};
-  const keyVar = custom.keyVar || (s.apiKeyName || (s.id.toUpperCase().replace(/-/g, '_') + '_API_KEY'));
-  const passVar = custom.passVar || (s.id.toUpperCase().replace(/-/g, '_') + '_PASSWORD');
-  const isPasswordPrimary = Boolean(custom.isPasswordPrimary);
-  const isRequired = Boolean(custom.isRequired || s.requiresApiKey);
+  // STRICT: Only skills explicitly configured in SKILL_CRED_MAP or with s.requiresApiKey qualify
+  const custom = SKILL_CRED_MAP[s.id];
+  if (!custom && !s.requiresApiKey) {
+    return {
+      isRequired: false,
+      hasCredentials: false
+    };
+  }
+
+  const def = custom || {};
+  const keyVar = def.keyVar || s.apiKeyName || (s.id.toUpperCase().replace(/-/g, '_') + '_API_KEY');
+  const passVar = def.passVar || (s.id.toUpperCase().replace(/-/g, '_') + '_PASSWORD');
+  const isPasswordPrimary = Boolean(def.isPasswordPrimary);
   
-  // Check localStorage
   const savedKey = localStorage.getItem('apikey_' + keyVar) || localStorage.getItem('apikey_' + s.id) || '';
   const savedPass = localStorage.getItem('password_' + passVar) || localStorage.getItem('password_' + s.id) || '';
   const isConfigured = Boolean(savedKey.trim() || savedPass.trim());
@@ -4331,14 +4351,42 @@ function getSkillCredentialInfo(s) {
   return {
     keyVar,
     passVar,
-    keyLabel: custom.keyLabel || `${s.name} API Key`,
-    passLabel: custom.passLabel || `${s.name} Password`,
+    keyLabel: def.keyLabel || `${s.name} API Key`,
+    passLabel: def.passLabel || `${s.name} Password`,
     isPasswordPrimary,
-    isRequired,
+    isRequired: true,
+    hasCredentials: true,
     savedKey,
     savedPass,
     isConfigured
   };
+}
+
+function renderSkillHeaderKeyBadge(s) {
+  const info = getSkillCredentialInfo(s);
+  if (!info.hasCredentials) return '';
+  
+  const isPass = info.isPasswordPrimary;
+  const sym = isPass ? '🔒' : '🔑';
+  const label = isPass ? 'Password' : 'Key';
+  
+  if (info.isConfigured) {
+    return `
+      <button class="skill-key-badge saved" 
+              onclick="event.stopPropagation(); openDirectSkillCredentialModal('${s.id}')" 
+              title="Configured in localStorage - Click to view or edit ${isPass ? info.passVar : info.keyVar}">
+        ✓ ${sym} ${label} Saved
+      </button>
+    `;
+  } else {
+    return `
+      <button class="skill-key-badge needed ${isPass ? 'pass' : ''}" 
+              onclick="event.stopPropagation(); openDirectSkillCredentialModal('${s.id}')" 
+              title="Requires ${isPass ? info.passVar : info.keyVar} - Click to configure">
+        ${sym} Requires ${label}
+      </button>
+    `;
+  }
 }
 
 function openDirectSkillCredentialModal(skillId) {
@@ -5169,20 +5217,20 @@ function renderCenter() {
                     </div>
 
                   </div>
-                  <!-- Circular Checkmark Badge (Image 4) -->
-                  <div class="check-pill">
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    ${renderSkillHeaderKeyBadge(s)}
+                    <!-- Circular Checkmark Badge -->
+                    <div class="check-pill">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
 
                 <div class="card-body" style="margin-top:10px;">
                   <div class="card-title">${s.name}</div>
                   <div class="card-desc">${s.desc}</div>
-                  <div class="card-cred-bar">
-                    ${getCardCredentialBadgeHtml(s)}
-                  </div>
                 </div>
               </div>
 
@@ -5196,16 +5244,9 @@ function renderCenter() {
                   </div>
                 ` : '<span></span>'}
 
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <button class="btn-gh btn-gh-sm btn-cred-trigger ${isSkillCredConfigured(s) ? 'configured' : ''}" 
-                          onclick="event.stopPropagation(); openDirectSkillCredentialModal('${s.id}')" 
-                          title="Configure API key, token, or password for ${s.name}">
-                    <span>🔑</span> / <span>🔒</span> ${isSkillCredConfigured(s) ? 'Key Saved' : 'Add Key / Pass'}
-                  </button>
-                  <button class="btn-gh btn-gh-sm btn-gh-ghost" onclick="openInspect('${s.id}')" title="Inspect README details">
-                    Inspect
-                  </button>
-                </div>
+                <button class="btn-gh btn-gh-sm btn-gh-ghost" onclick="openInspect('${s.id}')" title="Inspect README details">
+                  Inspect
+                </button>
               </div>
             </div>
           `;
