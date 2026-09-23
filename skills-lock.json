@@ -1,0 +1,848 @@
+{
+  "version": 1,
+  "skills": {
+    "brandkit": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/brandkit/SKILL.md",
+      "computedHash": "b63012f3c3d21197e0185d3e9cc7ec40c589fb10e0b5a32a561739de31aa3f20"
+    },
+    "design-taste-frontend": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/taste-skill/SKILL.md",
+      "computedHash": "6d838b246d0e35d0b53f4f23f98ba7a1dd561937e64f7d0c7553b0928e376c3e"
+    },
+    "design-taste-frontend-v1": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/taste-skill-v1/SKILL.md",
+      "computedHash": "d704ab912c4d0ca954ffa858983da755ae4cd5cad9ba22554db5557382f5bd34"
+    },
+    "full-output-enforcement": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/output-skill/SKILL.md",
+      "computedHash": "26bd29ce4c5e02c7666b2d503609bf466bd32290822e91f0e984147048dbb924"
+    },
+    "gpt-taste": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/gpt-tasteskill/SKILL.md",
+      "computedHash": "cc8f0c601d8240a124e1d11634351a2be7b8a72fd807c75e5b6bf7afcd5ddee0"
+    },
+    "high-end-visual-design": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/soft-skill/SKILL.md",
+      "computedHash": "7db385e4c5370e5a7fca9704a1361b056e4504ea6a03924bb86f33a4f00b5c73"
+    },
+    "image-to-code": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/image-to-code-skill/SKILL.md",
+      "computedHash": "58517b03b2a01f4c9ba65861559d03df931400871bbc200978c975b24bb92c73"
+    },
+    "imagegen-frontend-mobile": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/imagegen-frontend-mobile/SKILL.md",
+      "computedHash": "9ab7f4f6ce66a3cff02bbf5894e5bd5af50bf5d6ef0adffdc88e8fab772fe44f"
+    },
+    "imagegen-frontend-web": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/imagegen-frontend-web/SKILL.md",
+      "computedHash": "65f5ae59fa317567809438310b1c54f78cd133426deb43e4d3d4ca4c8f541628"
+    },
+    "industrial-brutalist-ui": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/brutalist-skill/SKILL.md",
+      "computedHash": "8fc355c4aadb7d29c53ca28bc41be3cd6eea765d121e3737c4dc2d0f90a8effa"
+    },
+    "minimalist-ui": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/minimalist-skill/SKILL.md",
+      "computedHash": "08873a3131d3be27bef9bf3304b310b16b44ca6e3561aebe532797be3443f6bd"
+    },
+    "redesign-existing-projects": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/redesign-skill/SKILL.md",
+      "computedHash": "b405eee0e0e80fc243f731d9aa368bca307e356db7e6157d27101d369dac6726"
+    },
+    "stitch-design-taste": {
+      "source": ".agents/taste-skill",
+      "sourceUrl": ".agents/taste-skill",
+      "sourceType": "git",
+      "skillPath": "skills/stitch-skill/SKILL.md",
+      "computedHash": "13322f38406cd3abf16ba45e35bdc9b18002d0153a79b4612b97aefc65d5a335"
+    },
+    "taste-skill": {
+      "clonedTo": ".claude-skills/taste-skill",
+      "addedOn": "2026-09-17",
+      "description": "Design taste framework. Editorial hierarchy, bento layouts, typography taste.",
+      "repo": "https://github.com/leonxlnx/taste-skill",
+      "agentSkillPath": ".claude-skills/taste-skill/skills/"
+    },
+    "impeccable": {
+      "clonedTo": ".claude-skills/impeccable",
+      "addedOn": "2026-09-17",
+      "description": "Impeccable design system. Apple 8 principles, warm minimalism, anti-patterns.",
+      "repo": "https://github.com/pbakaus/impeccable",
+      "agentSkillPath": ".claude-skills/impeccable/AGENTS.md"
+    },
+    "seedance2-skill": {
+      "clonedTo": ".claude-skills/seedance2-skill",
+      "addedOn": "2026-09-17",
+      "description": "Seedance 2.0 video generation. 10 scenarios, cinematic prompts, camera motion.",
+      "repo": "https://github.com/dexhunter/seedance2-skill",
+      "agentSkillPath": ".claude-skills/seedance2-skill/SKILL.md"
+    },
+    "emilkowalski-skills": {
+      "clonedTo": ".claude-skills/emilkowalski-skills",
+      "addedOn": "2026-09-17",
+      "description": "Emil Kowalski animation skills. animate, improve, find-opportunities, vocabulary.",
+      "repo": "https://github.com/emilkowalski/skills",
+      "agentSkillPath": ".claude-skills/emilkowalski-skills/skills/"
+    },
+    "motion-dev-animations-skill": {
+      "clonedTo": ".claude-skills/motion-dev-animations-skill",
+      "addedOn": "2026-09-17",
+      "description": "Motion.dev v11 deep animation skill. Spring physics, GPU-only, 60fps, prefers-reduced-motion.",
+      "repo": "https://github.com/199-biotechnologies/motion-dev-animations-skill",
+      "agentSkillPath": ".claude-skills/motion-dev-animations-skill/SKILL.md"
+    },
+    "gsap-skills": {
+      "clonedTo": ".claude-skills/gsap-skills",
+      "addedOn": "2026-09-17",
+      "description": "Official GreenSock GSAP skill suite. Core, ScrollTrigger, Timeline, React, Plugins.",
+      "repo": "https://github.com/greensock/gsap-skills",
+      "agentSkillPath": ".claude-skills/gsap-skills/skills/"
+    },
+    "claudedesignskills": {
+      "clonedTo": ".claude-skills/claudedesignskills",
+      "addedOn": "2026-09-17",
+      "description": "Full design system for Claude projects. Tokens, typography, components.",
+      "repo": "https://github.com/freshtechbro/claudedesignskills",
+      "agentSkillPath": ".claude-skills/claudedesignskills/CLAUDE.md"
+    },
+    "maptoposter": {
+      "clonedTo": ".claude-skills/maptoposter",
+      "addedOn": "2026-09-17",
+      "description": "Python CLI to generate map poster art from OpenStreetMap data. 20+ themes.",
+      "repo": "https://github.com/originalankur/maptoposter",
+      "agentSkillPath": ".claude-skills/maptoposter/SKILL.md"
+    },
+    "higgsfield-skills": {
+      "clonedTo": ".claude-skills/higgsfield-skills",
+      "addedOn": "2026-09-17",
+      "description": "Higgsfield AI skill suite. Generate, brandkit, soul-id, product-photoshoot, explainer, thumbnails.",
+      "repo": "https://github.com/higgsfield-ai/skills",
+      "agentSkillPath": ".claude-skills/higgsfield-skills/"
+    },
+    "appllama-design": {
+      "source": ".agents/skills/appllama-design",
+      "sourceUrl": "https://github.com/Appllama/appllama-skills",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Mobile UX intelligence benchmarked on 25k+ iOS apps. Finch-style microcopy and Lungy breathing animations.",
+      "skillPath": ".agents/skills/appllama-design/SKILL.md"
+    },
+    "canny-verifier": {
+      "source": ".agents/skills/canny-verifier",
+      "sourceUrl": "https://github.com/qkal/Canny",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Objective verification referee for AI coding agents. Diff proof and guardrail gating.",
+      "skillPath": ".agents/skills/canny-verifier/SKILL.md"
+    },
+    "jev-decision": {
+      "source": ".agents/skills/jev-decision",
+      "sourceUrl": "https://github.com/AnotiaWang/awesome-jev",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "JEV System One rapid decision primitives, gating, task routing, and context compaction.",
+      "skillPath": ".agents/skills/jev-decision/SKILL.md"
+    },
+    "jev-ultrafast": {
+      "source": ".agents/skills/jev-ultrafast",
+      "sourceUrl": "https://github.com/browser-use/jev-ultrafast",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Sub-second browser automation agent where DOM next-actions are decided by fast Jev scoring.",
+      "skillPath": ".agents/skills/jev-ultrafast/SKILL.md"
+    },
+    "fast-jev-compaction": {
+      "source": ".agents/skills/fast-jev-compaction",
+      "sourceUrl": "https://github.com/tamaratran/fast-jev-compaction",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Token-efficient context compaction plugin replacing slow LLM summarization with Jev typed pruning.",
+      "skillPath": ".agents/skills/fast-jev-compaction/SKILL.md"
+    },
+    "json-render": {
+      "source": ".agents/skills/json-render",
+      "sourceUrl": "https://github.com/vercel-labs/json-render",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Vercel Labs generative UI catalog emitting validated JSON for zero-XSS, non-hallucinating component rendering.",
+      "skillPath": ".agents/skills/json-render/SKILL.md"
+    },
+    "typesafe-mcp": {
+      "source": ".agents/skills/typesafe-mcp",
+      "sourceUrl": "https://github.com/itsmostafa/typesafe-mcp",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Core MCP server exposing Jev System One decision primitives (Choice, Score, Noul) to AI agents.",
+      "skillPath": ".agents/skills/typesafe-mcp/SKILL.md"
+    },
+    "jev-mcp": {
+      "source": ".agents/skills/jev-mcp",
+      "sourceUrl": "https://github.com/jkudish/jev-mcp",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Community MCP server enabling agents to offload verification, prompt-injection defense, and output ranking to Jev.",
+      "skillPath": ".agents/skills/jev-mcp/SKILL.md"
+    },
+    "semdecide": {
+      "source": ".agents/skills/semdecide",
+      "sourceUrl": "https://github.com/sharziki/semdecide",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Unix pipe CLI utility bringing Jev semantic filtering and classification into bash/zsh pipelines.",
+      "skillPath": ".agents/skills/semdecide/SKILL.md"
+    },
+    "jev-codex-router": {
+      "source": ".agents/skills/jev-codex-router",
+      "sourceUrl": "https://github.com/0xNatoshi/jev-codex-router",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Fast coding task complexity router evaluating turns in <100ms to dispatch between Flash and Reasoning models.",
+      "skillPath": ".agents/skills/jev-codex-router/SKILL.md"
+    },
+    "winnow": {
+      "source": ".agents/skills/winnow",
+      "sourceUrl": "https://github.com/GhalebDweikat/Winnow",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Coding agent garbage collector that eliminates noise from terminal, grep, and repeat file reads.",
+      "skillPath": ".agents/skills/winnow/SKILL.md"
+    },
+    "jev-review": {
+      "source": ".agents/skills/jev-review",
+      "sourceUrl": "https://github.com/devagrawal09/jev-review",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Pre-flight git diff reviewer scoring PRs and commits on security, breaking changes, and style.",
+      "skillPath": ".agents/skills/jev-review/SKILL.md"
+    },
+    "blink": {
+      "source": ".agents/skills/blink",
+      "sourceUrl": "https://github.com/ellipsis-dev/blink",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Semantic codebase navigator that scores directories and candidate files to jump to target locations in milliseconds.",
+      "skillPath": ".agents/skills/blink/SKILL.md"
+    },
+    "agent-desktop": {
+      "source": ".agents/skills/agent-desktop",
+      "sourceUrl": "https://github.com/lahfir/agent-desktop",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Native desktop accessibility tree automation where Jev decides element interactions.",
+      "skillPath": ".agents/skills/agent-desktop/SKILL.md"
+    },
+    "typesafe-mario": {
+      "source": ".agents/skills/typesafe-mario",
+      "sourceUrl": "https://github.com/fhshaik/typesafe-mario",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Real-time emulator controller where Jev makes discrete frame-level gameplay decisions from RAM state.",
+      "skillPath": ".agents/skills/typesafe-mario/SKILL.md"
+    },
+    "jev-drone": {
+      "source": ".agents/skills/jev-drone",
+      "sourceUrl": "https://github.com/RomanSlack/jev-drone",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Tactical flight decision controller in MuJoCo physics simulation operating at 2.5Hz.",
+      "skillPath": ".agents/skills/jev-drone/SKILL.md"
+    },
+    "onevonejev": {
+      "source": ".agents/skills/onevonejev",
+      "sourceUrl": "https://github.com/emrickgarrett/OneVOneJev",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Tactical 1v1 first-person shooter game decision agent evaluating combat state ticks.",
+      "skillPath": ".agents/skills/onevonejev/SKILL.md"
+    },
+    "jev-trader": {
+      "source": ".agents/skills/jev-trader",
+      "sourceUrl": "https://github.com/jarrodwatts/jev-trader",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "High-frequency market-making agent evaluating order book spreads on Monad testnet.",
+      "skillPath": ".agents/skills/jev-trader/SKILL.md"
+    },
+    "prism": {
+      "source": "irfndi/prism-liquidity-agent",
+      "sourceUrl": "https://github.com/irfndi/prism-liquidity-agent",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "DeFi liquidity intelligence agent detecting toxic order flow and market pool stress.",
+      "skillPath": ".agents/skills/prism/SKILL.md"
+    },
+    "neo4jev": {
+      "source": ".agents/skills/neo4jev",
+      "sourceUrl": "https://github.com/jexp/neo4jev",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Semantic pathfinding agent for Neo4j knowledge graphs using Jev to score relationship edges.",
+      "skillPath": ".agents/skills/neo4jev/SKILL.md"
+    },
+    "jev-curate": {
+      "source": "AkashPriyadarshii/jev-curate",
+      "sourceUrl": "https://github.com/AkashPriyadarshii/jev-curate",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "High-throughput dataset quality filter scoring JSONL and Parquet data rows.",
+      "skillPath": ".agents/skills/jev-curate/SKILL.md"
+    },
+    "killmyidea": {
+      "source": ".agents/skills/killmyidea",
+      "sourceUrl": "https://github.com/monteduro/killmyidea",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Harsh product idea validator scoring viability and labeling concepts as KILL, FIX, or SHIP.",
+      "skillPath": ".agents/skills/killmyidea/SKILL.md"
+    },
+    "awesome-jev": {
+      "source": ".agents/skills/awesome-jev",
+      "sourceUrl": "https://github.com/AnotiaWang/awesome-jev",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-22",
+      "description": "Master curated directory of all Jev models, MCPs, patterns, and prompt structures.",
+      "skillPath": ".agents/skills/awesome-jev/SKILL.md"
+    },
+    "decision": {
+      "source": "itsmostafa/typesafe-mcp",
+      "sourceUrl": "https://github.com/itsmostafa/typesafe-mcp",
+      "sourceType": "git",
+      "description": "Primary System One decision engine orchestrating sub-second choices across tasks.",
+      "files": [
+        ".agents/skills/typesafe-mcp/SKILL.md",
+        ".agents/skills/canny-verifier/SKILL.md"
+      ]
+    },
+    "claudedesignskills-threejs-webgl": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Three.js scene rendering, camera controls, materials, and lighting.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-threejs-webgl/SKILL.md"
+      ]
+    },
+    "claudedesignskills-react-three-fiber": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Declarative 3D scenes in React using R3F and Drei.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-react-three-fiber/SKILL.md"
+      ]
+    },
+    "claudedesignskills-spline-interactive": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Embed interactive Spline 3D objects with event listeners.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-spline-interactive/SKILL.md"
+      ]
+    },
+    "claudedesignskills-lottie-animations": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Vector JSON animations for micro-interactions and loading states.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-lottie-animations/SKILL.md"
+      ]
+    },
+    "claudedesignskills-rive-interactive": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Interactive vector state machine graphics with inputs and triggers.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-rive-interactive/SKILL.md"
+      ]
+    },
+    "claudedesignskills-babylonjs-engine": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Enterprise WebGL game engine for complex spatial environments.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-babylonjs-engine/SKILL.md"
+      ]
+    },
+    "claudedesignskills-barba-js": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Fluid page transitions without full page refreshes.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-barba-js/SKILL.md"
+      ]
+    },
+    "claudedesignskills-animejs": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Staggered micro-animations, SVG path morphs, and timelines.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-animejs/SKILL.md"
+      ]
+    },
+    "claudedesignskills-pixijs-2d": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Hardware-accelerated 2D WebGL renderer for thousands of moving sprites.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-pixijs-2d/SKILL.md"
+      ]
+    },
+    "claudedesignskills-react-spring-physics": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Physics-based spring animations for fluid and natural UI elements.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-react-spring-physics/SKILL.md"
+      ]
+    },
+    "claudedesignskills-locomotive-scroll": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Smooth virtual scrolling, parallax effects, and scroll position tracking.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-locomotive-scroll/SKILL.md"
+      ]
+    },
+    "claudedesignskills-playcanvas-engine": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Lightweight high-performance WebGL game and rendering engine.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-playcanvas-engine/SKILL.md"
+      ]
+    },
+    "claudedesignskills-substance-3d-texturing": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "PBR material textures, metallic roughness maps, and realistic surface shaders.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-substance-3d-texturing/SKILL.md"
+      ]
+    },
+    "claudedesignskills-motion-framer": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Declarative React animation library for gestures, drag, and component layoutId morphs.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-motion-framer/SKILL.md"
+      ]
+    },
+    "claudedesignskills-modern-web-design": {
+      "source": "freshtechbro/claudedesignskills",
+      "sourceUrl": "https://github.com/freshtechbro/claudedesignskills",
+      "sourceType": "git",
+      "description": "Modern responsive typography, micro-states, dark mode palettes, and layout rhythm.",
+      "files": [
+        "~/.gemini/config/skills/claudedesignskills-modern-web-design/SKILL.md"
+      ]
+    },
+    "motion-dev-animations": {
+      "source": "199-biotechnologies/motion-dev-animations-skill",
+      "sourceUrl": "https://github.com/199-biotechnologies/motion-dev-animations-skill",
+      "sourceType": "git",
+      "description": "GPU-only transform/opacity animations, spring physics, layoutId transitions, and accessible motion.",
+      "files": [
+        "~/.gemini/config/skills/motion-dev-animations-skill/SKILL.md"
+      ]
+    },
+    "gsap-core": {
+      "source": "greensock/gsap-skills",
+      "sourceUrl": "https://github.com/greensock/gsap-skills",
+      "sourceType": "git",
+      "description": "High-performance JavaScript animation engine for properties, SVG, and CSS.",
+      "files": [
+        "~/.gemini/config/skills/gsap-skills-gsap-core/SKILL.md"
+      ]
+    },
+    "gsap-react": {
+      "source": "greensock/gsap-skills",
+      "sourceUrl": "https://github.com/greensock/gsap-skills",
+      "sourceType": "git",
+      "description": "React integration hook managing scoping and automatic context cleanup.",
+      "files": [
+        "~/.gemini/config/skills/gsap-skills-gsap-react/SKILL.md"
+      ]
+    },
+    "gsap-scrolltrigger": {
+      "source": "greensock/gsap-skills",
+      "sourceUrl": "https://github.com/greensock/gsap-skills",
+      "sourceType": "git",
+      "description": "Scroll-driven animations, pinning, and scrubbed playback.",
+      "files": [
+        "~/.gemini/config/skills/gsap-skills-gsap-scrolltrigger/SKILL.md"
+      ]
+    },
+    "gsap-performance": {
+      "source": "greensock/gsap-skills",
+      "sourceUrl": "https://github.com/greensock/gsap-skills",
+      "sourceType": "git",
+      "description": "60fps animation optimization, will-change management, and GPU compositing.",
+      "files": [
+        "~/.gemini/config/skills/gsap-skills-gsap-performance/SKILL.md"
+      ]
+    },
+    "gsap-frameworks": {
+      "source": "greensock/gsap-skills",
+      "sourceUrl": "https://github.com/greensock/gsap-skills",
+      "sourceType": "git",
+      "description": "Integration patterns for Next.js App Router, Vite, and Nuxt SSR lifecycle.",
+      "files": [
+        "~/.gemini/config/skills/gsap-skills-gsap-frameworks/SKILL.md"
+      ]
+    },
+    "gsap-timeline": {
+      "source": "greensock/gsap-skills",
+      "sourceUrl": "https://github.com/greensock/gsap-skills",
+      "sourceType": "git",
+      "description": "Multi-stage timeline sequencing with relative offsets, labels, and callbacks.",
+      "files": [
+        "~/.gemini/config/skills/gsap-skills-gsap-timeline/SKILL.md"
+      ]
+    },
+    "gsap-utils": {
+      "source": "greensock/gsap-skills",
+      "sourceUrl": "https://github.com/greensock/gsap-skills",
+      "sourceType": "git",
+      "description": "Utility methods: mapRange, interpolate, snap, wrap, and normalize.",
+      "files": [
+        "~/.gemini/config/skills/gsap-skills-gsap-utils/SKILL.md"
+      ]
+    },
+    "gsap-plugins": {
+      "source": "greensock/gsap-skills",
+      "sourceUrl": "https://github.com/greensock/gsap-skills",
+      "sourceType": "git",
+      "description": "Official plugins: Flip, Draggable, MotionPath, and TextPlugin.",
+      "files": [
+        "~/.gemini/config/skills/gsap-skills-gsap-plugins/SKILL.md"
+      ]
+    },
+    "higgsfield-video-explainer": {
+      "source": "higgsfield-ai/skills",
+      "sourceUrl": "https://github.com/higgsfield-ai/skills",
+      "sourceType": "git",
+      "description": "AI video explainer generation and cinematic storyboard prompt engineering.",
+      "files": [
+        "~/.gemini/config/skills/higgsfield-skills-higgsfield-video-explainer/SKILL.md"
+      ]
+    },
+    "higgsfield-brandkit": {
+      "source": "higgsfield-ai/skills",
+      "sourceUrl": "https://github.com/higgsfield-ai/skills",
+      "sourceType": "git",
+      "description": "Extracts brand guidelines, generates harmonious color palettes, and outputs PPTX slides.",
+      "files": [
+        "~/.gemini/config/skills/higgsfield-skills-higgsfield-brandkit/SKILL.md"
+      ]
+    },
+    "higgsfield-websites": {
+      "source": "higgsfield-ai/skills",
+      "sourceUrl": "https://github.com/higgsfield-ai/skills",
+      "sourceType": "git",
+      "description": "Generative website hero backgrounds, motion video loops, and responsive assets.",
+      "files": [
+        "~/.gemini/config/skills/higgsfield-skills-higgsfield-websites/SKILL.md"
+      ]
+    },
+    "higgsfield-youtube-thumbnail": {
+      "source": "higgsfield-ai/skills",
+      "sourceUrl": "https://github.com/higgsfield-ai/skills",
+      "sourceType": "git",
+      "description": "High-CTR YouTube thumbnail prompt design with bold typography and contrast.",
+      "files": [
+        "~/.gemini/config/skills/higgsfield-skills-higgsfield-youtube-thumbnail/SKILL.md"
+      ]
+    },
+    "higgsfield-marketplace-cards": {
+      "source": "higgsfield-ai/skills",
+      "sourceUrl": "https://github.com/higgsfield-ai/skills",
+      "sourceType": "git",
+      "description": "Commercial marketplace card layouts and asset scaling guidelines.",
+      "files": [
+        "~/.gemini/config/skills/higgsfield-skills-higgsfield-marketplace-cards/SKILL.md"
+      ]
+    },
+    "higgsfield-product-photoshoot": {
+      "source": "higgsfield-ai/skills",
+      "sourceUrl": "https://github.com/higgsfield-ai/skills",
+      "sourceType": "git",
+      "description": "Photorealistic commercial vehicle photoshoot prompts with studio lighting.",
+      "files": [
+        "~/.gemini/config/skills/higgsfield-skills-higgsfield-product-photoshoot/SKILL.md"
+      ]
+    },
+    "higgsfield-generate": {
+      "source": "higgsfield-ai/skills",
+      "sourceUrl": "https://github.com/higgsfield-ai/skills",
+      "sourceType": "git",
+      "description": "Command-line generate client for automated background media rendering.",
+      "files": [
+        "~/.gemini/config/skills/higgsfield-skills-higgsfield-generate/SKILL.md"
+      ]
+    },
+    "higgsfield-soul-id": {
+      "source": "higgsfield-ai/skills",
+      "sourceUrl": "https://github.com/higgsfield-ai/skills",
+      "sourceType": "git",
+      "description": "Consistent character and persona seed generation across video frames.",
+      "files": [
+        "~/.gemini/config/skills/higgsfield-skills-higgsfield-soul-id/SKILL.md"
+      ]
+    },
+    "brutalist-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceUrl": "https://github.com/leonxlnx/taste-skill",
+      "sourceType": "git",
+      "description": "Monochrome, high-contrast borders, raw telemetry readouts, zero soft gradients.",
+      "files": [
+        "~/.gemini/config/skills/taste-skill-brutalist-skill/SKILL.md"
+      ]
+    },
+    "minimalist-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceUrl": "https://github.com/leonxlnx/taste-skill",
+      "sourceType": "git",
+      "description": "Generous breathing space, subtle warm grays, restrained typography.",
+      "files": [
+        "~/.gemini/config/skills/taste-skill-minimalist-skill/SKILL.md"
+      ]
+    },
+    "image-to-code-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceUrl": "https://github.com/leonxlnx/taste-skill",
+      "sourceType": "git",
+      "description": "Converts mockup screenshots directly to production HTML/Tailwind/Primer code.",
+      "files": [
+        "~/.gemini/config/skills/taste-skill-image-to-code-skill/SKILL.md"
+      ]
+    },
+    "taste-skill-v1": {
+      "source": "leonxlnx/taste-skill",
+      "sourceUrl": "https://github.com/leonxlnx/taste-skill",
+      "sourceType": "git",
+      "description": "Editorial magazine-style layout rules, typography leading, and drop caps.",
+      "files": [
+        "~/.gemini/config/skills/taste-skill-taste-skill-v1/SKILL.md"
+      ]
+    },
+    "gpt-tasteskill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceUrl": "https://github.com/leonxlnx/taste-skill",
+      "sourceType": "git",
+      "description": "GSAP-heavy landing pages with strict AIDA structure and bento grids.",
+      "files": [
+        "~/.gemini/config/skills/taste-skill-gpt-tasteskill/SKILL.md"
+      ]
+    },
+    "soft-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceUrl": "https://github.com/leonxlnx/taste-skill",
+      "sourceType": "git",
+      "description": "Soft surfaces, gentle layered drop-shadows, rounded geometry, and calm accents.",
+      "files": [
+        "~/.gemini/config/skills/taste-skill-soft-skill/SKILL.md"
+      ]
+    },
+    "stitch-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceUrl": "https://github.com/leonxlnx/taste-skill",
+      "sourceType": "git",
+      "description": "Semantic design system primitives and iterative design loops.",
+      "files": [
+        "~/.gemini/config/skills/taste-skill-stitch-skill/SKILL.md"
+      ]
+    },
+    "redesign-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceUrl": "https://github.com/leonxlnx/taste-skill",
+      "sourceType": "git",
+      "description": "Refactors legacy, cluttered interfaces into sleek, modern components.",
+      "files": [
+        "~/.gemini/config/skills/taste-skill-redesign-skill/SKILL.md"
+      ]
+    },
+    "output-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceUrl": "https://github.com/leonxlnx/taste-skill",
+      "sourceType": "git",
+      "description": "Strict rules requiring complete, non-truncated code outputs with zero placeholders.",
+      "files": [
+        "~/.gemini/config/skills/taste-skill-output-skill/SKILL.md"
+      ]
+    },
+    "emil-design-eng": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "60fps interaction engineering, spring damping, and tactile tactile micro-states.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-emil-design-eng/SKILL.md"
+      ]
+    },
+    "animate": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Button clicks, modal entrances, layout morphs, and accordion reveals.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-animate/SKILL.md"
+      ]
+    },
+    "ask-sonner": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Stacked toast notifications with swipe dismissal and action buttons.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-ask-sonner/SKILL.md"
+      ]
+    },
+    "apple-design": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Continuous corner radii, fluid sheets, safe area insets, and iOS gestures.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-apple-design/SKILL.md"
+      ]
+    },
+    "animate-expo": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "React Native & Expo fluid animations with Reanimated 3 and gesture handlers.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-animate-expo/SKILL.md"
+      ]
+    },
+    "find-animation-opportunities": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Systematic code audit identifying high-impact points for micro-animations.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-find-animation-opportunities/SKILL.md"
+      ]
+    },
+    "improve-animations": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Fine-tunes stiffness, damping, mass, and timing curves to eliminate awkward bounces.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-improve-animations/SKILL.md"
+      ]
+    },
+    "review-animations": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Audits animations across 8 categories: FPS, GPU offloading, jank, layout thrash, and a11y.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-review-animations/SKILL.md"
+      ]
+    },
+    "animation-vocabulary": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Precise terms and mathematical formulas for motion: FLIP, layoutId, spring overshoot.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-animation-vocabulary/SKILL.md"
+      ]
+    },
+    "prototype": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Builds interactive throwaway prototypes in code in minutes to test ideas with users.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-prototype/SKILL.md"
+      ]
+    },
+    "mobile-native": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Edge-to-edge layouts, bottom navigation bars, native haptics, and safe-area insets.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-mobile-native/SKILL.md"
+      ]
+    },
+    "write-swift": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Modern SwiftUI views, observation framework, sheets, and Liquid Glass styling.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-write-swift/SKILL.md"
+      ]
+    },
+    "pick-ui-library": {
+      "source": "emilkowalski/skills",
+      "sourceUrl": "https://github.com/emilkowalski/skills",
+      "sourceType": "git",
+      "description": "Objective decision rubric comparing Tailwind, Radix UI, Shadcn, and Mantine.",
+      "files": [
+        "~/.gemini/config/skills/emilkowalski-skills-pick-ui-library/SKILL.md"
+      ]
+    },
+    "appllama-mcp": {
+      "source": "Appllama/appllama-skills",
+      "sourceUrl": "https://github.com/Appllama/appllama-skills",
+      "sourceType": "git",
+      "description": "Model Context Protocol tools connecting mobile component templates, touch gesture primitives, and flow scaffolds.",
+      "files": [
+        ".agents/skills/appllama-design/SKILL.md"
+      ]
+    }
+  }
+}

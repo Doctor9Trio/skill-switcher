@@ -1,0 +1,18 @@
+# Logs & temporary files
+*.log
+*.tmp
+*.temp
+
+# Environment and secrets
+.env
+.env.local
+*.secret
+
+# OS artifacts
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Python cache (if scripts run locally)
+__pycache__/
+*.pyc
