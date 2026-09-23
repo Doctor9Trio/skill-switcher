@@ -998,6 +998,103 @@ html.dark .repo-nav-list::-webkit-scrollbar-thumb:hover {
   flex-shrink: 0;
 }
 
+
+/* ========================================================
+   SKILL CARD CREDENTIAL BAR & PASSWORD SYMBOLS
+   ======================================================== */
+.card-cred-bar {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card-cred-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  border: 1px solid var(--border-default);
+  background: var(--bg-subtle);
+  color: var(--fg-default);
+}
+.card-cred-badge:hover {
+  border-color: var(--accent-blue);
+  background: var(--accent-blue-bg);
+}
+.card-cred-badge.need {
+  border-color: #d4a72c;
+  background: rgba(212, 167, 44, 0.08);
+  color: #9a6700;
+}
+html.dark .card-cred-badge.need {
+  border-color: #bb8009;
+  background: rgba(187, 128, 9, 0.15);
+  color: #d29922;
+}
+.card-cred-badge.saved {
+  border-color: var(--accent-green-border);
+  background: var(--accent-green-bg);
+  color: var(--accent-green);
+}
+
+.cred-sym {
+  font-size: 13px;
+  line-height: 1;
+}
+.cred-name {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+}
+.cred-state-pill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.cred-state-pill.state-need {
+  background: rgba(212, 167, 44, 0.2);
+  color: #7d4e00;
+}
+html.dark .cred-state-pill.state-need {
+  background: rgba(187, 128, 9, 0.3);
+  color: #f0b72f;
+}
+.cred-state-pill.state-saved {
+  background: var(--accent-green);
+  color: #ffffff;
+}
+
+/* Card Footer Credential Button */
+.btn-cred-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  border-color: var(--border-default);
+  background: var(--bg-subtle);
+}
+.btn-cred-trigger:hover {
+  color: var(--accent-blue);
+  border-color: var(--accent-blue-border);
+  background: var(--accent-blue-bg);
+}
+.btn-cred-trigger.configured {
+  color: var(--accent-green);
+  border-color: var(--accent-green-border);
+  background: var(--accent-green-bg);
+}
+
 /* Circular Selection Checkmark Badge on Subskill Card */
 .check-pill {
   width: 20px;
@@ -1738,6 +1835,76 @@ html.dark .repo-nav-list::-webkit-scrollbar-thumb:hover {
       <button class="btn-gh btn-gh-primary" id="modal-toggle-btn" onclick="toggleModalActiveSkill()">
         Select This Skill
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECT SKILL CREDENTIAL & PASSWORD MODAL -->
+<div class="modal-overlay" id="skill-cred-modal-overlay" style="display:none;" onclick="if(event.target===this) closeSkillCredModal()">
+  <div class="modal-window keyvault-window" style="max-width:540px;" onclick="event.stopPropagation()">
+    <div class="keyvault-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:20px;">🔑</span>
+          <span style="font-size:20px;">🔒</span>
+          <span style="font-weight:600;font-size:15px;color:var(--fg-default);" id="scm-title">Configure Skill Credentials</span>
+        </div>
+        <div style="font-size:12px;color:var(--fg-muted);margin-top:2px;" id="scm-subtitle">Appllama / appllama-skills</div>
+      </div>
+      <button class="keyvault-close" onclick="closeSkillCredModal()">&times;</button>
+    </div>
+
+    <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;max-height:calc(85vh - 140px);overflow-y:auto;">
+      <!-- Security Notice -->
+      <div style="font-size:11.5px;color:var(--fg-muted);background:var(--bg-subtle);border:1px solid var(--border-default);border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:8px;">
+        <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="color:var(--accent-green);flex-shrink:0;">
+          <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+        </svg>
+        <span>Stored securely in browser <code>localStorage</code>. Zero server exposure.</span>
+      </div>
+
+      <!-- API Key Field -->
+      <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label style="font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--fg-default);">
+            <span style="font-size:14px;">🔑</span> API Key / Access Token
+          </label>
+          <span class="cred-state-pill" id="scm-key-status">○ Not Set</span>
+        </div>
+        <div style="font-size:11px;color:var(--fg-muted);margin-bottom:8px;">
+          Environment variable: <code id="scm-key-var" style="font-family:'Geist Mono',monospace;font-weight:600;color:var(--accent-blue);">APPLAMA_TOKEN</code>
+        </div>
+        <div class="keyvault-input-wrap">
+          <input type="password" id="scm-key-input" class="keyvault-input" placeholder="Type or paste API key...">
+          <button class="keyvault-eye-btn" onclick="toggleInputVisibility('scm-key-input', this)" title="Show/Hide">👁</button>
+        </div>
+      </div>
+
+      <!-- Password / Secret Field -->
+      <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <label style="font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--fg-default);">
+            <span style="font-size:14px;">🔒</span> Secret Password / Client Secret
+          </label>
+          <span class="cred-state-pill" id="scm-pass-status">○ Not Set</span>
+        </div>
+        <div style="font-size:11px;color:var(--fg-muted);margin-bottom:8px;">
+          Environment variable: <code id="scm-pass-var" style="font-family:'Geist Mono',monospace;font-weight:600;color:var(--accent-blue);">APPLAMA_SECRET</code>
+        </div>
+        <div class="keyvault-input-wrap">
+          <input type="password" id="scm-pass-input" class="keyvault-input" placeholder="Type or paste password or secret...">
+          <button class="keyvault-eye-btn" onclick="toggleInputVisibility('scm-pass-input', this)" title="Show/Hide">👁</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="keyvault-footer" style="display:flex;align-items:center;justify-content:space-between;">
+      <button class="btn-gh btn-gh-ghost" style="color:var(--prism-kw);" onclick="clearSkillCredentials()">Clear</button>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn-gh" onclick="closeSkillCredModal()">Cancel</button>
+        <button class="btn-gh btn-gh-primary" onclick="saveSkillCredentials()">Save to LocalStorage</button>
+      </div>
     </div>
   </div>
 </div>
@@ -4095,6 +4262,215 @@ function filterCategory(cat) {
 // API KEYS & ENVIRONMENT CREDENTIALS VAULT (LOCALSTORAGE)
 // ========================================================
 
+
+// Comprehensive Mapping of Known Skills to API Keys & Passwords
+const SKILL_CRED_MAP = {
+  // Appllama Mobile Suite
+  'appllama-design': { keyVar: 'APPLAMA_TOKEN', passVar: 'APPLAMA_SECRET', keyLabel: 'Appllama / Figma API Key', passLabel: 'Client Secret', isRequired: true },
+  'appllama-mcp': { keyVar: 'APPLAMA_TOKEN', passVar: 'APPLAMA_MCP_SECRET', keyLabel: 'Appllama API Token', passLabel: 'MCP Secret', isRequired: true },
+  
+  // MCP Systems
+  'typesafe-mcp': { keyVar: 'TYPESAFE_MCP_KEY', passVar: 'TYPESAFE_MCP_AUTH', keyLabel: 'TypeSafe MCP Server Key', passLabel: 'Server Auth Password', isRequired: true },
+  'decision': { keyVar: 'JEV_MCP_KEY', passVar: 'JEV_DECISION_SECRET', keyLabel: 'JEV Decision Loop Key', passLabel: 'Auth Secret', isRequired: true },
+  'jev-mcp': { keyVar: 'JEV_MCP_KEY', passVar: 'JEV_MCP_TOKEN', keyLabel: 'JEV MCP Knowledge Key', passLabel: 'Bearer Token', isRequired: true },
+  
+  // Agent & Automation
+  'agent-desktop': { keyVar: 'COMPUTER_USE_KEY', passVar: 'OS_DESKTOP_PASSWORD', keyLabel: 'Anthropic Computer-Use Key', passLabel: 'VNC / OS Password', isRequired: true },
+  
+  // Knowledge Graph & Database
+  'neo4jev': { keyVar: 'NEO4J_URI', passVar: 'NEO4J_PASSWORD', keyLabel: 'Neo4j Bolt URL', passLabel: 'Database Password', isPasswordPrimary: true, isRequired: true },
+  
+  // Trading & Web3
+  'jev-trader': { keyVar: 'EXCHANGE_API_KEY', passVar: 'EXCHANGE_SECRET', keyLabel: 'Exchange API Key', passLabel: 'Exchange Secret / Password', isRequired: true },
+  'prism': { keyVar: 'PRISM_API_KEY', passVar: 'PRISM_WALLET_SECRET', keyLabel: 'Prism Persona Key', passLabel: 'Wallet Secret / Password', isRequired: true },
+  'onevonejev': { keyVar: 'ONEVONE_API_KEY', passVar: 'REFEREE_PASSWORD', keyLabel: 'Referee API Key', passLabel: 'Judge Auth Password', isRequired: true },
+  
+  // Media & Video Generative
+  'higgsfield-video-explainer': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield Video Key', passLabel: 'Secret', isRequired: true },
+  'higgsfield-brandkit': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
+  'higgsfield-websites': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
+  'higgsfield-youtube-thumbnail': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
+  'higgsfield-marketplace-cards': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
+  'higgsfield-product-photoshoot': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield AI Key', passLabel: 'Secret', isRequired: true },
+  'higgsfield-generate': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Higgsfield CLI Key', passLabel: 'Secret', isRequired: true },
+  'higgsfield-soul-id': { keyVar: 'HIGGSFIELD_API_KEY', passVar: 'HIGGSFIELD_SECRET', keyLabel: 'Soul-ID Key', passLabel: 'Secret', isRequired: true },
+  'seedance2-skill': { keyVar: 'SEEDANCE_API_KEY', passVar: 'SEEDANCE_SECRET', keyLabel: 'SeeDance 2.0 API Key', passLabel: 'Cinematic Secret', isRequired: true },
+  
+  // Design, GPT & Vision
+  'gpt-tasteskill': { keyVar: 'OPENAI_API_KEY', passVar: 'OPENAI_ORG_ID', keyLabel: 'OpenAI API Key', passLabel: 'Organization ID', isRequired: true },
+  'image-to-code-skill': { keyVar: 'OPENAI_API_KEY', passVar: 'VISION_API_KEY', keyLabel: 'GPT-4o Vision Key', passLabel: 'Vision Secret', isRequired: true },
+  'json-render': { keyVar: 'OPENAI_API_KEY', passVar: 'ANTHROPIC_API_KEY', keyLabel: 'OpenAI Key', passLabel: 'Anthropic Key', isRequired: true },
+  'maptoposter': { keyVar: 'MAPBOX_TOKEN', passVar: 'GEO_API_KEY', keyLabel: 'Mapbox Access Token', passLabel: 'Vector Secret', isRequired: true },
+  
+  // Review, Gate & Verifiers
+  'semdecide': { keyVar: 'SEMDECIDE_API_KEY', passVar: 'DECISION_SECRET', keyLabel: 'SemDecide API Key', passLabel: 'Cluster Secret', isRequired: true },
+  'canny-verifier': { keyVar: 'CANNY_API_KEY', passVar: 'CANNY_SECRET', keyLabel: 'Canny Guardrail Key', passLabel: 'Policy Password', isRequired: true },
+  'killmyidea': { keyVar: 'KILLMYIDEA_KEY', passVar: 'GATE_SECRET', keyLabel: 'Feature Gate Key', passLabel: 'Gatekeeper Password', isRequired: true },
+  'winnow': { keyVar: 'WINNOW_API_KEY', passVar: 'TOKEN_PRUNER_SECRET', keyLabel: 'Winnow Token Key', passLabel: 'Secret', isRequired: true },
+  'blink': { keyVar: 'BLINK_API_KEY', passVar: 'INSTANT_FIX_KEY', keyLabel: 'Blink API Key', passLabel: 'Secret', isRequired: true },
+  'jev-review': { keyVar: 'JEV_REVIEW_KEY', passVar: 'DIFF_AUDIT_SECRET', keyLabel: 'JEV Review Key', passLabel: 'Audit Password', isRequired: true },
+  'jev-ultrafast': { keyVar: 'BROWSER_USE_KEY', passVar: 'PLAYWRIGHT_AUTH', keyLabel: 'Browser-Use Key', passLabel: 'Remote CDP Password', isRequired: true },
+  'fast-jev-compaction': { keyVar: 'COMPACTION_API_KEY', passVar: 'CACHE_SECRET', keyLabel: 'Compactor Key', passLabel: 'Cache Password', isRequired: true },
+  'impeccable': { keyVar: 'DESIGN_CRITIQUE_KEY', passVar: 'AI_CRITIQUE_PASS', keyLabel: 'Critique API Key', passLabel: 'Audit Password', isRequired: true }
+};
+
+let activeSkillCredTarget = null;
+
+function getSkillCredentialInfo(s) {
+  const custom = SKILL_CRED_MAP[s.id] || {};
+  const keyVar = custom.keyVar || (s.apiKeyName || (s.id.toUpperCase().replace(/-/g, '_') + '_API_KEY'));
+  const passVar = custom.passVar || (s.id.toUpperCase().replace(/-/g, '_') + '_PASSWORD');
+  const isPasswordPrimary = Boolean(custom.isPasswordPrimary);
+  const isRequired = Boolean(custom.isRequired || s.requiresApiKey);
+  
+  // Check localStorage
+  const savedKey = localStorage.getItem('apikey_' + keyVar) || localStorage.getItem('apikey_' + s.id) || '';
+  const savedPass = localStorage.getItem('password_' + passVar) || localStorage.getItem('password_' + s.id) || '';
+  const isConfigured = Boolean(savedKey.trim() || savedPass.trim());
+  
+  return {
+    keyVar,
+    passVar,
+    keyLabel: custom.keyLabel || `${s.name} API Key`,
+    passLabel: custom.passLabel || `${s.name} Password`,
+    isPasswordPrimary,
+    isRequired,
+    savedKey,
+    savedPass,
+    isConfigured
+  };
+}
+
+function openDirectSkillCredentialModal(skillId) {
+  const skill = ALL_SKILLS.find(s => s.id === skillId);
+  if (!skill) return;
+  activeSkillCredTarget = skill;
+  
+  const info = getSkillCredentialInfo(skill);
+  document.getElementById('scm-title').textContent = `Credentials: ${skill.name}`;
+  document.getElementById('scm-subtitle').textContent = `Target Repository: ${skill.repoName || skill.cat}`;
+  
+  document.getElementById('scm-key-var').textContent = info.keyVar;
+  document.getElementById('scm-pass-var').textContent = info.passVar;
+  
+  const keyInput = document.getElementById('scm-key-input');
+  const passInput = document.getElementById('scm-pass-input');
+  keyInput.value = info.savedKey;
+  passInput.value = info.savedPass;
+  
+  updateSkillCredModalStatuses(info);
+  
+  document.getElementById('skill-cred-modal-overlay').style.display = 'flex';
+}
+
+function updateSkillCredModalStatuses(info) {
+  const kStat = document.getElementById('scm-key-status');
+  const pStat = document.getElementById('scm-pass-status');
+  
+  if (info.savedKey) {
+    kStat.className = 'cred-state-pill state-saved';
+    kStat.textContent = '✓ Saved in localStorage';
+  } else {
+    kStat.className = 'cred-state-pill state-need';
+    kStat.textContent = '○ Not Set';
+  }
+  
+  if (info.savedPass) {
+    pStat.className = 'cred-state-pill state-saved';
+    pStat.textContent = '✓ Saved in localStorage';
+  } else {
+    pStat.className = 'cred-state-pill state-need';
+    pStat.textContent = '○ Not Set';
+  }
+}
+
+function closeSkillCredModal() {
+  document.getElementById('skill-cred-modal-overlay').style.display = 'none';
+  activeSkillCredTarget = null;
+}
+
+function saveSkillCredentials() {
+  if (!activeSkillCredTarget) return;
+  const info = getSkillCredentialInfo(activeSkillCredTarget);
+  const keyVal = document.getElementById('scm-key-input').value.trim();
+  const passVal = document.getElementById('scm-pass-input').value.trim();
+  
+  if (keyVal) {
+    localStorage.setItem('apikey_' + info.keyVar, keyVal);
+  } else {
+    localStorage.removeItem('apikey_' + info.keyVar);
+  }
+  
+  if (passVal) {
+    localStorage.setItem('password_' + info.passVar, passVal);
+  } else {
+    localStorage.removeItem('password_' + info.passVar);
+  }
+  
+  showToast(`Saved credentials for ${activeSkillCredTarget.name}!`);
+  closeSkillCredModal();
+  updateUI();
+  updateKeyVaultNavBadge();
+}
+
+function clearSkillCredentials() {
+  if (!activeSkillCredTarget) return;
+  const info = getSkillCredentialInfo(activeSkillCredTarget);
+  localStorage.removeItem('apikey_' + info.keyVar);
+  localStorage.removeItem('apikey_' + activeSkillCredTarget.id);
+  localStorage.removeItem('password_' + info.passVar);
+  localStorage.removeItem('password_' + activeSkillCredTarget.id);
+  
+  document.getElementById('scm-key-input').value = '';
+  document.getElementById('scm-pass-input').value = '';
+  showToast(`Cleared credentials for ${activeSkillCredTarget.name}`);
+  closeSkillCredModal();
+  updateUI();
+  updateKeyVaultNavBadge();
+}
+
+function isSkillCredConfigured(s) {
+  const info = getSkillCredentialInfo(s);
+  return info.isConfigured;
+}
+
+function getCardCredentialBadgeHtml(s) {
+  const info = getSkillCredentialInfo(s);
+  const isPass = info.isPasswordPrimary;
+  const sym = isPass ? '🔒' : '🔑';
+  const label = isPass ? 'Password' : 'API Key';
+  const varName = isPass ? info.passVar : info.keyVar;
+  
+  if (info.isConfigured) {
+    const preview = info.savedKey ? (info.savedKey.slice(0, 4) + '••••') : (info.savedPass ? '••••••••' : '');
+    return `
+      <div class="card-cred-badge saved" onclick="event.stopPropagation(); openDirectSkillCredentialModal('${s.id}')" title="Configured in localStorage - Click to edit or view">
+        <span class="cred-sym">${sym}</span>
+        <span class="cred-name">${label}: <strong>${varName}</strong></span>
+        <span class="cred-state-pill state-saved">✓ Saved (${preview})</span>
+      </div>
+    `;
+  } else if (info.isRequired) {
+    return `
+      <div class="card-cred-badge need" onclick="event.stopPropagation(); openDirectSkillCredentialModal('${s.id}')" title="Credentials required by this skill - Click to add">
+        <span class="cred-sym">${sym}</span>
+        <span class="cred-name">${label}: <strong>${varName}</strong></span>
+        <span class="cred-state-pill state-need">+ Add ${isPass ? 'Pass' : 'Key'}</span>
+      </div>
+    `;
+  } else {
+    // Optional / Custom key available
+    return `
+      <div class="card-cred-badge" onclick="event.stopPropagation(); openDirectSkillCredentialModal('${s.id}')" title="Add custom API key or password to this skill">
+        <span class="cred-sym">${sym}</span>
+        <span class="cred-name" style="color:var(--fg-muted);">${label}: <strong>${varName}</strong></span>
+        <span class="cred-state-pill state-need">+ Configure</span>
+      </div>
+    `;
+  }
+}
+
+
 const KNOWN_API_KEYS = [
   {
     name: "APPLAMA_TOKEN",
@@ -4442,25 +4818,24 @@ function toggleKeyVisibility() {
 function updateModalApiKeySection(s) {
   const row = document.getElementById('modal-apikey-row');
   if (!row) return;
-  if (!s.requiresApiKey) {
-    row.style.display = 'none';
-    return;
-  }
   row.style.display = 'block';
   const helpEl = document.getElementById('modal-apikey-help');
   const statusEl = document.getElementById('modal-apikey-status');
   const input = document.getElementById('modal-apikey-input');
   
-  helpEl.textContent = s.apiKeyHelp || `Required credential: ${s.apiKeyName || 'API Key'}. Stored locally in browser session.`;
-  const isConfigured = isSkillKeyConfigured(s);
-  if (isConfigured) {
-    statusEl.textContent = 'Key Configured';
+  const info = getSkillCredentialInfo(s);
+  helpEl.innerHTML = `<strong>${info.isPasswordPrimary ? '🔒 Password' : '🔑 API Key'}:</strong> <code>${info.isPasswordPrimary ? info.passVar : info.keyVar}</code> &bull; Saved locally in browser localStorage.`;
+  if (info.isConfigured) {
+    statusEl.textContent = '✓ Configured';
     statusEl.className = 'key-status-badge configured';
+  } else if (info.isRequired) {
+    statusEl.textContent = 'Required';
+    statusEl.className = 'key-status-badge';
   } else {
-    statusEl.textContent = 'Key Required';
+    statusEl.textContent = 'Optional';
     statusEl.className = 'key-status-badge';
   }
-  input.value = getSavedApiKey(s);
+  input.value = info.savedKey || info.savedPass || '';
 }
 
 // --- JEV & Skills Educational Guide Modal ---
@@ -4792,13 +5167,7 @@ function renderCenter() {
                     <div class="card-icon-wrap">
                       ${getCategoryIcon(s.cat)}
                     </div>
-                    ${s.requiresApiKey ? `
-                      <span class="api-key-pill ${isSkillKeyConfigured(s) ? 'configured' : ''}" 
-                            onclick="event.stopPropagation(); openKeyVaultFor('${s.apiKeyName || s.id}');"
-                            title="${isSkillKeyConfigured(s) ? 'API Key Configured in Vault - Click to Edit' : 'API Key Required - Click to Configure in Vault'}">
-                        🔑 ${isSkillKeyConfigured(s) ? 'Key Saved' : 'Set ' + (s.apiKeyName || 'API Key')}
-                      </span>
-                    ` : ''}
+
                   </div>
                   <!-- Circular Checkmark Badge (Image 4) -->
                   <div class="check-pill">
@@ -4811,6 +5180,9 @@ function renderCenter() {
                 <div class="card-body" style="margin-top:10px;">
                   <div class="card-title">${s.name}</div>
                   <div class="card-desc">${s.desc}</div>
+                  <div class="card-cred-bar">
+                    ${getCardCredentialBadgeHtml(s)}
+                  </div>
                 </div>
               </div>
 
@@ -4824,9 +5196,16 @@ function renderCenter() {
                   </div>
                 ` : '<span></span>'}
 
-                <button class="btn-gh btn-gh-sm btn-gh-ghost" onclick="openInspect('${s.id}')" title="Inspect README details">
-                  Inspect
-                </button>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <button class="btn-gh btn-gh-sm btn-cred-trigger ${isSkillCredConfigured(s) ? 'configured' : ''}" 
+                          onclick="event.stopPropagation(); openDirectSkillCredentialModal('${s.id}')" 
+                          title="Configure API key, token, or password for ${s.name}">
+                    <span>🔑</span> / <span>🔒</span> ${isSkillCredConfigured(s) ? 'Key Saved' : 'Add Key / Pass'}
+                  </button>
+                  <button class="btn-gh btn-gh-sm btn-gh-ghost" onclick="openInspect('${s.id}')" title="Inspect README details">
+                    Inspect
+                  </button>
+                </div>
               </div>
             </div>
           `;
