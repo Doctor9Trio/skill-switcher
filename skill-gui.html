@@ -858,6 +858,11 @@ html.dark .repo-nav-list::-webkit-scrollbar-thumb:hover {
 }
 
 /* Repository Section Banner (Accordion Card) */
+
+.repo-group-banner.highlight-target {
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 3px var(--accent-blue-bg), var(--shadow-md) !important;
+}
 .repo-group-banner {
   background: var(--bg-card);
   border: 1px solid var(--border-default);
@@ -4482,30 +4487,17 @@ function switchGuideTab(tabId) {
   if (panel) panel.classList.add('active');
 }
 
-function filterCategory(cat) {
-  curCat = cat;
-  selectedRepoId = null;
-  document.querySelectorAll('.subnav-tab').forEach(t => t.classList.remove('active'));
-  const el = document.getElementById('tab-' + cat);
-  if (el) el.classList.add('active');
-  renderSidebarCatPills();
-  renderLeftNav();
-  renderCenter();
-}
-
 function selectRepoNav(id) {
-  selectedRepoId = (selectedRepoId === id) ? null : id;
-  // Automatically expand the chosen repo
-  if (selectedRepoId) {
-    collapsedRepos.delete(selectedRepoId);
-  }
+  selectedRepoId = id;
+  // Automatically expand the chosen repo in the accordion
+  collapsedRepos.delete(id);
   renderLeftNav();
   renderCenter();
-  if (selectedRepoId) {
-    const target = document.getElementById('repo-sec-' + id);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const target = document.getElementById('repo-sec-' + id);
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    target.classList.add('highlight-target');
+    setTimeout(() => target.classList.remove('highlight-target'), 1500);
   }
 }
 
@@ -4606,9 +4598,7 @@ function getFilteredRepos() {
     }
   }
 
-  if (selectedRepoId) {
-    list = list.filter(r => r.id === selectedRepoId);
-  }
+// Keeping all repositories visible in sidebar and feed
 
   if (searchQuery) {
     list = list.filter(r => 
