@@ -1,0 +1,38 @@
+{
+  "mcpServers": {
+    "typesafe-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@itsmostafa/typesafe-mcp"
+      ],
+      "env": {
+        "JEV_DECISION_MODE": "deterministic"
+      }
+    },
+    "jev-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "jev-mcp-server"
+      ]
+    },
+    "json-render": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@vercel/json-render-mcp"
+      ]
+    },
+    "appllama-design": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "appllama-skills"
+      ],
+      "env": {
+        "APPLAMA_TOKEN": "YOUR_APPLAMA_TOKEN_HERE"
+      }
+    }
+  }
+}
