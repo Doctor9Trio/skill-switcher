@@ -255,6 +255,92 @@ html.dark .gh-pill.green {
   gap: 10px;
 }
 
+
+/* ========================================================
+   KEY VAULT MODAL & CREDENTIAL BADGES
+   ======================================================== */
+.keyvault-window {
+  max-width: 780px !important;
+  max-height: 88vh;
+}
+.keyvault-item {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+.keyvault-item:hover {
+  border-color: var(--fg-subtle);
+}
+.keyvault-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.keyvault-name {
+  font-family: 'Geist Mono', monospace;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--fg-default);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.keyvault-desc {
+  font-size: 11px;
+  color: var(--fg-muted);
+  line-height: 1.4;
+}
+.keyvault-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.keyvault-input {
+  flex: 1;
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-card);
+  color: var(--fg-default);
+}
+.keyvault-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+}
+.key-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-family: 'Geist Mono', monospace;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  border: 1px solid rgba(188, 76, 0, 0.3);
+  background: rgba(188, 76, 0, 0.08);
+  color: var(--accent-orange);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.key-pill-badge:hover {
+  background: rgba(188, 76, 0, 0.15);
+}
+.key-pill-badge.configured {
+  border-color: var(--accent-blue-border);
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue);
+}
+.key-pill-badge.configured:hover {
+  background: rgba(9, 105, 218, 0.18);
+}
+
 /* GitHub Buttons */
 /* GitHub Mark Icon Button */
 .btn-gh-icon {
@@ -1333,7 +1419,11 @@ html.dark .repo-nav-list::-webkit-scrollbar-thumb:hover {
       <svg class="octicon" width="12" height="12" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z"></path></svg>
       85 Verified on Disk
     </span>
-        <button class="btn-gh" onclick="openJevGuide()" title="Master guide on using JEV, MCP, and design skills">
+        <button class="btn-gh" onclick="openKeyVaultModal()" title="Manage API keys, tokens, and environment passwords">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M6.5 5.5a4 4 0 1 1 5.656 5.657l-1.077 1.077a.75.75 0 0 1-1.06 0L8.75 11l-.97.97a.75.75 0 0 1-1.06 0L5.45 10.7a.75.75 0 0 1 0-1.06l1.05-1.05V6.5a1 1 0 0 1 0-1ZM8 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"></path></svg>
+      API Keys <span class="counter-bubble" id="key-vault-nav-badge">0</span>
+    </button>
+    <button class="btn-gh" onclick="openJevGuide()" title="Master guide on using JEV, MCP, and design skills">
       <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.003 1H15.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.247a3.75 3.75 0 0 0-3.003 1.501A3.75 3.75 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75ZM5.003 11.5a2.25 2.25 0 0 1 2.25 2.25.75.75 0 0 1-.75.75H.75V2.5h3.503a2.25 2.25 0 0 1 2.25 2.25v6.75ZM10.247 13.75a.75.75 0 0 1-.75-.75 2.25 2.25 0 0 1 2.25-2.25V4.75a2.25 2.25 0 0 1 2.25-2.25h3.503v12h-5.753a2.25 2.25 0 0 1-1.5-.75Z"></path></svg>
       How to Use Skills & JEV
     </button>
@@ -1642,6 +1732,63 @@ html.dark .repo-nav-list::-webkit-scrollbar-thumb:hover {
       </a>
       <button class="btn-gh btn-gh-primary" id="modal-toggle-btn" onclick="toggleModalActiveSkill()">
         Select This Skill
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- API Keys & Secrets Vault Modal -->
+<div class="modal-overlay" id="keyvault-modal-overlay" onclick="closeKeyVaultModalOnBackdrop(event)">
+  <div class="modal-window keyvault-window" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <svg class="octicon" width="20" height="20" viewBox="0 0 16 16" style="color:var(--accent-orange);"><path d="M6.5 5.5a4 4 0 1 1 5.656 5.657l-1.077 1.077a.75.75 0 0 1-1.06 0L8.75 11l-.97.97a.75.75 0 0 1-1.06 0L5.45 10.7a.75.75 0 0 1 0-1.06l1.05-1.05V6.5a1 1 0 0 1 0-1ZM8 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"></path></svg>
+        <div>
+          <div style="font-weight:600;font-size:15px;color:var(--fg-default);">API Keys & Environment Secrets Vault</div>
+          <div style="font-size:11px;color:var(--fg-muted);">Stored securely in browser localStorage • 100% offline & client-side</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="counter-bubble" id="keyvault-configured-count">0 configured</span>
+        <button class="btn-gh btn-gh-sm" onclick="closeKeyVaultModal()">✕</button>
+      </div>
+    </div>
+
+    <div class="modal-body" style="gap:16px;">
+      <!-- Search / Action Header -->
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="text" id="keyvault-search" class="repo-filter-input" placeholder="Filter credentials (e.g. APPLAMA_TOKEN, OPENAI)..." style="margin-bottom:0;flex:1;" oninput="renderKeyVaultList(this.value)">
+        <button class="btn-gh btn-gh-sm" onclick="copyAllEnvSnippet()" title="Copy all configured keys in .env format">
+          <svg class="octicon" width="12" height="12" viewBox="0 0 16 16"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg>
+          Export .env
+        </button>
+      </div>
+
+      <!-- Known Keys List -->
+      <div id="keyvault-list" style="display:flex;flex-direction:column;gap:10px;">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Add Custom Secret Section -->
+      <div style="background:var(--bg-card);border:1px dashed var(--border-default);border-radius:8px;padding:12px 14px;">
+        <div style="font-weight:600;font-size:12px;margin-bottom:6px;color:var(--fg-default);display:flex;align-items:center;gap:6px;">
+          <span>➕ Add Custom Environment Secret</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <input type="text" id="custom-key-name" class="keyvault-input" placeholder="Variable Name (e.g. DATABASE_URL)" style="flex:1;">
+          <input type="password" id="custom-key-val" class="keyvault-input" placeholder="Secret Value / Password" style="flex:1.5;">
+          <button class="btn-gh btn-gh-primary btn-gh-sm" onclick="addCustomKeyFromVault()">Add Secret</button>
+        </div>
+        <div style="font-size:11px;color:var(--fg-muted);">Custom secrets are stored in your browser's localStorage and exported when clicking "Export .env".</div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <div style="font-size:11px;color:var(--fg-muted);">
+        🔒 All credentials stay on this machine. They are never committed to git.
+      </div>
+      <button class="btn-gh btn-gh-primary" onclick="closeKeyVaultModal()">
+        Done
       </button>
     </div>
   </div>
@@ -3939,7 +4086,97 @@ function filterCategory(cat) {
   }
 }
 
-// --- API Key Management ---
+// ========================================================
+// API KEYS & ENVIRONMENT CREDENTIALS VAULT (LOCALSTORAGE)
+// ========================================================
+
+const KNOWN_API_KEYS = [
+  {
+    name: "APPLAMA_TOKEN",
+    label: "Appllama / Figma Token",
+    desc: "Appllama MCP mobile screen scaffolder & Figma Personal Access Token",
+    placeholder: "appl_live_... or figd_...",
+    skills: ["Appllama Mobile Flows", "Mobile Component Generator"]
+  },
+  {
+    name: "COMPUTER_USE_KEY",
+    label: "Anthropic Computer-Use Key",
+    desc: "Anthropic API Key for autonomous desktop & OS level mouse/keyboard interaction",
+    placeholder: "sk-ant-api03-...",
+    skills: ["Agent Desktop Controller"]
+  },
+  {
+    name: "HIGGSFIELD_API_KEY",
+    label: "Higgsfield AI Key",
+    desc: "Higgsfield API key to run automated Brandkit pipeline & photoshoot generation",
+    placeholder: "hf_live_...",
+    skills: ["Higgsfield Brandkit", "Higgsfield Websites", "Product Photoshoot"]
+  },
+  {
+    name: "SEEDANCE_API_KEY",
+    label: "SeeDance 2.0 Video Key",
+    desc: "SeeDance 2.0 API token for automated cinematic video creation & camera loops",
+    placeholder: "sd_token_...",
+    skills: ["SeeDance 2.0 Video Engine"]
+  },
+  {
+    name: "NEO4J_PASSWORD",
+    label: "Neo4j Database Password",
+    desc: "Neo4j instance connection password for knowledge graphs & entity maps",
+    placeholder: "neo4j_password...",
+    skills: ["Neo4JEV Graph Connector"]
+  },
+  {
+    name: "EXCHANGE_API_KEY",
+    label: "Exchange Read-Only Key",
+    desc: "Read-only cryptocurrency exchange API key for risk simulation bounds",
+    placeholder: "api_key_...",
+    skills: ["JEV Trader"]
+  },
+  {
+    name: "DEFI_RPC_KEY",
+    label: "DeFi / Ethereum RPC Key",
+    desc: "Infura / Alchemy / Ethereum RPC endpoint URL for swap tick feeds",
+    placeholder: "https://eth-mainnet.g.alchemy.com/v2/...",
+    skills: ["Prism Persona Engine"]
+  },
+  {
+    name: "OPENAI_API_KEY",
+    label: "OpenAI API Key",
+    desc: "OpenAI API Key for GPT-4o, vision tools, and text embeddings",
+    placeholder: "sk-proj-...",
+    skills: ["MCP Tools & General Agents"]
+  },
+  {
+    name: "ANTHROPIC_API_KEY",
+    label: "Anthropic Claude Key",
+    desc: "Claude API Key for frontier coding, reasoning, and planning agents",
+    placeholder: "sk-ant-api03-...",
+    skills: ["Claude Code & Autonomous Sessions"]
+  }
+];
+
+function getCustomVaultKeys() {
+  try {
+    return JSON.parse(localStorage.getItem('custom_vault_keys') || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+function getAllVaultKeys() {
+  const customNames = getCustomVaultKeys();
+  const customObjects = customNames.map(name => ({
+    name: name,
+    label: name,
+    desc: "Custom environment secret configured by user",
+    placeholder: "Enter secret value...",
+    skills: ["Custom Secret"],
+    isCustom: true
+  }));
+  return [...KNOWN_API_KEYS, ...customObjects];
+}
+
 function isSkillKeyConfigured(skill) {
   if (!skill || !skill.requiresApiKey) return false;
   const key1 = localStorage.getItem('apikey_' + skill.id);
@@ -3950,6 +4187,204 @@ function isSkillKeyConfigured(skill) {
 function getSavedApiKey(skill) {
   if (!skill) return '';
   return localStorage.getItem('apikey_' + skill.id) || (skill.apiKeyName ? localStorage.getItem('apikey_' + skill.apiKeyName) : '') || '';
+}
+
+function updateKeyVaultNavBadge() {
+  const all = getAllVaultKeys();
+  const configured = all.filter(k => {
+    const val = localStorage.getItem('apikey_' + k.name);
+    return Boolean(val && val.trim());
+  }).length;
+  
+  const badge = document.getElementById('key-vault-nav-badge');
+  if (badge) badge.textContent = configured;
+  
+  const modalCount = document.getElementById('keyvault-configured-count');
+  if (modalCount) modalCount.textContent = `${configured} of ${all.length} configured`;
+}
+
+function openKeyVaultModal(focusKeyName = null) {
+  const overlay = document.getElementById('keyvault-modal-overlay');
+  if (!overlay) return;
+  overlay.classList.add('open');
+  renderKeyVaultList('');
+  updateKeyVaultNavBadge();
+  
+  if (focusKeyName) {
+    setTimeout(() => {
+      const input = document.getElementById('kv-input-' + focusKeyName);
+      if (input) {
+        input.focus();
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 150);
+  }
+}
+
+function closeKeyVaultModal() {
+  const overlay = document.getElementById('keyvault-modal-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+function closeKeyVaultModalOnBackdrop(e) {
+  if (e.target.id === 'keyvault-modal-overlay') closeKeyVaultModal();
+}
+
+function openKeyVaultFor(keyName) {
+  openKeyVaultModal(keyName);
+}
+
+function renderKeyVaultList(filterQuery = '') {
+  const list = document.getElementById('keyvault-list');
+  if (!list) return;
+  list.innerHTML = '';
+  
+  const q = filterQuery.toLowerCase().trim();
+  let keys = getAllVaultKeys();
+  if (q) {
+    keys = keys.filter(k => 
+      k.name.toLowerCase().includes(q) || 
+      k.label.toLowerCase().includes(q) || 
+      k.desc.toLowerCase().includes(q)
+    );
+  }
+  
+  if (!keys.length) {
+    list.innerHTML = `
+      <div style="padding:24px;text-align:center;color:var(--fg-muted);background:var(--bg-card);border:1px solid var(--border-default);border-radius:6px;font-size:12px;">
+        No credentials matched "${filterQuery}". You can add it below as a custom environment secret.
+      </div>
+    `;
+    return;
+  }
+  
+  keys.forEach(k => {
+    const val = localStorage.getItem('apikey_' + k.name) || '';
+    const isSet = Boolean(val && val.trim());
+    
+    const card = document.createElement('div');
+    card.className = 'keyvault-item';
+    card.id = 'kv-card-' + k.name;
+    
+    card.innerHTML = `
+      <div class="keyvault-item-head">
+        <div class="keyvault-name">
+          <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" style="color:${isSet ? 'var(--accent-blue)' : 'var(--fg-muted)'};"><path d="M6.5 5.5a4 4 0 1 1 5.656 5.657l-1.077 1.077a.75.75 0 0 1-1.06 0L8.75 11l-.97.97a.75.75 0 0 1-1.06 0L5.45 10.7a.75.75 0 0 1 0-1.06l1.05-1.05V6.5a1 1 0 0 1 0-1ZM8 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"></path></svg>
+          <span>${k.name}</span>
+          ${k.isCustom ? `<span class="gh-pill" style="font-size:10px;">Custom</span>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="key-status-badge ${isSet ? 'configured' : ''}">${isSet ? '✓ Saved in localStorage' : '○ Not Set'}</span>
+          ${k.isCustom ? `<button class="btn-gh btn-gh-sm btn-gh-ghost" onclick="deleteCustomVaultKey('${k.name}')" title="Delete custom secret" style="color:var(--fg-muted);padding:1px 5px;">✕</button>` : ''}
+        </div>
+      </div>
+      <div class="keyvault-desc">${k.desc}</div>
+      <div class="keyvault-input-row">
+        <input type="password" id="kv-input-${k.name}" class="keyvault-input" placeholder="${k.placeholder || 'Enter value...'}" value="${val.replace(/"/g, '&quot;')}" onkeydown="if(event.key==='Enter') saveKeyVaultEntry('${k.name}')">
+        <button class="btn-gh btn-gh-sm" id="kv-eye-${k.name}" onclick="toggleVaultKeyEye('${k.name}')" title="Show/Hide">👁</button>
+        <button class="btn-gh btn-gh-sm btn-gh-primary" onclick="saveKeyVaultEntry('${k.name}')">Save</button>
+        ${isSet ? `<button class="btn-gh btn-gh-sm btn-gh-ghost" onclick="clearKeyVaultEntry('${k.name}')" title="Clear key">Clear</button>` : ''}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function toggleVaultKeyEye(keyName) {
+  const input = document.getElementById('kv-input-' + keyName);
+  const eye = document.getElementById('kv-eye-' + keyName);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (eye) eye.textContent = '🔒';
+  } else {
+    input.type = 'password';
+    if (eye) eye.textContent = '👁';
+  }
+}
+
+function saveKeyVaultEntry(keyName) {
+  const input = document.getElementById('kv-input-' + keyName);
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) {
+    showToast('Please type a key or password before saving', false);
+    return;
+  }
+  localStorage.setItem('apikey_' + keyName, val);
+  showToast(`Saved ${keyName} to browser localStorage!`, true);
+  updateKeyVaultNavBadge();
+  renderKeyVaultList(document.getElementById('keyvault-search').value);
+  renderCenter();
+}
+
+function clearKeyVaultEntry(keyName) {
+  localStorage.removeItem('apikey_' + keyName);
+  showToast(`Cleared ${keyName} from localStorage`, false);
+  updateKeyVaultNavBadge();
+  renderKeyVaultList(document.getElementById('keyvault-search').value);
+  renderCenter();
+}
+
+function addCustomKeyFromVault() {
+  const nameInput = document.getElementById('custom-key-name');
+  const valInput = document.getElementById('custom-key-val');
+  let name = nameInput.value.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+  const val = valInput.value.trim();
+  
+  if (!name) {
+    showToast('Please enter an environment variable name (e.g. DATABASE_URL)', false);
+    return;
+  }
+  if (!val) {
+    showToast('Please enter the secret value', false);
+    return;
+  }
+  
+  localStorage.setItem('apikey_' + name, val);
+  
+  const custom = getCustomVaultKeys();
+  if (!custom.includes(name)) {
+    custom.push(name);
+    localStorage.setItem('custom_vault_keys', JSON.stringify(custom));
+  }
+  
+  nameInput.value = '';
+  valInput.value = '';
+  showToast(`Added custom secret ${name}!`, true);
+  updateKeyVaultNavBadge();
+  renderKeyVaultList(document.getElementById('keyvault-search').value);
+}
+
+function deleteCustomVaultKey(keyName) {
+  localStorage.removeItem('apikey_' + keyName);
+  let custom = getCustomVaultKeys();
+  custom = custom.filter(k => k !== keyName);
+  localStorage.setItem('custom_vault_keys', JSON.stringify(custom));
+  showToast(`Removed custom secret ${keyName}`, false);
+  updateKeyVaultNavBadge();
+  renderKeyVaultList(document.getElementById('keyvault-search').value);
+}
+
+function copyAllEnvSnippet() {
+  const all = getAllVaultKeys();
+  const configured = all.filter(k => {
+    const val = localStorage.getItem('apikey_' + k.name);
+    return Boolean(val && val.trim());
+  });
+  
+  if (!configured.length) {
+    showToast('No API keys configured yet. Enter your keys first!');
+    return;
+  }
+  
+  let envText = "# Doctor9Trio / Skill Switcher - Environment Secrets\n# Stored in local browser vault\n\n";
+  configured.forEach(k => {
+    const val = localStorage.getItem('apikey_' + k.name) || '';
+    envText += `${k.name}=${val}\n`;
+  });
+  
+  copySnippetText(envText, `Copied ${configured.length} keys in .env format!`);
 }
 
 function saveSkillApiKey() {
@@ -3968,6 +4403,7 @@ function saveSkillApiKey() {
   }
   showToast(`API Key saved for ${s.name}`, true);
   updateModalApiKeySection(s);
+  updateKeyVaultNavBadge();
   renderCenter();
 }
 
@@ -3982,6 +4418,7 @@ function clearSkillApiKey() {
   document.getElementById('modal-apikey-input').value = '';
   showToast(`API Key cleared for ${s.name}`, false);
   updateModalApiKeySection(s);
+  updateKeyVaultNavBadge();
   renderCenter();
 }
 
@@ -4367,9 +4804,9 @@ function renderCenter() {
                     </div>
                     ${s.requiresApiKey ? `
                       <span class="api-key-pill ${isSkillKeyConfigured(s) ? 'configured' : ''}" 
-                            onclick="event.stopPropagation(); openInspect('${s.id}');"
-                            title="${isSkillKeyConfigured(s) ? 'API Key Configured - Click to Edit' : 'API Key Required - Click to Configure'}">
-                        🔑 ${isSkillKeyConfigured(s) ? 'Key Configured' : 'API Key Required'}
+                            onclick="event.stopPropagation(); openKeyVaultFor('${s.apiKeyName || s.id}');"
+                            title="${isSkillKeyConfigured(s) ? 'API Key Configured in Vault - Click to Edit' : 'API Key Required - Click to Configure in Vault'}">
+                        🔑 ${isSkillKeyConfigured(s) ? 'Key Saved' : 'Set ' + (s.apiKeyName || 'API Key')}
                       </span>
                     ` : ''}
                   </div>
