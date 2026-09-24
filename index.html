@@ -2107,7 +2107,8 @@ const REPOS = [
         "trigger": "/laya [preset|predict] [text]",
         "example_prompt": "Run laya with triage preset on incoming customer message: 'We were charged twice for March, refund please.'",
         "files": [
-          ".agents/skills/laya/SKILL.md"
+          ".agents/skills/laya/SKILL.md",
+          ".agents/skills/laya/scripts/laya_runner.py"
         ],
         "clone_cmd": "git clone https://github.com/NandhaKishorM/laya.git",
         "act": "LAYA DECISION ENGINE: Execute non-autoregressive System 1 typed decisions (Choice, Score, Noul) for deterministic classification, guardrails, and triage without token generation.",

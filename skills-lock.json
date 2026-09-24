@@ -851,6 +851,10 @@
       "addedOn": "2026-09-24",
       "description": "Multilingual, non-autoregressive System 1 decision engine. 33ms typed choice, score, and noul decisions over 100+ languages.",
       "skillPath": ".agents/skills/laya/SKILL.md",
+      "files": [
+        ".agents/skills/laya/SKILL.md",
+        ".agents/skills/laya/scripts/laya_runner.py"
+      ],
       "computedHash": "0937b99e2b5fd53e7bc5dea55bf6071f32d6005aa3b3712592bd5e0331e17f5d"
     },
     "laya-mcp": {

@@ -33,6 +33,18 @@
       "env": {
         "APPLAMA_TOKEN": "YOUR_APPLAMA_TOKEN_HERE"
       }
+    },
+    "laya": {
+      "command": "python",
+      "args": [
+        "-m",
+        "laya.mcp.server"
+      ],
+      "env": {
+        "LAYA_DEVICE": "cpu",
+        "LAYA_PRELOAD": "1",
+        "LAYA_MODELS": "english,multilingual"
+      }
     }
   }
 }
