@@ -32,19 +32,20 @@ Modern AI coding agents (Antigravity IDE, Claude Code, Gemini CLI) read custom r
 
 - **GitHub Primer UI/UX**: Built entirely to match GitHub's native design system with Light and Dark mode support, Geist fonts, and official Octicons.
 - **6-Pillar Subcategory Navigation**:
-  - ⚡ **JEV Systems** — Sub-second DOM automation, fast context compaction, typed decision engines.
+  - ⚡ **JEV & Laya Systems** — Sub-second DOM automation, fast context compaction, Laya multilingual non-autoregressive decision engine (33ms, 100+ languages), typed decision engines.
   - 🔌 **MCP Tools** — Model Context Protocol servers, tools, and typed schema primitives.
   - 🎨 **Frontend & Design** — Modern CSS, GSAP animations, Motion Dev, Tailwind, Apple design rules.
   - 📊 **Data & Media** — Generative UI (JSON Render), vector search, 3D, and audio/video generation.
   - 🔍 **Code Review** — Multi-agent diff review, semantic decision gates, vulnerability checks.
-  - 🌐 **All Repositories** — Comprehensive catalog of 30+ repositories and 85+ tools.
+  - 🌐 **All Repositories** — Comprehensive catalog of 32 repositories and 87+ tools.
 - **Smart 1-Click Operations**:
   - **Direct Select Checkboxes**: Activate an entire repository's toolset directly from the sidebar or header.
   - **Single Adaptive Expand/Collapse**: One smart toggle button (`∨ Expand All` / `> Collapse All`) that adapts to your view.
   - **Refined Status Indicators**: Clean, subtle blue counters (`✓ Active (N)`) and soft amber indicators for partial selection.
+- **Universal Skill Pointers**: Emits absolute system paths and clickable markdown links so that any active workspace across your machine can immediately resolve deep `SKILL.md` manuals without broken relative links.
 - **API Key Management**: Built-in credential prompts for skills requiring API keys (OpenAI, Fal.ai, Appllama) without exposing keys to git.
 - **Educational Guide**: Includes a built-in "How to Use Skills & JEV" master modal explaining triggers, token savings, and workflow best practices.
-- **Batteries-Included**: Bundled with 23+ production-ready open-source JEV & MCP skills inside `.agents/skills/`.
+- **Batteries-Included**: Bundled with 24+ production-ready open-source JEV, Laya & MCP skills inside `.agents/skills/`.
 
 ---
 
@@ -72,7 +73,8 @@ For command-line enthusiasts:
 ```
 skill-switcher/
 ├── .agents/
-│   └── skills/                  # 23+ Bundled, production-ready JEV & MCP skills
+│   └── skills/                  # 24+ Bundled, production-ready JEV, Laya & MCP skills
+│       ├── laya/                # Multilingual non-autoregressive System 1 decision engine
 │       ├── jev-ultrafast/       # High-speed DOM automation loop
 │       ├── fast-jev-compaction/ # Context-window token compactor
 │       ├── typesafe-mcp/        # Model Context Protocol decision primitives

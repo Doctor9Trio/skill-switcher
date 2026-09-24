@@ -273,12 +273,13 @@ Self-contained executor-ready plans in plans/ directory.
 "@
     }
     "9" = @{
-        Name  = "JEV DECISION"
+        Name  = "JEV & LAYA DECISION"
         Emoji = "[JEV]"
         Color = "Green"
-        Desc  = "System One rapid decision primitives, gating & Canny referee"
-        Tags  = "system-one, gating, canny, compaction, telemetry-checks"
+        Desc  = "System One rapid decision primitives, Laya engine & Canny referee"
+        Tags  = "system-one, laya, gating, canny, compaction, telemetry-checks"
         Files = @(
+            ".agents/skills/laya/SKILL.md"
             ".agents/skills/jev-decision/SKILL.md"
             ".agents/skills/typesafe-mcp/SKILL.md"
             ".agents/skills/fast-jev-compaction/SKILL.md"
@@ -304,12 +305,11 @@ Self-contained executor-ready plans in plans/ directory.
             "docs/skills/JEV_AND_APLLAMA_SKILLS_REFERENCE.md"
         )
         Activation = @"
-JEV SYSTEM ONE DECISION ACTIVE
-===============================
-System One decision primitives active:
-  Gate(condition, rule) -> Binary pass/fail enforcement
-  Choice(options, criteria) -> Deterministic selection
-  Score(target, rubrics) -> Multi-criteria ranking
+JEV & LAYA SYSTEM ONE DECISION ACTIVE
+=====================================
+System One non-autoregressive decision primitives active:
+  Laya: Choice, Score, Noul in 33ms (0 tokens, 100+ languages, presets: guard/triage/email)
+  Jev: Gate(condition, rule), Choice(options, criteria), Score(target, rubrics)
 Canny Verifier:
   - Guardrail checking against read-only core apps
   - Zero sensitive telematics leakage (lat/lon only)
@@ -373,6 +373,7 @@ Consumer-grade transit mobile UX loaded:
             ".claude-skills/higgsfield-ai-skills/higgsfield-generate/SKILL.md"
             ".claude-skills/higgsfield-ai-skills/higgsfield-brandkit/SKILL.md"
             ".claude-skills/higgsfield-ai-skills/higgsfield-soul-id/SKILL.md"
+            ".agents/skills/laya/SKILL.md"
             ".agents/skills/jev-decision/SKILL.md"
             ".agents/skills/canny-verifier/SKILL.md"
             ".agents/skills/appllama-design/SKILL.md"

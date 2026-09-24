@@ -843,6 +843,26 @@
       "files": [
         ".agents/skills/appllama-design/SKILL.md"
       ]
+    },
+    "laya": {
+      "source": ".agents/skills/laya",
+      "sourceUrl": "https://github.com/NandhaKishorM/laya",
+      "sourceType": "local-skill",
+      "addedOn": "2026-09-24",
+      "description": "Multilingual, non-autoregressive System 1 decision engine. 33ms typed choice, score, and noul decisions over 100+ languages.",
+      "skillPath": ".agents/skills/laya/SKILL.md",
+      "computedHash": "0937b99e2b5fd53e7bc5dea55bf6071f32d6005aa3b3712592bd5e0331e17f5d"
+    },
+    "laya-mcp": {
+      "source": "NandhaKishorM/laya",
+      "sourceUrl": "https://github.com/NandhaKishorM/laya",
+      "sourceType": "git",
+      "addedOn": "2026-09-24",
+      "description": "Model Context Protocol stdio server for Laya, exposing laya_predict, laya_preset, laya_route, and laya_status tools.",
+      "skillPath": ".agents/skills/laya/SKILL.md",
+      "files": [
+        ".agents/skills/laya/SKILL.md"
+      ]
     }
   }
 }
