@@ -15,13 +15,34 @@ The AI will immediately read the corresponding skill files and adopt the special
 | # | Pillar Category | When to Use | Primary Skills Loaded |
 |---|---|---|---|
 | **1** | **JEV SYSTEMS** | Fast DOM loops, token compaction, typed decision engines | `jev-ultrafast`, `fast-jev-compaction`, `jev-codex-router`, `jev-drone`, `semdecide`, `winnow`, `blink`, `agent-desktop` |
+| **1b** | **LAYA DECISION ENGINE** | Sub-100ms System 1 typed decisions, guardrails, triage | `laya`, `laya-mcp` |
 | **2** | **MCP TOOLS** | Model Context Protocol servers, typed schemas, tools | `typesafe-mcp`, `jev-mcp`, `appllama-design` |
 | **3** | **FRONTEND & DESIGN** | High-end UI, GSAP animations, Motion.dev, Apple design | `gsap-core`, `motion-dev-animations`, `impeccable`, `apple-design`, `tailwind-design-system`, `emil-design-eng` |
 | **4** | **DATA & MEDIA** | Generative UI (JSON Render), knowledge graphs, 3D/video | `json-render`, `neo4jev`, `seedance2`, `higgsfield-generate`, `threejs-webgl`, `rive-interactive` |
 | **5** | **CODE REVIEW** | PR audits, semantic decision gates, security & diff checks | `jev-review`, `winnow`, `semdecide`, `canny-verifier`, `code-reviewer` |
 | **6** | **FULL STACK** | Complete autonomous stack: JEV + MCP + UI + Review | **ALL skills bundled in repository** |
 
+> 🆕 **Smart Skill Picker**: Open the GUI → Left sidebar → type what you want to build → only the required skills auto-activate. Solves token overload.
+
 ---
+
+## 🧠 Laya — System 1 Decision Engine (Key Integration)
+
+Laya is a non-autoregressive decision model that operates **without generating tokens**. Use it to:
+
+- **Route prompts** to cheap vs expensive models (`model_router` preset)
+- **Guard inputs** against injection or jailbreak (`guard` preset)
+- **Triage tickets** without burning LLM context (`triage` preset)
+
+```text
+Trigger: /laya [preset] [text]
+Example: /laya triage "Customer says billing was charged twice"
+MCP Tool: laya_preset(state="...", preset="triage")
+```
+
+Skill file: `.agents/skills/laya/SKILL.md`
+
+
 
 ## ⚡ Quick Trigger Prompts (Say These in Chat)
 
