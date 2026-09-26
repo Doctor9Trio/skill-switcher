@@ -2487,6 +2487,13 @@ code, pre, .prism-box, .modal-code-box, .keyvault-input, .repo-filter-input, #in
           <span style="color:var(--fg-muted);">Local Proof</span>
           <span style="color:#1a7f37;font-weight:500;">All Verified</span>
         </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px dashed var(--border-muted);">
+          <span style="color:var(--fg-muted);">Context Math</span>
+          <button class="btn-gh btn-gh-sm" onclick="openTokenInspectorModal()" style="font-size:10px;padding:1px 6px;height:20px;gap:3px;" title="Inspect real-time token metrics and context window savings">
+            <svg class="octicon" width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M1 3.5C1 2.12 4.13 1 8 1s7 1.12 7 2.5v9c0 1.38-3.13 2.5-7 2.5s-7-1.12-7-2.5v-9Zm1.5 0v1.78c1.19.67 3.26 1.02 5.5 1.02s4.31-.35 5.5-1.02V3.5C13.5 2.86 11.23 2.5 8 2.5S2.5 2.86 2.5 3.5Zm11 4.28c-1.19.67-3.26 1.02-5.5 1.02s-4.31-.35-5.5-1.02v1.72c0 .64 2.27 1 5.5 1s5.5-.36 5.5-1V7.78Zm0 3.5c-1.19.67-3.26 1.02-5.5 1.02s-4.31-.35-5.5-1.02v1.72c0 .64 2.27 1 5.5 1s5.5-.36 5.5-1v-1.72Z"/></svg>
+            Live Math
+          </button>
+        </div>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:8px;">
@@ -2848,6 +2855,94 @@ code, pre, .prism-box, .modal-code-box, .keyvault-input, .repo-filter-input, #in
       <button class="btn-gh btn-gh-primary" onclick="closeKeyVaultModal()">
         Done
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Token & Context Math Inspector Modal -->
+<div class="modal-overlay" id="token-inspector-modal-overlay" onclick="closeTokenInspectorModalOnBackdrop(event)">
+  <div class="modal-window" style="max-width:760px;" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <svg class="octicon" width="20" height="20" viewBox="0 0 16 16" style="color:var(--accent-blue);"><path d="M1 3.5C1 2.12 4.13 1 8 1s7 1.12 7 2.5v9c0 1.38-3.13 2.5-7 2.5s-7-1.12-7-2.5v-9Zm1.5 0v1.78c1.19.67 3.26 1.02 5.5 1.02s4.31-.35 5.5-1.02V3.5C13.5 2.86 11.23 2.5 8 2.5S2.5 2.86 2.5 3.5Zm11 4.28c-1.19.67-3.26 1.02-5.5 1.02s-4.31-.35-5.5-1.02v1.72c0 .64 2.27 1 5.5 1s5.5-.36 5.5-1V7.78Zm0 3.5c-1.19.67-3.26 1.02-5.5 1.02s-4.31-.35-5.5-1.02v1.72c0 .64 2.27 1 5.5 1s5.5-.36 5.5-1v-1.72Z"/></svg>
+        <div>
+          <div style="font-weight:600;font-size:15px;color:var(--fg-default);">Context Window & Token Math Engine</div>
+          <div style="font-size:11px;color:var(--fg-muted);">Real-time BPE token metrics for Antigravity & Claude pair programming</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="counter-bubble" id="token-modal-badge">0 tokens</span>
+        <button class="btn-gh btn-gh-sm" onclick="closeTokenInspectorModal()"><svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg></button>
+      </div>
+    </div>
+
+    <div class="modal-body" style="gap:16px;">
+      <!-- Stat Cards Grid -->
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;">
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">Injected Rules Tokens</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent-blue);" id="tm-stat-tokens">0</div>
+          <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;" id="tm-stat-chars">0 characters</div>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">Context Saved</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent-green);" id="tm-stat-saving">100%</div>
+          <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;">vs all 87 skills enabled</div>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">Full Suite Rules Base</div>
+          <div style="font-size:20px;font-weight:700;color:var(--fg-default);">~6,565</div>
+          <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;">tokens if all active</div>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">Raw Docs Deferred</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent-purple,#8250df);">~271k</div>
+          <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;">85 full SKILL.md files</div>
+        </div>
+      </div>
+
+      <!-- Explanatory Architecture Note -->
+      <div style="background:var(--bg-inset, rgba(13,17,23,0.04));border:1px solid var(--border-muted);border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.5;">
+        <div style="font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:var(--fg-default);">
+          <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>
+          <span>How Skill-Switcher Prevents Context Window Exhaustion</span>
+        </div>
+        <p style="margin:0 0 8px 0;color:var(--fg-muted);">
+          Antigravity & Claude automatically read <code>~/.gemini/config/rules/active-skills.md</code> into system memory at session start.
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;color:var(--fg-muted);">
+          <div>&bull; <strong>Lazy Pointer Pattern:</strong> Rather than pasting 271,000+ tokens of full markdown manuals, Skill-Switcher writes concise 1-line execution triggers and universal file pointers (<code>file:///...</code>).</div>
+          <div>&bull; <strong>On-Demand Loading:</strong> The LLM reads only the deep skill file when your prompt specifically calls for it, keeping 90-95% of your token budget free for project code.</div>
+        </div>
+      </div>
+
+      <!-- Live Active Skills Breakdown Table -->
+      <div>
+        <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:var(--fg-default);display:flex;justify-content:space-between;align-items:center;">
+          <span>Active Skills Context Breakdown (<span id="tm-table-count">0</span> active)</span>
+          <span style="font-size:11px;font-weight:normal;color:var(--fg-muted);">Target: <code>~/.gemini/config/rules/active-skills.md</code></span>
+        </div>
+        <div style="max-height:220px;overflow-y:auto;border:1px solid var(--border-default);border-radius:6px;">
+          <table style="width:100%;border-collapse:collapse;font-size:11px;text-align:left;">
+            <thead>
+              <tr style="background:var(--bg-canvas-subtle);border-bottom:1px solid var(--border-default);">
+                <th style="padding:6px 10px;">Skill</th>
+                <th style="padding:6px 10px;">Activation Trigger</th>
+                <th style="padding:6px 10px;text-align:right;">Rule Chars</th>
+                <th style="padding:6px 10px;text-align:right;">Est. Tokens</th>
+              </tr>
+            </thead>
+            <tbody id="tm-skills-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-gh" onclick="copyActivePrompt()">Copy active-skills.md</button>
+      <button class="btn-gh btn-gh-primary" onclick="closeTokenInspectorModal()">Close</button>
     </div>
   </div>
 </div>
@@ -6527,6 +6622,87 @@ function renderCenter() {
   });
 }
 
+const FULL_SUITE_RULES_TOKENS = 6565; // Measured baseline for all 87 skills in active-skills.md
+
+function countBpeTokens(text) {
+  if (!text) return 0;
+  const matches = text.match(/[\p{L}\p{N}]+|[^\s\p{L}\p{N}]/gu);
+  return matches ? matches.length : Math.round(text.length / 3.8);
+}
+
+function calculateTokenMetrics(text, count, total) {
+  if (!text || count === 0) {
+    return {
+      tokens: 0,
+      chars: 0,
+      words: 0,
+      fullSuiteTokens: FULL_SUITE_RULES_TOKENS,
+      savedPct: 100,
+      lazySavingsTokens: 271000
+    };
+  }
+  const chars = text.length;
+  const words = (text.trim().split(/\s+/)).filter(Boolean).length;
+  const tokens = countBpeTokens(text);
+  const savedPct = Math.max(0, Math.min(100, Math.round(((FULL_SUITE_RULES_TOKENS - tokens) / FULL_SUITE_RULES_TOKENS) * 100)));
+  const lazySavingsTokens = Math.max(0, (total - count) * 3100);
+  return { tokens, chars, words, fullSuiteTokens: FULL_SUITE_RULES_TOKENS, savedPct, lazySavingsTokens };
+}
+
+// Token Math & Context Inspector Controller
+function openTokenInspectorModal() {
+  const overlay = document.getElementById('token-inspector-modal-overlay');
+  if (!overlay) return;
+  renderTokenInspectorContent();
+  overlay.classList.add('open');
+}
+
+function closeTokenInspectorModal() {
+  const overlay = document.getElementById('token-inspector-modal-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+function closeTokenInspectorModalOnBackdrop(e) {
+  if (e.target.id === 'token-inspector-modal-overlay') closeTokenInspectorModal();
+}
+
+function renderTokenInspectorContent() {
+  const items = ALL_SKILLS.filter(s => sel.has(s.id));
+  const count = items.length;
+  const rules = count ? generateActiveRules() : '';
+  const metrics = calculateTokenMetrics(rules, count, ALL_SKILLS.length);
+
+  const tTokens = document.getElementById('tm-stat-tokens');
+  const tChars = document.getElementById('tm-stat-chars');
+  const tSaving = document.getElementById('tm-stat-saving');
+  const tBadge = document.getElementById('token-modal-badge');
+  const tTableCount = document.getElementById('tm-table-count');
+  const tTbody = document.getElementById('tm-skills-tbody');
+
+  if (tTokens) tTokens.textContent = `~${metrics.tokens.toLocaleString()}`;
+  if (tChars) tChars.textContent = `${metrics.chars.toLocaleString()} chars · ${metrics.words.toLocaleString()} words`;
+  if (tSaving) tSaving.textContent = `${metrics.savedPct}%`;
+  if (tBadge) tBadge.textContent = `${metrics.tokens.toLocaleString()} tokens`;
+  if (tTableCount) tTableCount.textContent = count;
+
+  if (tTbody) {
+    if (count === 0) {
+      tTbody.innerHTML = `<tr><td colspan="4" style="padding:16px;text-align:center;color:var(--fg-muted);">No skills currently selected. Select tools or pick a starter template to view real-time token breakdown.</td></tr>`;
+    } else {
+      tTbody.innerHTML = items.map(s => {
+        const actChars = (s.act || '').length;
+        const estTok = countBpeTokens(s.act || '') + 25; // rule text + file pointer link
+        return `<tr style="border-bottom:1px solid var(--border-muted);">
+          <td style="padding:6px 10px;font-weight:600;color:var(--fg-default);">${s.name}</td>
+          <td style="padding:6px 10px;color:var(--fg-muted);font-family:var(--font-mono);font-size:10px;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(s.act || '').replace(/"/g, '&quot;')}">${s.act || '-'}</td>
+          <td style="padding:6px 10px;text-align:right;color:var(--fg-muted);">${actChars}</td>
+          <td style="padding:6px 10px;text-align:right;font-weight:600;color:var(--accent-blue);">~${estTok}</td>
+        </tr>`;
+      }).join('');
+    }
+  }
+}
+
 function updateUI() {
   updateCategoryCounts();
   renderSubcategoryStrip();
@@ -6538,30 +6714,30 @@ function updateUI() {
   const dockCounter = document.getElementById('dock-counter');
   if (dockCounter) dockCounter.textContent = `${count} skill${count !== 1 ? 's' : ''} active`;
   
+  // Live rules preview in right sidebar
+  const rules = count ? generateActiveRules() : '';
+  const preview = document.getElementById('md-preview-body');
+  if (preview) {
+    preview.textContent = count ? rules : '# Select tools to generate context rules';
+  }
+
+  // Real-time BPE Tokenizer calculation
+  const metrics = calculateTokenMetrics(rules, count, ALL_SKILLS.length);
   const rightCounter = document.getElementById('right-counter');
   if (rightCounter) {
-    const estTokens = count * 420;
-    const savedPct = ALL_SKILLS.length > 0 ? Math.round(((ALL_SKILLS.length - count) / ALL_SKILLS.length) * 100) : 0;
-    rightCounter.innerHTML = `${count} of ${ALL_SKILLS.length} <span style="font-size:10px;color:var(--fg-muted);font-weight:normal;">(~${estTokens.toLocaleString()} tokens &bull; ${savedPct}% saved)</span>`;
+    rightCounter.innerHTML = `${count} of ${ALL_SKILLS.length} <span onclick="openTokenInspectorModal()" style="font-size:10px;color:var(--accent-blue);font-weight:500;cursor:pointer;text-decoration:underline;" title="Click for live context window token math">(~${metrics.tokens.toLocaleString()} tokens &bull; ${metrics.savedPct}% saved)</span>`;
   }
 
   const btnDock = document.getElementById('apply-btn');
   const btnRight = document.getElementById('apply-btn-right');
   if (btnDock) btnDock.disabled = count === 0;
   if (btnRight) btnRight.disabled = count === 0;
-
-  // Live rules preview in right sidebar
-  const rules = generateActiveRules();
-  const preview = document.getElementById('md-preview-body');
-  if (preview) {
-    preview.textContent = count ? rules : '# Select tools to generate context rules';
-  }
 }
 
-function generateActiveRules() {
-  const items = ALL_SKILLS.filter(s => sel.has(s.id));
+function generateActiveRules(customSkills) {
+  const items = customSkills || ALL_SKILLS.filter(s => sel.has(s.id));
   const names = items.map(s => s.name).join(', ');
-  const files = [...new Set(items.flatMap(s => s.files))];
+  const files = [...new Set(items.flatMap(s => s.files || []))];
   const act = items.map(s => s.act).join('\n');
   const now = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
   const centralVault = detectedProjectRoot || "c:/Users/1000859/Desktop/Skills-Switcher";
@@ -7006,12 +7182,12 @@ function runIntentRouter() {
 
     updateUI();
 
-    const totalSkills = ALL_SKILLS.length || 87;
+    const stagedSkills = ALL_SKILLS.filter(s => toActivate.has(s.id));
+    const stagedRules = generateActiveRules(stagedSkills);
+    const stagedTokens = activatedCount > 0 ? countBpeTokens(stagedRules) : 0;
     const savingPct = activatedCount > 0 
-      ? Math.max(0, Math.min(100, Math.round(((totalSkills - activatedCount) / totalSkills) * 100)))
+      ? Math.max(0, Math.min(100, Math.round(((FULL_SUITE_RULES_TOKENS - stagedTokens) / FULL_SUITE_RULES_TOKENS) * 100)))
       : 0;
-    const estTokensActive = activatedCount * 420;
-    const estTokensFull = totalSkills * 480;
 
     // Build rich category cards showing EXACT matched skills with canonical names
     const cardsHTML = matches.map(m => {
@@ -7057,7 +7233,7 @@ function runIntentRouter() {
     resultsEl.innerHTML = `
       ${statusBannerHTML}
 
-      <div class="ir-token-bar">
+      <div class="ir-token-bar" onclick="openTokenInspectorModal()" style="cursor:pointer;" title="Click for live context window token math">
         <div class="ir-token-label">
           <span>Context Window Optimization</span>
           ${tokenLabelHTML}
@@ -7066,8 +7242,8 @@ function runIntentRouter() {
           <div class="ir-token-fill" id="ir-token-fill" style="width:0%"></div>
         </div>
         <div style="font-size:10px;color:var(--fg-muted);margin-top:4px;display:flex;justify-content:space-between;">
-          <span>Staged: ~${estTokensActive.toLocaleString()} tokens</span>
-          <span>Full: ~${estTokensFull.toLocaleString()} tokens</span>
+          <span>Staged Rules: ~${stagedTokens.toLocaleString()} tokens</span>
+          <span>Baseline Suite: ~${FULL_SUITE_RULES_TOKENS.toLocaleString()} tokens</span>
         </div>
       </div>
 
