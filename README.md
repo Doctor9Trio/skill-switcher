@@ -7,6 +7,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
   <img src="https://img.shields.io/badge/Interface-GitHub%20Primer-1f2328.svg" alt="Interface">
+  <img src="https://img.shields.io/badge/Verified%20Tools-87%20Subskills-success.svg" alt="87 Verified Tools">
   <img src="https://img.shields.io/badge/Offline-100%25%20Local-success.svg" alt="Local Offline">
   <img src="https://img.shields.io/badge/Author-Doctor9Trio-0969da.svg" alt="Author">
 </p>
@@ -15,155 +16,122 @@
 
 ## 🌟 What is Skill Switcher?
 
-**Skill Switcher** is a developer-first tool designed to eliminate prompt fatigue in AI pair-programming sessions.
+**Skill Switcher** is an offline-first, developer-grade orchestrator designed to eliminate prompt fatigue and context bloat in AI pair-programming sessions.
 
-Modern AI coding agents (Antigravity IDE, Claude Code, Gemini CLI) read custom rules and specialized instructions from rule files (`~/.gemini/config/rules/active-skills.md`) at the start of every session. **Skill Switcher** provides both a high-fidelity **GitHub Primer Web GUI** and an **interactive terminal CLI** that lets you activate, configure, and swap specialized skills with one click.
+Modern AI coding agents (Antigravity IDE, Claude Code, Gemini CLI, Cursor, Windsurf) read custom rules and specialized instructions from rule files (`~/.gemini/config/rules/active-skills.md`) at the start of every session. **Skill Switcher** provides both a high-fidelity **GitHub Primer Web GUI** and a fully functional **interactive terminal CLI** that lets you activate, inspect, test, and swap specialized skills with one click.
 
 ```
-+------------------------+      Click "Apply"      +-------------------------------------------+
-|  Skill Switcher GUI    |  ====================>  | ~/.gemini/config/rules/active-skills.md   |
-| (JEV, MCP, UI, Review) |                         | (Auto-read by Antigravity every session!) |
-+------------------------+                         +-------------------------------------------+
++------------------------------------+      1-Click Apply      +-------------------------------------------+
+|        Skill Switcher Suite        |  ====================>  | ~/.gemini/config/rules/active-skills.md   |
+| (Web GUI, Presets, Laya Playground)|                         | (Auto-read by Antigravity every session!) |
++------------------------------------+                         +-------------------------------------------+
 ```
 
 ---
 
-## ✨ Features
+## ✨ Features & Architecture
 
-- **GitHub Primer UI/UX**: Built entirely to match GitHub's native design system with Light and Dark mode support, Geist fonts, and official Octicons.
-- **6-Pillar Subcategory Navigation**:
-  - ⚡ **JEV & Laya Systems** — Sub-second DOM automation, fast context compaction, Laya multilingual non-autoregressive decision engine (33ms, 100+ languages), typed decision engines.
-  - 🔌 **MCP Tools** — Model Context Protocol servers, tools, and typed schema primitives.
-  - 🎨 **Frontend & Design** — Modern CSS, GSAP animations, Motion Dev, Tailwind, Apple design rules.
-  - 📊 **Data & Media** — Generative UI (JSON Render), vector search, 3D, and audio/video generation.
-  - 🔍 **Code Review** — Multi-agent diff review, semantic decision gates, vulnerability checks.
-  - 🌐 **All Repositories** — Comprehensive catalog of 32 repositories and 87+ tools.
-- **Smart 1-Click Operations**:
-  - **Direct Select Checkboxes**: Activate an entire repository's toolset directly from the sidebar or header.
-  - **Single Adaptive Expand/Collapse**: One smart toggle button (`∨ Expand All` / `> Collapse All`) that adapts to your view.
-  - **Refined Status Indicators**: Clean, subtle blue counters (`✓ Active (N)`) and soft amber indicators for partial selection.
-- **Universal Skill Pointers**: Emits absolute system paths and clickable markdown links so that any active workspace across your machine can immediately resolve deep `SKILL.md` manuals without broken relative links.
-- **API Key Management**: Built-in credential prompts for skills requiring API keys (OpenAI, Fal.ai, Appllama) without exposing keys to git.
-- **Educational Guide**: Includes a built-in "How to Use Skills & JEV" master modal explaining triggers, token savings, and workflow best practices.
-- **Batteries-Included**: Bundled with 24+ production-ready open-source JEV, Laya & MCP skills inside `.agents/skills/`.
+- **GitHub Primer UI/UX**: Built natively with GitHub's exact design system, Geist typography, crisp SVG Octicons, and Light/Dark mode.
+- **Workflow Stacks (1-Click Presets)**:
+  - 🎨 **Frontend Motion** — GSAP Core, ScrollTrigger, React, Timeline, Motion Dev, Emil Kowalski Animate & Impeccable Design.
+  - ⚡ **JEV DOM Loop** — Sub-second headless browser clicks & input verification loop, Drone spatial engine, Desktop agent, and Canny verifier.
+  - 🧠 **System 1 Decision** — Laya non-autoregressive decision engine, Fast context compactor, Winnow noise filter, and Blink instant fixer.
+  - 🛡️ **PR Review & Guard** — JEV multi-agent diff review, Canny verifier guardrails, and Semdecide semantic gates.
+  - 📱 **Mobile App UX** — Appllama transit UX, Finch/Lungy pulse patterns, and Swift native styling.
+  - 🌐 **Full Suite** — Balanced, battle-tested full stack development context.
+  - 💾 **Custom Presets** — Save and reload custom skill combinations from localStorage with one click.
+- **Interactive Full SKILL.md Reader**:
+  - The Inspect modal features a dedicated **"Full SKILL.md Manual"** tab that reads the live markdown documentation directly from disk via local API and renders clean syntax-highlighted instructions, file line counts, and a copy button.
+- **⚡ Live Laya System 1 Decision Playground**:
+  - Integrated testing sandbox running `laya_runner.py` on your machine.
+  - Test any user message or prompt with `Triage` or `Safety Guard` presets in **1–33ms with 0 token burn**.
+- **Two-Way Memory Synchronization**:
+  - Real-time disk status badge showing active skills in `~/.gemini/config/rules/active-skills.md`.
+  - **Sync Disk**: Instantly syncs GUI checkboxes to match what is currently saved on disk.
+  - **Wipe Disk**: Safely resets agent memory to clean slate with one click.
+- **Dynamic Universal Path Resolution**:
+  - Automatically resolves workspace and global paths across any user machine or directory structure without broken hardcoded links.
+- **Token Economy Calculator**:
+  - Real-time token budget visualizer showing estimated context footprint and context savings percentage (e.g. `~2,940 tokens • 92% saved vs full catalog`).
+- **Local Verification Health Matrix**:
+  - Modal matrix listing all 87 subskills, file paths, file sizes, and verification status.
+- **100% Offline & Private**:
+  - Zero telemetry, zero cloud lock-in. All credentials and configurations stay strictly on your local machine.
 
 ---
 
 ## 🚀 Quick Start
 
-### Method 1: GUI Mode (Recommended)
+### Method 1: Web GUI Mode (Recommended)
 
-1. Double-click **`skill-gui.bat`** (or execute `./skill-gui-server.ps1` in PowerShell).
+1. Double-click **`skill-gui.bat`** (or run `powershell -ExecutionPolicy Bypass -File .\skill-gui-server.ps1`).
 2. The local server launches at `http://localhost:7891` and automatically opens in your default browser.
-3. Select the skill packs or repositories you want.
+3. Select any skill, repository, or 1-click preset.
 4. Click **Apply to Antigravity Memory**.
-5. Start or resume your AI coding session — your AI agent now executes using those active skills!
+5. Start or resume your AI coding session — your agent immediately executes with active skills!
 
 ### Method 2: Terminal Interactive CLI
 
-For command-line enthusiasts:
+For terminal users:
 1. Double-click **`skill-loader.bat`** (or run `powershell -ExecutionPolicy Bypass -File .\skill-loader.ps1`).
-2. Use keyboard number toggles to activate/deactivate skill categories.
-3. Press `A` to apply directly to Antigravity memory.
+2. Press numbers `1-11` to toggle skill packs on/off.
+3. Press `A` to apply directly to `active-skills.md` on disk.
+4. Press `S` to inspect disk memory status, or `W` to wipe memory.
+5. Press `T` to test the Laya System 1 decision engine live in terminal.
 
 ---
 
 ## 📁 Repository Structure
 
 ```
-skill-switcher/
+Skills-Switcher/
 ├── .agents/
-│   └── skills/                  # 24+ Bundled, production-ready JEV, Laya & MCP skills
-│       ├── laya/                # Multilingual non-autoregressive System 1 decision engine
+│   └── skills/                  # 85+ Bundled, production-ready JEV, Laya, GSAP & MCP skills
+│       ├── laya/                # Multilingual non-autoregressive System 1 decision engine & runner
 │       ├── jev-ultrafast/       # High-speed DOM automation loop
 │       ├── fast-jev-compaction/ # Context-window token compactor
 │       ├── typesafe-mcp/        # Model Context Protocol decision primitives
 │       ├── json-render/         # Generative UI React component renderer
 │       ├── semdecide/           # Semantic decision tree reviewer
 │       ├── winnow/              # Context filter and noise pruner
+│       ├── gsap-skills-.../     # Complete GSAP animation suite
 │       └── ...
 │
 ├── skill-gui.html               # Single-page GitHub Primer application
-├── skill-gui-server.ps1         # Local HTTP server (APIs: /verify-skills, /apply, /clear, /status)
+├── index.html                   # Static web entry point
+├── skill-gui-server.ps1         # Local HTTP REST server (APIs: /status, /verify-skills, /get-skill-content, /apply, /clear, /run-laya)
 ├── skill-gui.bat                # 1-Click Windows launcher for GUI
-├── skill-loader.ps1             # Interactive terminal-based skill selector
+├── skill-loader.ps1             # Interactive terminal-based skill manager with direct disk sync
 ├── skill-loader.bat             # 1-Click Windows launcher for CLI
 ├── skills-lock.json             # Skill registry and checksum tracker
 ├── README.md                    # Project documentation
-├── LICENSE                      # MIT License
-└── .gitignore                   # Standard ignore rules
+└── LICENSE                      # MIT License
 ```
 
 ---
 
-## 🛠️ How to Add or Update Skills
+## 🛠️ REST API Specification
 
-### 1. Adding a New Skill File
-Place your skill's `SKILL.md` inside `.agents/skills/<skill-name>/`:
+The local server (`skill-gui-server.ps1`) exposes the following endpoints on port `7891`:
 
-```markdown
----
-name: my-new-skill
-description: Brief description of what this skill does and when to invoke it
----
-
-# Instructions & Workflows
-- Define step-by-step rules and workflows for the AI agent here.
-```
-
-### 2. Registering the Skill in `skill-gui.html`
-Open `skill-gui.html`, locate `const REPOS = [` around line 1650, and add the repository definition:
-
-```javascript
-{
-  "id": "repo-my-skill",
-  "name": "Doctor9Trio/my-skill",
-  "title": "My Specialized Skill",
-  "repoUrl": "https://github.com/Doctor9Trio/my-skill",
-  "desc": "Short explanation of the capabilities of this skill pack.",
-  "lang": "TypeScript",
-  "langColor": "#3178c6",
-  "stars": "500",
-  "cat": "mcp", // Category: jev, mcp, frontend, data_media, review
-  "hasApiKey": false,
-  "subskills": [
-    {
-      "id": "my-skill-tool",
-      "name": "My Skill Tool",
-      "cat": "mcp",
-      "desc": "Executes specialized workflow tasks.",
-      "purpose": "Invoked whenever task X is needed.",
-      "trigger": "/my-skill [options]",
-      "files": [
-        ".agents/skills/my-new-skill/SKILL.md"
-      ],
-      "act": "MY SKILL: Execute task X following the instructions in my-new-skill/SKILL.md."
-    }
-  ]
-}
-```
-
-### 3. Updating Existing Skills
-- To modify prompt behavior: edit the corresponding `.agents/skills/<skill-name>/SKILL.md` file.
-- To change GUI metadata, triggers, or descriptions: edit the entry in `skill-gui.html`.
-- The GUI will immediately reflect your updates upon page refresh.
-
----
-
-## 🔑 API Key Support
-
-Certain MCP tools require API credentials (e.g. OpenAI, Fal.ai, Appllama).
-When a skill marked `"requiresApiKey": true` is selected:
-- The GUI displays a **`🔑 API Key`** badge on the repository card.
-- Click the badge or settings button to safely configure the key for your local environment.
+| Endpoint | Method | Description |
+|---|---|---|
+| `GET /` | `GET` | Serves the GitHub Primer Web GUI |
+| `GET /status` | `GET` | Returns active skills count, active list, and file timestamp on disk |
+| `GET /verify-skills` | `GET` | Scans and verifies all skills in workspace and global directories |
+| `GET /get-skill-content?skill=X` | `GET` | Streams the full content of `SKILL.md` for live in-GUI inspection |
+| `GET /active-rules` | `GET` | Returns the raw markdown content of `active-skills.md` |
+| `POST /apply` | `POST` | Writes generated markdown rules to `~/.gemini/config/rules/active-skills.md` |
+| `POST /clear` | `POST` | Wipes active skills from `active-skills.md` |
+| `POST /run-laya` | `POST` | Executes `laya_runner.py` with custom text and preset, returning instant classification |
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are always welcome! Feel free to:
-1. Fork the repository.
-2. Add new skill definitions in `.agents/skills/` and register them in `skill-gui.html`.
+Contributions are welcome!
+1. Add new skill folders in `.agents/skills/<skill-name>/` with a valid `SKILL.md`.
+2. Register the repository and subskills in `skill-gui.html` and `index.html`.
 3. Submit a Pull Request.
 
 ---
