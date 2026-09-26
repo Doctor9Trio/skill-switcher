@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1537,6 +1537,305 @@ html.dark .cred-state-pill.state-saved {
   align-items: center;
   gap: 8px;
 }
+
+/* â”€â”€ Smart Skill Picker Premium Styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+#intent-router-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+}
+#intent-router-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #0969da, #8250df, #0969da);
+  background-size: 200% 100%;
+  animation: irShimmer 3s linear infinite;
+}
+@keyframes irShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.ir-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg-default);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.ir-badge-new {
+  font-size: 9px;
+  font-weight: 700;
+  background: linear-gradient(135deg,#0969da,#8250df);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.ir-subtitle {
+  font-size: 11px;
+  color: var(--fg-muted);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+/* Example chips row */
+.ir-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.ir-chip {
+  font-size: 10px;
+  font-family: 'Geist Mono', monospace;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: 20px;
+  padding: 3px 9px;
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+.ir-chip:hover {
+  background: var(--accent-blue-bg);
+  border-color: var(--accent-blue-border);
+  color: var(--accent-blue);
+  transform: translateY(-1px);
+}
+.ir-chip:active { transform: translateY(0); }
+/* Textarea */
+#intent-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border-default);
+  border-radius: 6px;
+  color: var(--fg-default);
+  font-family: 'Geist', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 9px 11px;
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  min-height: 70px;
+}
+#intent-input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(9,105,218,0.12);
+}
+#intent-input::placeholder { color: var(--fg-subtle); }
+/* Action row */
+.ir-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  align-items: center;
+}
+.ir-btn-analyze {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #0969da, #0550ae);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: 'Geist', sans-serif;
+}
+.ir-btn-analyze:hover {
+  background: linear-gradient(135deg, #0550ae, #033d8b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(9,105,218,0.35);
+}
+.ir-btn-analyze:active { transform: translateY(0); }
+.ir-btn-analyze:disabled {
+  background: var(--border-default);
+  color: var(--fg-subtle);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.ir-btn-clear {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Geist', sans-serif;
+  line-height: 1;
+}
+.ir-btn-clear:hover { background: var(--bg-hover); color: var(--fg-default); }
+/* Thinking animation */
+.ir-thinking {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: var(--accent-blue-bg);
+  border: 1px solid var(--accent-blue-border);
+  border-radius: 6px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+.ir-thinking.active { display: flex; }
+.ir-dots span {
+  display: inline-block;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  animation: irDot 1.2s ease-in-out infinite;
+}
+.ir-dots span:nth-child(2) { animation-delay: 0.2s; }
+.ir-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes irDot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+/* Results panel */
+#intent-results {
+  display: none;
+  margin-top: 10px;
+  animation: irFadeIn 0.25s ease;
+}
+@keyframes irFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ir-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.ir-results-summary {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-green);
+}
+.ir-results-collapse {
+  font-size: 10px;
+  color: var(--fg-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-muted);
+  transition: all 0.15s;
+}
+.ir-results-collapse:hover { background: var(--bg-hover); color: var(--fg-default); }
+/* Token savings bar */
+.ir-token-bar {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.ir-token-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--fg-muted);
+  margin-bottom: 5px;
+}
+.ir-token-label strong { color: var(--accent-green); }
+.ir-token-track {
+  height: 6px;
+  background: var(--border-muted);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.ir-token-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1a7f37, #4ac26b);
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(.25,.46,.45,.94);
+  width: 0;
+}
+/* Category result cards */
+.ir-cat-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  padding: 7px 9px;
+  margin-bottom: 5px;
+  animation: irFadeIn 0.2s ease both;
+}
+.ir-cat-card:nth-child(2) { animation-delay: 0.04s; }
+.ir-cat-card:nth-child(3) { animation-delay: 0.08s; }
+.ir-cat-card:nth-child(4) { animation-delay: 0.12s; }
+.ir-cat-card:nth-child(5) { animation-delay: 0.16s; }
+.ir-cat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.ir-cat-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ir-cat-reason {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-default);
+}
+.ir-cat-meta {
+  font-size: 10px;
+  color: var(--fg-muted);
+  line-height: 1.4;
+  padding-left: 14px;
+}
+.ir-cat-hits {
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+.ir-footer-note {
+  font-size: 10px;
+  color: var(--fg-subtle);
+  padding-top: 6px;
+  border-top: 1px solid var(--border-muted);
+  text-align: center;
+  line-height: 1.5;
+}
+/* Char counter */
+.ir-char-count {
+  font-size: 10px;
+  color: var(--fg-subtle);
+  text-align: right;
+  margin-top: 3px;
+}
+/* Result body (collapsible) */
+.ir-result-body { }
+.ir-result-body.collapsed .ir-cat-card { display: none; }
+.ir-result-body.collapsed .ir-cat-card:first-child { display: block; }
+
 </style>
 </head>
 <body>
@@ -1641,23 +1940,55 @@ html.dark .cred-state-pill.state-saved {
       <div class="repo-nav-list" id="repo-nav-list"></div>
     </div>
 
-    <!-- Smart Intent Router Box -->
-    <div class="sidebar-box" id="intent-router-box" style="font-size:12px;">
-      <div style="font-weight:600;margin-bottom:6px;color:var(--fg-default);display:flex;align-items:center;gap:6px;">
-        <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm7-3.25v2.992l2.028.812a.75.75 0 0 1-.557 1.392l-2.5-1A.751.751 0 0 1 7 8.25v-3.5a.75.75 0 0 1 1.5 0Z"></path></svg>
+    <!-- Smart Intent Router Box â€” Premium UX -->
+    <div id="intent-router-box">
+
+      <div class="ir-title">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="color:#0969da;"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm4.25-2.25a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .53 1.28L7.44 9.5H10a.75.75 0 0 1 0 1.5H6a.75.75 0 0 1-.53-1.28L8.06 6.5H5.75a.75.75 0 0 1-.75-.75Z"/></svg>
         Smart Skill Picker
-        <span style="font-size:10px;background:var(--accent-emphasis);color:#fff;padding:1px 5px;border-radius:10px;font-weight:500;">NEW</span>
+        <span class="ir-badge-new">NEW</span>
       </div>
-      <p style="color:var(--fg-muted);line-height:1.5;margin-bottom:8px;">Describe what you want to build — only the needed skills load.</p>
-      <textarea id="intent-input" rows="3" placeholder="e.g. I want to build a 3D animated landing page with GSAP and React..." style="width:100%;box-sizing:border-box;background:var(--bg-subtle);border:1px solid var(--border-default);border-radius:6px;color:var(--fg-default);font-family:'Geist Mono',monospace;font-size:11px;padding:8px;resize:vertical;outline:none;transition:border 0.15s;" onfocus="this.style.borderColor='var(--accent-emphasis)'" onblur="this.style.borderColor='var(--border-default)'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();runIntentRouter();}"></textarea>
-      <div style="display:flex;gap:6px;margin-top:6px;">
-        <button class="btn-gh btn-gh-primary" style="flex:1;justify-content:center;" onclick="runIntentRouter()">
-          <svg class="octicon" width="12" height="12" viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm7-3.25v2.992l2.028.812a.75.75 0 0 1-.557 1.392l-2.5-1A.751.751 0 0 1 7 8.25v-3.5a.75.75 0 0 1 1.5 0Z"></path></svg>
-          Auto-Select Skills
+
+      <p class="ir-subtitle">Describe your project â€” AI selects only the right skills, keeping context lean.</p>
+
+      <!-- Example chips -->
+      <div class="ir-chips" id="ir-chips">
+        <span class="ir-chip" onclick="irFillChip('3D animated landing page with GSAP and React')">ðŸŽ¬ 3D GSAP + React</span>
+        <span class="ir-chip" onclick="irFillChip('Mobile iOS app with Swift animations')">ðŸ“± iOS Swift App</span>
+        <span class="ir-chip" onclick="irFillChip('ticket triage guard safety prompt injection detection')">ðŸ§  Laya Guard</span>
+        <span class="ir-chip" onclick="irFillChip('MCP server with typed schema and tool SDK')">ðŸ”Œ MCP Server</span>
+        <span class="ir-chip" onclick="irFillChip('code review audit security diff pull request')">ðŸ” PR Review</span>
+        <span class="ir-chip" onclick="irFillChip('compress context token memory budget prune')">ðŸ—œï¸ Token Saver</span>
+        <span class="ir-chip" onclick="irFillChip('brand video generate thumbnail media higgsfield')">ðŸŽ¥ Brand Video</span>
+        <span class="ir-chip" onclick="irFillChip('trading stock finance market portfolio chart')">ðŸ“ˆ Trading</span>
+      </div>
+
+      <!-- Textarea -->
+      <textarea
+        id="intent-input"
+        placeholder="e.g. I want to build a 3D animated landing page with GSAP and React..."
+        oninput="irUpdateCharCount(this)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();runIntentRouter();}"
+      ></textarea>
+      <div class="ir-char-count" id="ir-char-count">Press Enter to analyze</div>
+
+      <!-- Action buttons -->
+      <div class="ir-actions">
+        <button class="ir-btn-analyze" id="ir-analyze-btn" onclick="runIntentRouter()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6.5 0a6.5 6.5 0 0 1 5.31 10.25l3.22 3.22a.75.75 0 1 1-1.06 1.06l-3.22-3.22A6.5 6.5 0 1 1 6.5 0Zm0 1.5a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm.25 2a.75.75 0 0 1 .75.75v1.75H9.25a.75.75 0 0 1 0 1.5H7.5v1.75a.75.75 0 0 1-1.5 0V7.5H4.25a.75.75 0 0 1 0-1.5H6V3.75a.75.75 0 0 1 .75-.75Z"/></svg>
+          Analyze & Auto-Select
         </button>
-        <button class="btn-gh btn-gh-ghost" style="justify-content:center;" onclick="clearIntentRouter()" title="Clear">✕</button>
+        <button class="ir-btn-clear" onclick="clearIntentRouter()" title="Clear all">âœ•</button>
       </div>
-      <div id="intent-results" style="display:none;margin-top:10px;"></div>
+
+      <!-- Thinking state -->
+      <div class="ir-thinking" id="ir-thinking">
+        <div class="ir-dots"><span></span><span></span><span></span></div>
+        <span>Analyzing your intent...</span>
+      </div>
+
+      <!-- Results -->
+      <div id="intent-results"></div>
     </div>
 
     <!-- Quick Batch Selection Box -->
@@ -1764,7 +2095,7 @@ html.dark .cred-state-pill.state-saved {
       <!-- Tab 1: Concept -->
       <div id="guide-panel-concept" class="guide-content-panel active">
         <div class="guide-callout">
-          <strong>⚡ The Core Concept of JEV:</strong> Traditional frontier LLMs (Claude 3.5, GPT-4o) are slow (3–8s per turn) and costly for repetitive operations like verifying button clicks, validating schema transitions, or checking code diffs. <strong>JEV (JSON-Evaluated Vectors)</strong> implements sub-50ms deterministic local decision loops that run instant evaluations before delegating back to the main agent.
+          <strong>âš¡ The Core Concept of JEV:</strong> Traditional frontier LLMs (Claude 3.5, GPT-4o) are slow (3â€“8s per turn) and costly for repetitive operations like verifying button clicks, validating schema transitions, or checking code diffs. <strong>JEV (JSON-Evaluated Vectors)</strong> implements sub-50ms deterministic local decision loops that run instant evaluations before delegating back to the main agent.
         </div>
         <p style="margin-bottom:10px;"><strong>When to use JEV skills:</strong></p>
         <ul style="padding-left:20px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px;">
@@ -1797,7 +2128,7 @@ html.dark .cred-state-pill.state-saved {
       <!-- Tab 3: MCP Setup -->
       <div id="guide-panel-mcp" class="guide-content-panel">
         <div class="guide-callout">
-          <strong>🔌 Model Context Protocol (MCP):</strong> MCP allows Antigravity IDE to invoke external tools (desktop controllers, graph databases, design systems) as native agent tools.
+          <strong>ðŸ”Œ Model Context Protocol (MCP):</strong> MCP allows Antigravity IDE to invoke external tools (desktop controllers, graph databases, design systems) as native agent tools.
         </div>
         <p style="margin-bottom:8px;"><strong>Connecting MCP Skills in Antigravity IDE:</strong></p>
         <ol style="padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:12px;">
@@ -1894,7 +2225,7 @@ html.dark .cred-state-pill.state-saved {
         <div style="font-size:12px;color:var(--fg-muted);margin-bottom:8px;" id="modal-apikey-help"></div>
         <div class="apikey-input-group">
           <input type="password" id="modal-apikey-input" placeholder="Paste your API key here..." class="repo-filter-input" style="margin-bottom:0;flex:1;font-family:'Geist Mono',monospace;font-size:12px;">
-          <button class="btn-gh btn-gh-sm" id="modal-key-eye" onclick="toggleKeyVisibility()" title="Toggle visibility">👁</button>
+          <button class="btn-gh btn-gh-sm" id="modal-key-eye" onclick="toggleKeyVisibility()" title="Toggle visibility">ðŸ‘</button>
           <button class="btn-gh btn-gh-sm btn-gh-primary" onclick="saveSkillApiKey()">Save Key</button>
           <button class="btn-gh btn-gh-sm btn-gh-ghost" onclick="clearSkillApiKey()" title="Remove saved key">Clear</button>
         </div>
@@ -1902,7 +2233,7 @@ html.dark .cred-state-pill.state-saved {
     </div>
     <div class="modal-foot">
       <a href="#" target="_blank" id="modal-gh-link" class="btn-gh" style="color:var(--accent-blue);">
-        View Upstream GitHub Repo ↗
+        View Upstream GitHub Repo â†—
       </a>
       <button class="btn-gh btn-gh-primary" id="modal-toggle-btn" onclick="toggleModalActiveSkill()">
         Select This Skill
@@ -1917,8 +2248,8 @@ html.dark .cred-state-pill.state-saved {
     <div class="keyvault-header">
       <div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:20px;">🔑</span>
-          <span style="font-size:20px;">🔒</span>
+          <span style="font-size:20px;">ðŸ”‘</span>
+          <span style="font-size:20px;">ðŸ”’</span>
           <span style="font-weight:600;font-size:15px;color:var(--fg-default);" id="scm-title">Configure Skill Credentials</span>
         </div>
         <div style="font-size:12px;color:var(--fg-muted);margin-top:2px;" id="scm-subtitle">Appllama / appllama-skills</div>
@@ -1939,16 +2270,16 @@ html.dark .cred-state-pill.state-saved {
       <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px 14px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <label style="font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--fg-default);">
-            <span style="font-size:14px;">🔑</span> API Key / Access Token
+            <span style="font-size:14px;">ðŸ”‘</span> API Key / Access Token
           </label>
-          <span class="cred-state-pill" id="scm-key-status">○ Not Set</span>
+          <span class="cred-state-pill" id="scm-key-status">â—‹ Not Set</span>
         </div>
         <div style="font-size:11px;color:var(--fg-muted);margin-bottom:8px;">
           Environment variable: <code id="scm-key-var" style="font-family:'Geist Mono',monospace;font-weight:600;color:var(--accent-blue);">APPLAMA_TOKEN</code>
         </div>
         <div class="keyvault-input-wrap">
           <input type="password" id="scm-key-input" class="keyvault-input" placeholder="Type or paste API key...">
-          <button class="keyvault-eye-btn" onclick="toggleInputVisibility('scm-key-input', this)" title="Show/Hide">👁</button>
+          <button class="keyvault-eye-btn" onclick="toggleInputVisibility('scm-key-input', this)" title="Show/Hide">ðŸ‘</button>
         </div>
       </div>
 
@@ -1956,16 +2287,16 @@ html.dark .cred-state-pill.state-saved {
       <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px 14px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <label style="font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--fg-default);">
-            <span style="font-size:14px;">🔒</span> Secret Password / Client Secret
+            <span style="font-size:14px;">ðŸ”’</span> Secret Password / Client Secret
           </label>
-          <span class="cred-state-pill" id="scm-pass-status">○ Not Set</span>
+          <span class="cred-state-pill" id="scm-pass-status">â—‹ Not Set</span>
         </div>
         <div style="font-size:11px;color:var(--fg-muted);margin-bottom:8px;">
           Environment variable: <code id="scm-pass-var" style="font-family:'Geist Mono',monospace;font-weight:600;color:var(--accent-blue);">APPLAMA_SECRET</code>
         </div>
         <div class="keyvault-input-wrap">
           <input type="password" id="scm-pass-input" class="keyvault-input" placeholder="Type or paste password or secret...">
-          <button class="keyvault-eye-btn" onclick="toggleInputVisibility('scm-pass-input', this)" title="Show/Hide">👁</button>
+          <button class="keyvault-eye-btn" onclick="toggleInputVisibility('scm-pass-input', this)" title="Show/Hide">ðŸ‘</button>
         </div>
       </div>
     </div>
@@ -1989,12 +2320,12 @@ html.dark .cred-state-pill.state-saved {
         <svg class="octicon" width="20" height="20" viewBox="0 0 16 16" style="color:var(--accent-orange);"><path d="M6.5 5.5a4 4 0 1 1 5.656 5.657l-1.077 1.077a.75.75 0 0 1-1.06 0L8.75 11l-.97.97a.75.75 0 0 1-1.06 0L5.45 10.7a.75.75 0 0 1 0-1.06l1.05-1.05V6.5a1 1 0 0 1 0-1ZM8 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"></path></svg>
         <div>
           <div style="font-weight:600;font-size:15px;color:var(--fg-default);">API Keys & Environment Secrets Vault</div>
-          <div style="font-size:11px;color:var(--fg-muted);">Stored securely in browser localStorage • 100% offline & client-side</div>
+          <div style="font-size:11px;color:var(--fg-muted);">Stored securely in browser localStorage â€¢ 100% offline & client-side</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="counter-bubble" id="keyvault-configured-count">0 configured</span>
-        <button class="btn-gh btn-gh-sm" onclick="closeKeyVaultModal()">✕</button>
+        <button class="btn-gh btn-gh-sm" onclick="closeKeyVaultModal()">âœ•</button>
       </div>
     </div>
 
@@ -2016,7 +2347,7 @@ html.dark .cred-state-pill.state-saved {
       <!-- Add Custom Secret Section -->
       <div style="background:var(--bg-card);border:1px dashed var(--border-default);border-radius:8px;padding:12px 14px;">
         <div style="font-weight:600;font-size:12px;margin-bottom:6px;color:var(--fg-default);display:flex;align-items:center;gap:6px;">
-          <span>➕ Add Custom Environment Secret</span>
+          <span>âž• Add Custom Environment Secret</span>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:8px;">
           <input type="text" id="custom-key-name" class="keyvault-input" placeholder="Variable Name (e.g. DATABASE_URL)" style="flex:1;">
@@ -2029,7 +2360,7 @@ html.dark .cred-state-pill.state-saved {
 
     <div class="modal-foot">
       <div style="font-size:11px;color:var(--fg-muted);">
-        🔒 All credentials stay on this machine. They are never committed to git.
+        ðŸ”’ All credentials stay on this machine. They are never committed to git.
       </div>
       <button class="btn-gh btn-gh-primary" onclick="closeKeyVaultModal()">
         Done
@@ -4797,7 +5128,7 @@ function renderSkillHeaderKeyBadge(s) {
   if (!info.hasCredentials) return '';
   
   const isPass = info.isPasswordPrimary;
-  const sym = isPass ? '🔒' : '🔑';
+  const sym = isPass ? 'ðŸ”’' : 'ðŸ”‘';
   const label = isPass ? 'Password' : 'Key';
   
   if (info.isConfigured) {
@@ -4805,7 +5136,7 @@ function renderSkillHeaderKeyBadge(s) {
       <button class="skill-key-badge saved" 
               onclick="event.stopPropagation(); openDirectSkillCredentialModal('${s.id}')" 
               title="Configured in localStorage - Click to view or edit ${isPass ? info.passVar : info.keyVar}">
-        ✓ ${sym} ${label} Saved
+        âœ“ ${sym} ${label} Saved
       </button>
     `;
   } else {
@@ -4847,18 +5178,18 @@ function updateSkillCredModalStatuses(info) {
   
   if (info.savedKey) {
     kStat.className = 'cred-state-pill state-saved';
-    kStat.textContent = '✓ Saved in localStorage';
+    kStat.textContent = 'âœ“ Saved in localStorage';
   } else {
     kStat.className = 'cred-state-pill state-need';
-    kStat.textContent = '○ Not Set';
+    kStat.textContent = 'â—‹ Not Set';
   }
   
   if (info.savedPass) {
     pStat.className = 'cred-state-pill state-saved';
-    pStat.textContent = '✓ Saved in localStorage';
+    pStat.textContent = 'âœ“ Saved in localStorage';
   } else {
     pStat.className = 'cred-state-pill state-need';
-    pStat.textContent = '○ Not Set';
+    pStat.textContent = 'â—‹ Not Set';
   }
 }
 
@@ -4915,17 +5246,17 @@ function isSkillCredConfigured(s) {
 function getCardCredentialBadgeHtml(s) {
   const info = getSkillCredentialInfo(s);
   const isPass = info.isPasswordPrimary;
-  const sym = isPass ? '🔒' : '🔑';
+  const sym = isPass ? 'ðŸ”’' : 'ðŸ”‘';
   const label = isPass ? 'Password' : 'API Key';
   const varName = isPass ? info.passVar : info.keyVar;
   
   if (info.isConfigured) {
-    const preview = info.savedKey ? (info.savedKey.slice(0, 4) + '••••') : (info.savedPass ? '••••••••' : '');
+    const preview = info.savedKey ? (info.savedKey.slice(0, 4) + 'â€¢â€¢â€¢â€¢') : (info.savedPass ? 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢' : '');
     return `
       <div class="card-cred-badge saved" onclick="event.stopPropagation(); openDirectSkillCredentialModal('${s.id}')" title="Configured in localStorage - Click to edit or view">
         <span class="cred-sym">${sym}</span>
         <span class="cred-name">${label}: <strong>${varName}</strong></span>
-        <span class="cred-state-pill state-saved">✓ Saved (${preview})</span>
+        <span class="cred-state-pill state-saved">âœ“ Saved (${preview})</span>
       </div>
     `;
   } else if (info.isRequired) {
@@ -5133,14 +5464,14 @@ function renderKeyVaultList(filterQuery = '') {
           ${k.isCustom ? `<span class="gh-pill" style="font-size:10px;">Custom</span>` : ''}
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
-          <span class="key-status-badge ${isSet ? 'configured' : ''}">${isSet ? '✓ Saved in localStorage' : '○ Not Set'}</span>
-          ${k.isCustom ? `<button class="btn-gh btn-gh-sm btn-gh-ghost" onclick="deleteCustomVaultKey('${k.name}')" title="Delete custom secret" style="color:var(--fg-muted);padding:1px 5px;">✕</button>` : ''}
+          <span class="key-status-badge ${isSet ? 'configured' : ''}">${isSet ? 'âœ“ Saved in localStorage' : 'â—‹ Not Set'}</span>
+          ${k.isCustom ? `<button class="btn-gh btn-gh-sm btn-gh-ghost" onclick="deleteCustomVaultKey('${k.name}')" title="Delete custom secret" style="color:var(--fg-muted);padding:1px 5px;">âœ•</button>` : ''}
         </div>
       </div>
       <div class="keyvault-desc">${k.desc}</div>
       <div class="keyvault-input-row">
         <input type="password" id="kv-input-${k.name}" class="keyvault-input" placeholder="${k.placeholder || 'Enter value...'}" value="${val.replace(/"/g, '&quot;')}" onkeydown="if(event.key==='Enter') saveKeyVaultEntry('${k.name}')">
-        <button class="btn-gh btn-gh-sm" id="kv-eye-${k.name}" onclick="toggleVaultKeyEye('${k.name}')" title="Show/Hide">👁</button>
+        <button class="btn-gh btn-gh-sm" id="kv-eye-${k.name}" onclick="toggleVaultKeyEye('${k.name}')" title="Show/Hide">ðŸ‘</button>
         <button class="btn-gh btn-gh-sm btn-gh-primary" onclick="saveKeyVaultEntry('${k.name}')">Save</button>
         ${isSet ? `<button class="btn-gh btn-gh-sm btn-gh-ghost" onclick="clearKeyVaultEntry('${k.name}')" title="Clear key">Clear</button>` : ''}
       </div>
@@ -5155,10 +5486,10 @@ function toggleVaultKeyEye(keyName) {
   if (!input) return;
   if (input.type === 'password') {
     input.type = 'text';
-    if (eye) eye.textContent = '🔒';
+    if (eye) eye.textContent = 'ðŸ”’';
   } else {
     input.type = 'password';
-    if (eye) eye.textContent = '👁';
+    if (eye) eye.textContent = 'ðŸ‘';
   }
 }
 
@@ -5286,10 +5617,10 @@ function toggleKeyVisibility() {
   const eye = document.getElementById('modal-key-eye');
   if (input.type === 'password') {
     input.type = 'text';
-    eye.textContent = '🔒';
+    eye.textContent = 'ðŸ”’';
   } else {
     input.type = 'password';
-    eye.textContent = '👁';
+    eye.textContent = 'ðŸ‘';
   }
 }
 
@@ -5302,9 +5633,9 @@ function updateModalApiKeySection(s) {
   const input = document.getElementById('modal-apikey-input');
   
   const info = getSkillCredentialInfo(s);
-  helpEl.innerHTML = `<strong>${info.isPasswordPrimary ? '🔒 Password' : '🔑 API Key'}:</strong> <code>${info.isPasswordPrimary ? info.passVar : info.keyVar}</code> &bull; Saved locally in browser localStorage.`;
+  helpEl.innerHTML = `<strong>${info.isPasswordPrimary ? 'ðŸ”’ Password' : 'ðŸ”‘ API Key'}:</strong> <code>${info.isPasswordPrimary ? info.passVar : info.keyVar}</code> &bull; Saved locally in browser localStorage.`;
   if (info.isConfigured) {
-    statusEl.textContent = '✓ Configured';
+    statusEl.textContent = 'âœ“ Configured';
     statusEl.className = 'key-status-badge configured';
   } else if (info.isRequired) {
     statusEl.textContent = 'Required';
@@ -5506,7 +5837,7 @@ function renderCenter() {
   controls.innerHTML = `
     <div>
       <span class="feed-count-text">${repos.length} Repositories (${getFilteredSkills().length} subskills total)</span>
-      <span style="font-size:12px;color:var(--fg-muted);margin-left:8px;">Collapsed by default • Direct 1-click selection</span>
+      <span style="font-size:12px;color:var(--fg-muted);margin-left:8px;">Collapsed by default â€¢ Direct 1-click selection</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
       <button class="btn-gh btn-gh-sm" onclick="toggleAllReposCollapse()" title="${allExpanded ? 'Collapse all visible repositories' : 'Expand all visible repositories'}">
@@ -5659,7 +5990,7 @@ function renderCenter() {
           <div>${r.subskills.length} available tools</div>
         </div>
         <div>
-          <span style="color:#1a7f37;font-weight:500;">● Verified on disk</span>
+          <span style="color:#1a7f37;font-weight:500;">â— Verified on disk</span>
         </div>
       </div>
     `;
@@ -5709,7 +6040,7 @@ function generateActiveRules() {
     return `${i + 1}. [${f}](file:///${abs}) (Absolute: \`${abs}\`)`;
   }).join('\n');
 
-  return `# Active Skills — Doctor9Trio / Skill Switcher\n# Generated: ${now}\n# Active: ${names}\n\n## Activation Rules\n${act}\n\n## Skill Files (Universal Pointers)\n${fileLines}\n\n## Session Instruction\nApply all skill rules above to every response. Use the absolute file links above whenever deep skill instructions are needed. At session start, confirm active skills in one line.\n`;
+  return `# Active Skills â€” Doctor9Trio / Skill Switcher\n# Generated: ${now}\n# Active: ${names}\n\n## Activation Rules\n${act}\n\n## Skill Files (Universal Pointers)\n${fileLines}\n\n## Session Instruction\nApply all skill rules above to every response. Use the absolute file links above whenever deep skill instructions are needed. At session start, confirm active skills in one line.\n`;
 }
 
 async function applySkills() {
@@ -5767,7 +6098,7 @@ function copyLungyPrompt() {
     showToast('Lungy & Finch prompt copied to clipboard!');
     const btn = document.getElementById('copyLungyPromptBtn');
     if (btn) {
-      btn.innerHTML = '✓ Copied!';
+      btn.innerHTML = 'âœ“ Copied!';
       setTimeout(() => {
         btn.innerHTML = '<svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path></svg> Copy Prompt';
       }, 2000);
@@ -5796,7 +6127,7 @@ function openInspect(id) {
   activeModalId = id;
 
   document.getElementById('modal-skill-title').textContent = s.name;
-  document.getElementById('modal-repo-info').textContent = (s.repoName || 'Local Workspace') + ' • ' + (s.files ? s.files[0] : '');
+  document.getElementById('modal-repo-info').textContent = (s.repoName || 'Local Workspace') + ' â€¢ ' + (s.files ? s.files[0] : '');
   document.getElementById('modal-desc').textContent = s.desc;
   document.getElementById('modal-purpose').textContent = s.purpose || s.desc;
   document.getElementById('modal-trigger').textContent = s.trigger || 'No trigger defined';
@@ -5852,208 +6183,324 @@ if (persistedState) {
   updateUI();
 }
 
-// ──────────────────────────────────────────────────────
-// SMART INTENT ROUTER
-// Analyzes user description → recommends minimal skill set
-// ──────────────────────────────────────────────────────
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SMART SKILL PICKER â€” Premium Intent Engine
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+// Category color palette (maps to colored dots in results)
+const IR_COLORS = {
+  decision:  '#8250df',
+  automation:'#e36209',
+  context:   '#0969da',
+  review:    '#1a7f37',
+  mcp:       '#0550ae',
+  gsap:      '#cf222e',
+  react:     '#61dafb',
+  threejs:   '#ff6b35',
+  mobile:    '#1f883d',
+  design:    '#8250df',
+  video:     '#bc4c00',
+  graph:     '#0969da',
+  scaffold:  '#656d76',
+  codex:     '#6e40c9',
+  trading:   '#116329',
+  taste:     '#9a6700',
+  lottie:    '#e36209',
+  pixel:     '#1a7f37',
+};
 
 const INTENT_SKILL_MAP = [
-  // ─── JEV / Decision / Routing ───────────────────────
   {
-    keywords: ['decision', 'route', 'triage', 'classify', 'guard', 'safety', 'injection', 'spam', 'filter', 'score', 'intent', 'router', 'jailbreak', 'ticket', 'support', 'detect'],
-    skills: ['laya', 'laya-mcp', 'semdecide', 'jev-decision'],
-    reason: '🧠 Decision / Routing logic detected'
+    id: 'decision',
+    keywords: ['decision','route','triage','classify','guard','safety','injection','spam','filter','score','intent','router','jailbreak','ticket','support','detect'],
+    skills: ['laya','laya-mcp','semdecide','jev-decision'],
+    reason: 'Decision / Routing Logic'
   },
-  // ─── JEV Automation / Speed ─────────────────────────
   {
-    keywords: ['dom', 'navigate', 'scroll', 'click', 'automate', 'loop', 'fast', 'speed', 'rapid', 'batch', 'sequential', 'robot'],
-    skills: ['jev-ultrafast', 'jev-drone', 'agent-desktop'],
-    reason: '⚡ DOM automation / speed loop detected'
+    id: 'automation',
+    keywords: ['dom','navigate','scroll','click','automate','loop','fast','speed','rapid','batch','sequential','robot'],
+    skills: ['jev-ultrafast','jev-drone','agent-desktop'],
+    reason: 'DOM Automation / Speed Loop'
   },
-  // ─── Context / Token / Memory ───────────────────────
   {
-    keywords: ['context', 'token', 'memory', 'prune', 'compact', 'compress', 'trim', 'limit', 'budget', 'window', 'long', 'large', 'overflow'],
-    skills: ['fast-jev-compaction', 'winnow', 'blink'],
-    reason: '🗜️ Context / Token management needed'
+    id: 'context',
+    keywords: ['context','token','memory','prune','compact','compress','trim','limit','budget','window','long','large','overflow'],
+    skills: ['fast-jev-compaction','winnow','blink'],
+    reason: 'Context / Token Management'
   },
-  // ─── Code Review / Audit ─────────────────────────────
   {
-    keywords: ['review', 'audit', 'pr', 'pull request', 'diff', 'lint', 'check', 'quality', 'security', 'bug', 'vulnerability', 'verify', 'assert', 'test'],
-    skills: ['jev-review', 'canny-verifier', 'semdecide'],
-    reason: '🔍 Code review / audit workflow detected'
+    id: 'review',
+    keywords: ['review','audit','pr','pull request','diff','lint','check','quality','security','bug','vulnerability','verify','assert','test'],
+    skills: ['jev-review','canny-verifier','semdecide'],
+    reason: 'Code Review / Audit'
   },
-  // ─── MCP / Typed Tools ──────────────────────────────
   {
-    keywords: ['mcp', 'model context protocol', 'typed', 'schema', 'tool', 'server', 'protocol', 'sdk', 'api server', 'plugin'],
-    skills: ['typesafe-mcp', 'jev-mcp'],
-    reason: '🔌 MCP / Tool schema detected'
+    id: 'mcp',
+    keywords: ['mcp','model context protocol','typed','schema','tool','server','protocol','sdk','api server','plugin'],
+    skills: ['typesafe-mcp','jev-mcp'],
+    reason: 'MCP / Typed Tool Server'
   },
-  // ─── GSAP / Animations ──────────────────────────────
   {
-    keywords: ['gsap', 'tween', 'timeline', 'scrolltrigger', 'animate', 'animation', 'motion', 'transition', 'scroll', 'parallax', 'framer'],
-    skills: ['gsap-skills-gsap-core', 'gsap-skills-gsap-scrolltrigger', 'gsap-skills-gsap-timeline', 'motion-dev-animations-skill'],
-    reason: '🎬 GSAP / animation system detected'
+    id: 'gsap',
+    keywords: ['gsap','tween','timeline','scrolltrigger','animate','animation','motion','transition','scroll','parallax','framer'],
+    skills: ['gsap-skills-gsap-core','gsap-skills-gsap-scrolltrigger','gsap-skills-gsap-timeline','motion-dev-animations-skill'],
+    reason: 'GSAP / Animation System'
   },
-  // ─── React / Frontend Framework ─────────────────────
   {
-    keywords: ['react', 'nextjs', 'next.js', 'vite', 'jsx', 'tsx', 'component', 'hook', 'state', 'frontend'],
-    skills: ['gsap-skills-gsap-react', 'json-render', 'emilkowalski-skills-animate'],
-    reason: '⚛️ React / frontend framework detected'
+    id: 'react',
+    keywords: ['react','nextjs','next.js','vite','jsx','tsx','component','hook','state','frontend'],
+    skills: ['gsap-skills-gsap-react','json-render','emilkowalski-skills-animate'],
+    reason: 'React / Frontend Framework'
   },
-  // ─── 3D / WebGL / Three.js ──────────────────────────
   {
-    keywords: ['3d', 'three', 'threejs', 'webgl', 'shader', 'canvas', 'r3f', 'react three', 'babylon', 'playcanvas', 'spline', 'rive'],
-    skills: ['claudedesignskills-threejs-webgl', 'claudedesignskills-react-three-fiber', 'claudedesignskills-babylonjs-engine', 'claudedesignskills-rive-interactive'],
-    reason: '🌐 3D / WebGL engine detected'
+    id: 'threejs',
+    keywords: ['3d','three','threejs','webgl','shader','canvas','r3f','react three','babylon','playcanvas','spline','rive'],
+    skills: ['claudedesignskills-threejs-webgl','claudedesignskills-react-three-fiber','claudedesignskills-babylonjs-engine','claudedesignskills-rive-interactive'],
+    reason: '3D / WebGL Engine'
   },
-  // ─── Mobile / Native ────────────────────────────────
   {
-    keywords: ['mobile', 'ios', 'android', 'swift', 'react native', 'expo', 'swiftui', 'native', 'app', 'phone', 'tablet'],
-    skills: ['emilkowalski-skills-mobile-native', 'emilkowalski-skills-write-swift', 'emilkowalski-skills-animate-expo'],
-    reason: '📱 Mobile / native app detected'
+    id: 'mobile',
+    keywords: ['mobile','ios','android','swift','react native','expo','swiftui','native','app','phone','tablet'],
+    skills: ['emilkowalski-skills-mobile-native','emilkowalski-skills-write-swift','emilkowalski-skills-animate-expo'],
+    reason: 'Mobile / Native App'
   },
-  // ─── UI / Design / Apple ────────────────────────────
   {
-    keywords: ['design', 'ui', 'ux', 'apple', 'hig', 'beautiful', 'premium', 'polish', 'visual', 'aesthetic', 'typography', 'spacing', 'layout'],
-    skills: ['emilkowalski-skills-apple-design', 'emilkowalski-skills-emil-design-eng', 'impeccable'],
-    reason: '🎨 UI / Design aesthetics detected'
+    id: 'design',
+    keywords: ['design','ui','ux','apple','hig','beautiful','premium','polish','visual','aesthetic','typography','spacing','layout'],
+    skills: ['emilkowalski-skills-apple-design','emilkowalski-skills-emil-design-eng','impeccable'],
+    reason: 'UI / Design Aesthetics'
   },
-  // ─── Video / Generative Media ───────────────────────
   {
-    keywords: ['video', 'generate', 'image', 'higgsfield', 'seedance', 'media', 'thumbnail', 'brand', 'photoshoot', 'explainer'],
-    skills: ['higgsfield-skills-higgsfield-generate', 'higgsfield-skills-higgsfield-brandkit', 'seedance2-skill'],
-    reason: '🎥 Generative media / video detected'
+    id: 'video',
+    keywords: ['video','generate','image','higgsfield','seedance','media','thumbnail','brand','photoshoot','explainer'],
+    skills: ['higgsfield-skills-higgsfield-generate','higgsfield-skills-higgsfield-brandkit','seedance2-skill'],
+    reason: 'Generative Media / Video'
   },
-  // ─── Graph / Knowledge ──────────────────────────────
   {
-    keywords: ['graph', 'knowledge', 'neo4j', 'node', 'edge', 'relationship', 'data pipeline', 'extract'],
-    skills: ['neo4jev', 'json-render'],
-    reason: '🕸️ Knowledge graph / data pipeline detected'
+    id: 'graph',
+    keywords: ['graph','knowledge','neo4j','node','edge','relationship','data pipeline','extract'],
+    skills: ['neo4jev','json-render'],
+    reason: 'Knowledge Graph / Data Pipeline'
   },
-  // ─── Appllama / Mobile Scaffold ─────────────────────
   {
-    keywords: ['appllama', 'scaffold', 'mobile component', 'screen', 'app design'],
+    id: 'scaffold',
+    keywords: ['appllama','scaffold','mobile component','screen','app design'],
     skills: ['appllama-design'],
-    reason: '📐 App component scaffolding detected'
+    reason: 'App Component Scaffolding'
   },
-  // ─── Codex / Routing ────────────────────────────────
   {
-    keywords: ['prompt', 'codex', 'route prompt', 'llm routing', 'model selection', 'smart model'],
-    skills: ['jev-codex-router', 'laya'],
-    reason: '🚦 LLM prompt routing detected'
+    id: 'codex',
+    keywords: ['prompt','codex','route prompt','llm routing','model selection','smart model'],
+    skills: ['jev-codex-router','laya'],
+    reason: 'LLM Prompt Routing'
   },
-  // ─── Trading / Finance ──────────────────────────────
   {
-    keywords: ['trading', 'trade', 'stock', 'finance', 'market', 'portfolio', 'chart', 'candle'],
+    id: 'trading',
+    keywords: ['trading','trade','stock','finance','market','portfolio','chart','candle'],
     skills: ['jev-trader'],
-    reason: '📈 Trading / finance workflow detected'
+    reason: 'Trading / Finance'
   },
-  // ─── Taste / Design Style ────────────────────────────
   {
-    keywords: ['brand', 'brandkit', 'glassmorphism', 'brutalist', 'minimalist', 'dark mode', 'gradient', 'style', 'redesign', 'stitch'],
-    skills: ['taste-skill', 'taste-skill-brandkit', 'prism'],
-    reason: '✨ Design taste / brand system detected'
+    id: 'taste',
+    keywords: ['brand','brandkit','glassmorphism','brutalist','minimalist','dark mode','gradient','style','redesign','stitch'],
+    skills: ['taste-skill','taste-skill-brandkit','prism'],
+    reason: 'Design Taste / Brand System'
   },
-  // ─── Lottie / Barba / Anime ─────────────────────────
   {
-    keywords: ['lottie', 'barba', 'anime', 'animejs', 'locomotive', 'smooth scroll', 'page transition'],
-    skills: ['claudedesignskills-lottie-animations', 'claudedesignskills-barba-js', 'claudedesignskills-animejs', 'claudedesignskills-locomotive-scroll'],
-    reason: '🎞️ Micro-animation / page transition library detected'
+    id: 'lottie',
+    keywords: ['lottie','barba','anime','animejs','locomotive','smooth scroll','page transition'],
+    skills: ['claudedesignskills-lottie-animations','claudedesignskills-barba-js','claudedesignskills-animejs','claudedesignskills-locomotive-scroll'],
+    reason: 'Micro-Animation / Page Transitions'
   },
-  // ─── Pixel / 2D / Sprite ─────────────────────────────
   {
-    keywords: ['pixel', 'pixi', '2d', 'sprite', 'game', 'canvas 2d'],
+    id: 'pixel',
+    keywords: ['pixel','pixi','2d','sprite','game','canvas 2d'],
     skills: ['claudedesignskills-pixijs-2d'],
-    reason: '🕹️ 2D game / pixel canvas detected'
+    reason: '2D Game / Pixel Canvas'
   }
 ];
 
-// Utility: Score an intent text against the keyword maps
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+function irFillChip(text) {
+  const input = document.getElementById('intent-input');
+  if (!input) return;
+  input.value = text;
+  irUpdateCharCount(input);
+  input.focus();
+  // Animate the chip fill with a brief pulse on the textarea
+  input.style.transition = 'box-shadow 0.2s';
+  input.style.boxShadow = '0 0 0 3px rgba(9,105,218,0.25)';
+  setTimeout(() => { input.style.boxShadow = ''; }, 600);
+  // Auto-run after a brief delay for instant feedback
+  setTimeout(() => runIntentRouter(), 250);
+}
+
+function irUpdateCharCount(el) {
+  const countEl = document.getElementById('ir-char-count');
+  if (!countEl) return;
+  const len = el.value.trim().length;
+  if (len === 0) {
+    countEl.textContent = 'Press Enter to analyze';
+    countEl.style.color = 'var(--fg-subtle)';
+  } else if (len < 10) {
+    countEl.textContent = `${len} chars â€” describe more for better results`;
+    countEl.style.color = 'var(--accent-orange)';
+  } else {
+    countEl.textContent = `${len} chars â€” press Enter or click Analyze`;
+    countEl.style.color = 'var(--fg-subtle)';
+  }
+}
+
 function scoreIntentText(text) {
   const lower = text.toLowerCase();
   const matched = [];
-
   INTENT_SKILL_MAP.forEach(rule => {
     const hits = rule.keywords.filter(kw => lower.includes(kw));
-    if (hits.length > 0) {
-      matched.push({ ...rule, hits, score: hits.length });
-    }
+    if (hits.length > 0) matched.push({ ...rule, hits, score: hits.length });
   });
-
-  // Sort by score (most hits first)
   matched.sort((a, b) => b.score - a.score);
   return matched;
 }
 
-// Main: Run intent router on textarea content
+// â”€â”€ Main Router â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+let _irCollapsed = false;
+
 function runIntentRouter() {
   const input = document.getElementById('intent-input');
   const resultsEl = document.getElementById('intent-results');
+  const thinkingEl = document.getElementById('ir-thinking');
+  const analyzeBtn = document.getElementById('ir-analyze-btn');
   const text = (input ? input.value : '').trim();
 
   if (!text) {
     showToast('Describe what you want to build first!');
+    input && input.focus();
     return;
   }
 
-  const matches = scoreIntentText(text);
+  // Show thinking state
+  resultsEl.style.display = 'none';
+  thinkingEl && thinkingEl.classList.add('active');
+  if (analyzeBtn) { analyzeBtn.disabled = true; analyzeBtn.textContent = 'Analyzing...'; }
 
-  if (matches.length === 0) {
-    resultsEl.style.display = 'block';
-    resultsEl.innerHTML = `<div style="color:var(--fg-muted);font-size:11px;padding:8px;background:var(--bg-subtle);border-radius:6px;border:1px solid var(--border-default);">
-      No specific skills matched. Try describing your project in more detail, or use Batch Activation below.
-    </div>`;
-    return;
-  }
+  // Simulate brief async (gives the animation time to render)
+  setTimeout(() => {
+    const matches = scoreIntentText(text);
 
-  // Collect unique skill IDs to activate
-  const toActivate = new Set();
-  matches.forEach(m => m.skills.forEach(id => toActivate.add(id)));
-
-  // Clear current selection first for minimal context
-  sel.clear();
-
-  // Activate matching skills that actually exist
-  let activatedCount = 0;
-  toActivate.forEach(id => {
-    const skill = ALL_SKILLS.find(s => s.id === id);
-    if (skill) {
-      sel.add(id);
-      activatedCount++;
+    // Hide thinking
+    thinkingEl && thinkingEl.classList.remove('active');
+    if (analyzeBtn) {
+      analyzeBtn.disabled = false;
+      analyzeBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6.5 0a6.5 6.5 0 0 1 5.31 10.25l3.22 3.22a.75.75 0 1 1-1.06 1.06l-3.22-3.22A6.5 6.5 0 1 1 6.5 0Zm0 1.5a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm.25 2a.75.75 0 0 1 .75.75v1.75H9.25a.75.75 0 0 1 0 1.5H7.5v1.75a.75.75 0 0 1-1.5 0V7.5H4.25a.75.75 0 0 1 0-1.5H6V3.75a.75.75 0 0 1 .75-.75Z"/></svg> Analyze & Auto-Select`;
     }
-  });
 
-  updateUI();
+    if (matches.length === 0) {
+      resultsEl.style.display = 'block';
+      resultsEl.innerHTML = `<div style="padding:10px;background:var(--bg-subtle);border:1px solid var(--border-default);border-radius:6px;font-size:11px;color:var(--fg-muted);text-align:center;">
+        No specific patterns found.<br>Try adding keywords like <em>GSAP, React, mobile, review, MCP...</em>
+      </div>`;
+      return;
+    }
 
-  // Render results card
-  const reasonsHTML = matches.map(m => `
-    <div style="padding:6px 8px;background:var(--bg-subtle);border:1px solid var(--border-default);border-radius:5px;margin-bottom:5px;">
-      <div style="font-weight:600;color:var(--fg-default);font-size:11px;">${m.reason}</div>
-      <div style="color:var(--fg-muted);font-size:10px;margin-top:2px;">Matched: <span style="color:var(--accent-fg);">${m.hits.join(', ')}</span></div>
-      <div style="color:var(--fg-muted);font-size:10px;">Skills: ${m.skills.join(', ')}</div>
-    </div>
-  `).join('');
+    // Collect unique skill IDs
+    const toActivate = new Set();
+    matches.forEach(m => m.skills.forEach(id => toActivate.add(id)));
 
-  resultsEl.style.display = 'block';
-  resultsEl.innerHTML = `
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
-      <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" style="color:#1a7f37;"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>
-      <span style="font-weight:600;color:#1a7f37;font-size:11px;">${activatedCount} skills auto-selected (minimal context)</span>
-    </div>
-    ${reasonsHTML}
-    <div style="font-size:10px;color:var(--fg-muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border-muted);">
-      Token overhead reduced vs loading all ${ALL_SKILLS.length} skills. Click <strong>Apply</strong> to save.
-    </div>
-  `;
+    // Clear â†’ select only matching
+    sel.clear();
+    let activatedCount = 0;
+    toActivate.forEach(id => {
+      const skill = ALL_SKILLS.find(s => s.id === id);
+      if (skill) { sel.add(id); activatedCount++; }
+    });
 
-  showToast(`✅ ${activatedCount} skills selected for: "${text.substring(0, 40)}${text.length > 40 ? '...' : ''}"`);
+    updateUI();
+
+    // Token savings math
+    const totalSkills = ALL_SKILLS.length;
+    const savingPct = Math.round(((totalSkills - activatedCount) / totalSkills) * 100);
+
+    // Build category cards
+    const cardsHTML = matches.map(m => {
+      const color = IR_COLORS[m.id] || '#0969da';
+      return `<div class="ir-cat-card">
+        <div class="ir-cat-row">
+          <div class="ir-cat-dot" style="background:${color};"></div>
+          <span class="ir-cat-reason">${m.reason}</span>
+        </div>
+        <div class="ir-cat-meta">
+          Matched: <span class="ir-cat-hits">${m.hits.join(', ')}</span><br>
+          Skills: ${m.skills.length} loaded
+        </div>
+      </div>`;
+    }).join('');
+
+    _irCollapsed = false;
+    resultsEl.style.display = 'block';
+    resultsEl.innerHTML = `
+      <div class="ir-results-header">
+        <div class="ir-results-summary">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+          ${activatedCount} skills selected
+        </div>
+        <span class="ir-results-collapse" onclick="irToggleCollapse(this)" id="ir-collapse-btn">â–² Hide details</span>
+      </div>
+
+      <div class="ir-token-bar">
+        <div class="ir-token-label">
+          <span>Token context saved</span>
+          <strong>${savingPct}% leaner vs full load</strong>
+        </div>
+        <div class="ir-token-track">
+          <div class="ir-token-fill" id="ir-token-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="ir-result-body" id="ir-result-body">
+        ${cardsHTML}
+      </div>
+
+      <div class="ir-footer-note">
+        ${activatedCount} of ${totalSkills} skills active &middot; Click <strong>Apply</strong> to save
+      </div>
+    `;
+
+    // Animate the token bar filling
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        const fill = document.getElementById('ir-token-fill');
+        if (fill) fill.style.width = savingPct + '%';
+      }, 80);
+    });
+
+    showToast(`âœ… ${activatedCount} skills for "${text.length > 35 ? text.substring(0,35)+'â€¦' : text}"`);
+  }, 320);
+}
+
+function irToggleCollapse(btn) {
+  _irCollapsed = !_irCollapsed;
+  const body = document.getElementById('ir-result-body');
+  if (!body) return;
+  if (_irCollapsed) {
+    body.querySelectorAll('.ir-cat-card').forEach((c, i) => { c.style.display = i === 0 ? '' : 'none'; });
+    btn.textContent = 'â–¼ Show details';
+  } else {
+    body.querySelectorAll('.ir-cat-card').forEach(c => { c.style.display = ''; });
+    btn.textContent = 'â–² Hide details';
+  }
 }
 
 function clearIntentRouter() {
   const input = document.getElementById('intent-input');
   const resultsEl = document.getElementById('intent-results');
+  const thinkingEl = document.getElementById('ir-thinking');
+  const countEl = document.getElementById('ir-char-count');
   if (input) input.value = '';
   if (resultsEl) { resultsEl.style.display = 'none'; resultsEl.innerHTML = ''; }
+  if (thinkingEl) thinkingEl.classList.remove('active');
+  if (countEl) { countEl.textContent = 'Press Enter to analyze'; countEl.style.color = 'var(--fg-subtle)'; }
 }
 
 </script>
