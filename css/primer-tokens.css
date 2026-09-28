@@ -1,0 +1,137 @@
+/* Skill Switcher — Design Tokens & Base Styles */
+/* GitHub Primer Color System, Typography, Dark Mode */
+
+/* ========================================================
+   GITHUB PRIMER & PRISM UI DESIGN SYSTEM
+   DEFAULT: CRISP WHITE THEME (NO DUMMY STATS, NO FUNKY EMOJIS)
+   ======================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  color-scheme: light;
+  --bg-canvas: #ffffff;
+  --bg-page: #f6f8fa;
+  --bg-card: #ffffff;
+  --bg-subtle: #f6f8fa;
+  --bg-hover: #eaeef2;
+  --border-default: #d0d7de;
+  --border-muted: #e1e4e8;
+  --border-focus: #0969da;
+  
+  --fg-default: #1f2328;
+  --fg-muted: #656d76;
+  --fg-subtle: #8c959f;
+  
+  --accent-blue: #0969da;
+  --accent-blue-bg: #ddf4ff;
+  --accent-blue-border: #54aeff;
+  --accent-green: #1a7f37;
+  --accent-green-hover: #1f883d;
+  --accent-green-bg: #dafbe1;
+  --accent-green-border: #4ac26b;
+  --accent-orange: #bc4c00;
+  
+  --prism-bg: #f6f8fa;
+  --prism-border: #d0d7de;
+  --prism-kw: #cf222e;
+  --prism-fn: #0969da;
+  --prism-str: #116329;
+  --prism-op: #8250df;
+  
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 3px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+html.dark {
+  color-scheme: dark;
+  --bg-canvas: #0d1117;
+  --bg-page: #010409;
+  --bg-card: #161b22;
+  --bg-subtle: #21262d;
+  --bg-hover: #292e36;
+  --border-default: #30363d;
+  --border-muted: #21262d;
+  --border-focus: #58a6ff;
+  
+  --fg-default: #e6edf3;
+  --fg-muted: #848d97;
+  --fg-subtle: #6e7681;
+  
+  --accent-blue: #2f81f7;
+  --accent-blue-bg: rgba(56, 139, 253, 0.12);
+  --accent-blue-border: rgba(56, 139, 253, 0.35);
+  --accent-green: #238636;
+  --accent-green-hover: #2ea043;
+  --accent-green-bg: rgba(46, 160, 67, 0.12);
+  --accent-green-border: rgba(46, 160, 67, 0.35);
+  --accent-orange: #f78166;
+  
+  --prism-bg: #0b0f14;
+  --prism-border: #30363d;
+  --prism-kw: #ff7b72;
+  --prism-fn: #79c0ff;
+  --prism-str: #7ee787;
+  --prism-op: #d2a8ff;
+  
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 6px 16px rgba(0,0,0,0.5);
+  --shadow-lg: 0 16px 36px rgba(0,0,0,0.7);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--fg-default);
+  line-height: 1.5;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================================
+   MINIMAL SLEEK SCROLLBARS (NON-INTRUSIVE & CLEAN)
+   ======================================================== */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 133, 144, 0.25) transparent;
+}
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(125, 133, 144, 0.25);
+  border-radius: 9999px;
+  transition: background 0.15s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(125, 133, 144, 0.55);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+html.dark * {
+  scrollbar-color: rgba(205, 217, 229, 0.2) transparent;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(205, 217, 229, 0.2);
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(205, 217, 229, 0.5);
+}
+
+/* SVG Octicons */
+.octicon {
+  display: inline-block;
+  vertical-align: text-bottom;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+

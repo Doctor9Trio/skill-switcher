@@ -226,21 +226,45 @@ Yes! Place any skill folder inside `.agents/skills/<your-skill-name>/` containin
 Skills-Switcher/
 ├── .agents/
 │   └── skills/                  # 85+ Bundled, production-ready JEV, Laya, GSAP & MCP skills
-│       ├── laya/                # Multilingual non-autoregressive System 1 decision engine & runner
+│       ├── laya/                # Multilingual non-autoregressive System 1 decision engine
 │       ├── jev-ultrafast/       # High-speed DOM automation loop
 │       ├── fast-jev-compaction/ # Context-window token compactor
-│       ├── typesafe-mcp/        # Model Context Protocol decision primitives
-│       ├── json-render/         # Generative UI React component renderer
-│       ├── semdecide/           # Semantic decision tree reviewer
-│       ├── winnow/              # Context filter and noise pruner
 │       ├── gsap-skills-.../     # Complete GSAP animation suite
 │       └── ...
 │
-├── skill-gui.html               # Single-page GitHub Primer application
-├── index.html                   # Static web entry point
-├── skill-gui-server.ps1         # Local HTTP REST server (APIs: /status, /verify-skills, /get-skill-content, /apply, /clear, /run-laya)
+├── css/                         # ← NEW: Modular CSS (extracted from monolith)
+│   ├── primer-tokens.css        # GitHub Primer color tokens, dark/light mode variables
+│   ├── layout.css               # Navbar, sidebar, three-column grid layout
+│   └── components.css           # Cards, badges, modals, telemetry, animations
+│
+├── js/                          # ← NEW: Modular JavaScript
+│   ├── data/
+│   │   ├── repos-catalog.js     # All 62+ skill repository definitions + REPOS array
+│   │   └── presets.js           # WORKFLOW_PRESETS & category definitions
+│   ├── state/
+│   │   └── store.js             # Redux-lite state engine + localStorage persistence
+│   ├── services/
+│   │   ├── key-vault.js         # Credential manager & API key secure storage
+│   │   ├── api-client.js        # Server sync, presets, Laya, health endpoints
+│   │   └── telemetry.js         # Live INR/USD cost engine & session telemetry
+│   └── ui/
+│       ├── render-feed.js       # Accordion feed, repo filter, skill cards renderer
+│       ├── render-modals.js     # Intent Router, Inspect modal, markdown formatter
+│       └── app.js               # Application entry point & keyboard shortcuts
+│
+├── pages/                       # ← NEW: Standalone tools pages
+│   └── token-monitor.html       # Live Token Monitor dashboard
+│
+├── scripts/                     # ← NEW: Build & maintenance scripts
+│   ├── split-to-modules.js      # Extracts monolith → modular structure (run once)
+│   └── inject-nav.js            # Injects nav links into index.html
+│
+├── index.html                   # Lean shell (984 lines, loads modular CSS+JS)
+├── skill-gui.html               # Mirror of index.html (served as default GUI)
+├── index.html.bak               # Original monolith backup (8,465 lines)
+├── skill-gui-server.ps1         # Local HTTP REST server (10 API endpoints)
 ├── skill-gui.bat                # 1-Click Windows launcher for GUI
-├── skill-loader.ps1             # Interactive terminal-based skill manager with direct disk sync
+├── skill-loader.ps1             # Interactive terminal-based skill manager
 ├── skill-loader.bat             # 1-Click Windows launcher for CLI
 ├── skills-lock.json             # Skill registry and checksum tracker
 ├── README.md                    # Project documentation
@@ -260,11 +284,41 @@ The local server (`skill-gui-server.ps1`) exposes the following endpoints on por
 | `GET /verify-skills` | `GET` | Scans and verifies all skills in workspace and global directories |
 | `GET /get-skill-content?skill=X` | `GET` | Streams the full content of `SKILL.md` for live in-GUI inspection |
 | `GET /active-rules` | `GET` | Returns the raw markdown content of `active-skills.md` |
-| `GET /session-telemetry` | `GET` | Streams real-time incoming/outgoing token usage and estimated cost in **₹ INR** and **$ USD** |
+| `GET /session-telemetry` | `GET` | Streams real-time incoming/outgoing token usage and estimated cost in **₹ INR** |
 | `GET /sessions-list` | `GET` | Lists all historical and active agent trajectories detected on disk |
+| `GET /token-stats?period=day\|month\|total&model=X` | `GET` | **NEW**: Aggregated token stats across all sessions for the chosen period |
+| `GET /token-trends?days=7\|30\|90\|365` | `GET` | **NEW**: Day-by-day token breakdown for chart visualization |
 | `POST /apply` | `POST` | Writes generated markdown rules to `~/.gemini/config/rules/active-skills.md` |
 | `POST /clear` | `POST` | Wipes active skills from `active-skills.md` |
 | `POST /run-laya` | `POST` | Executes `laya_runner.py` with custom text and preset, returning instant classification |
+
+Static files under any path are served automatically (CSS, JS, pages/, etc.).
+
+---
+
+## ⚡ Live Token Monitor (`pages/token-monitor.html`)
+
+A dedicated full-screen dark dashboard available at [http://localhost:7891/pages/token-monitor.html](http://localhost:7891/pages/token-monitor.html) that reads from real Antigravity IDE trajectory files.
+
+### Features:
+- **Hero token count** — Giant, real-time total token counter for Day / Month / All-time
+- **₹ INR primary cost** with USD secondary (configurable via Settings ⚙)
+- **Token breakdown rows**: Input Cache Hit / Cache Miss / Output tokens
+- **Usage Limit progress bars**: 5-hour window & weekly window with color-coded warnings
+- **30-day trend chart** — Bar chart from actual transcript data (7 / 30 / 90 / 365-day ranges)
+- **Model breakdown** — Per-model token attribution (Gemini Flash, Pro, Claude Sonnet, GPT-4o)
+- **Auto-refresh every 15 seconds** (configurable, or manual-only mode)
+- **Settings modal** — Adjust currency, exchange rate, limits, model, refresh interval
+
+### How Tokens are Calculated:
+Tokens are estimated from `transcript.jsonl` files in `~/.gemini/antigravity-ide/brain/<session-id>/`:
+- Each JSONL line is a trajectory step. `content.length / 3.8` → estimated tokens (BPE approximation)
+- Steps with `source == "MODEL"` or `type == "PLANNER_RESPONSE"` → **output tokens**
+- All other steps (USER_INPUT, SYSTEM, tool responses) → **input tokens**
+- Cache hit ratio estimated at 86% for long sessions (>10,000 input tokens)
+
+> [!NOTE]
+> Token counts are estimates using character-based BPE approximation (chars ÷ 3.8). They are not from the LLM API billing system, but provide an accurate-enough ballpark for cost tracking purposes.
 
 ---
 
@@ -286,7 +340,7 @@ Skill Switcher features an integrated, **zero-overhead telemetry engine** that r
 
 Contributions are welcome!
 1. Add new skill folders in `.agents/skills/<skill-name>/` with a valid `SKILL.md`.
-2. Register the repository and subskills in `skill-gui.html` and `index.html`.
+2. Register the repository and subskills in `js/data/repos-catalog.js`.
 3. Submit a Pull Request.
 
 ---
