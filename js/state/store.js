@@ -383,7 +383,7 @@ store.subscribe(() => {
   saveReduxStateToStorage(state);
 
   // Sync Subnav Tabs
-  document.querySelectorAll('.subnav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.cat-pill, .subnav-tab[id^="tab-"]').forEach(t => t.classList.remove('active'));
   const tabEl = document.getElementById(curMainCat === 'data_media' ? 'tab-data-media' : 'tab-' + curMainCat);
   if (tabEl) tabEl.classList.add('active');
 
@@ -541,6 +541,10 @@ function updateCategoryCounts() {
   Object.keys(map).forEach(key => {
     const el = document.getElementById(map[key]);
     if (el) el.textContent = counts[key] || 0;
+    if (key === 'all') {
+      const p = document.getElementById('count-all-pill');
+      if (p) p.textContent = counts['all'] || 0;
+    }
   });
 }
 

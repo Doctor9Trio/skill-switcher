@@ -296,7 +296,7 @@ write('index.html', newIndex);
 fs.copyFileSync(path.join(ROOT, 'index.html'), path.join(ROOT, 'skill-gui.html'));
 console.log('  ✓  skill-gui.html (mirror copy)');
 
-console.log('\n✅ Modular split complete!');
+console.log('\nModular split complete!');
 console.log('   Open http://localhost:7891 to verify.');
 console.log('\n   File structure created:');
 console.log('   css/primer-tokens.css');

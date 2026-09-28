@@ -24,7 +24,7 @@ async function initServerSync() {
       }
       const diskBadge = document.getElementById('disk-badge');
       if (diskBadge) {
-        diskBadge.innerHTML = `<svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> ${vdata.total_found || 87} Verified on Disk`;
+        diskBadge.innerHTML = `<svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> ${vdata.total_found || 87}<span> Verified</span>`;
       }
     }
   } catch (e) {}

@@ -559,6 +559,7 @@ html.dark .repo-key-indicator.configured {
 .modal-body {
   padding: 18px;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -1449,3 +1450,321 @@ code, pre, .prism-box, .modal-code-box, .keyvault-input, .repo-filter-input, #in
   opacity: 1;
 }
 
+
+/* GitHub Primer Custom Select Component */
+.gh-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+.gh-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--bg-card);
+  color: var(--fg-default);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  padding: 4px 26px 4px 10px;
+  font-family: var(--font-sans, inherit);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  white-space: nowrap;
+}
+.gh-select:hover {
+  background-color: var(--bg-subtle);
+  border-color: var(--border-muted);
+}
+.gh-select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.25);
+}
+.gh-select option {
+  background-color: var(--bg-card);
+  color: var(--fg-default);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.gh-select-chevron {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--fg-muted);
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ========================================================
+   SHADCN UI SELECT COMPONENT (Radix / shadcn Style)
+   ======================================================== */
+.shadcn-select-wrapper {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+.shadcn-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 32px;
+  min-width: 150px;
+  padding: 0 10px;
+  background-color: var(--bg-card);
+  color: var(--fg-default);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  white-space: nowrap;
+}
+.shadcn-select-trigger:hover {
+  background-color: var(--bg-subtle);
+  border-color: var(--border-muted);
+}
+.shadcn-select-trigger:focus-visible,
+.shadcn-select-wrapper.open .shadcn-select-trigger {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px var(--accent-blue-bg, rgba(9, 105, 218, 0.18));
+}
+.shadcn-select-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shadcn-select-chevron {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: var(--fg-muted);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.shadcn-select-wrapper.open .shadcn-select-chevron {
+  transform: rotate(180deg);
+  color: var(--accent-blue);
+}
+.shadcn-select-content {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 1200;
+  min-width: 100%;
+  width: max-content;
+  max-width: 380px;
+  max-height: 290px;
+  padding: 4px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: none;
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+}
+.shadcn-select-wrapper.open .shadcn-select-content {
+  display: block;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.shadcn-select-group-title {
+  padding: 6px 8px 3px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fg-muted);
+}
+.shadcn-select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  color: var(--fg-default);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+.shadcn-select-item:hover,
+.shadcn-select-item.highlighted {
+  background-color: var(--bg-subtle);
+  color: var(--fg-default);
+}
+.shadcn-select-item.selected {
+  font-weight: 600;
+  color: var(--accent-blue);
+  background-color: var(--accent-blue-bg, rgba(9, 105, 218, 0.08));
+}
+.shadcn-select-item-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shadcn-select-item-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.shadcn-select-check {
+  width: 12px;
+  height: 12px;
+  color: var(--accent-blue);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.shadcn-select-item.selected .shadcn-select-check {
+  opacity: 1;
+  transform: scale(1);
+}
+.shadcn-select-badge {
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--bg-subtle);
+  color: var(--fg-muted);
+  border: 1px solid var(--border-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ========================================================
+   SESSION TELEMETRY MODAL PREMIUM SHADCN STYLING
+   ======================================================== */
+.tel-modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  max-width: 860px;
+  width: 95%;
+}
+.tel-hero-card {
+  background: linear-gradient(135deg, rgba(46,160,67,0.08) 0%, rgba(31,111,235,0.05) 100%);
+  border: 1px solid var(--accent-green-border, rgba(46,160,67,0.3));
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.tel-hero-cost {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--accent-green);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.tel-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.tel-kpi-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.tel-kpi-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.tel-kpi-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--fg-muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.tel-kpi-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.tel-kpi-sub {
+  font-size: 10px;
+  color: var(--fg-muted);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.tel-tool-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) 50px 70px 45px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-muted);
+  font-size: 11px;
+}
+.tel-tool-row:last-child {
+  border-bottom: none;
+}
+.tel-tool-freq-bar-bg {
+  height: 5px;
+  background: var(--bg-subtle);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.tel-tool-freq-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1f6feb 0%, #2f81f7 100%);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+.tel-turn-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 11px;
+  transition: background 0.1s ease;
+}
+.tel-turn-card:hover {
+  background: var(--bg-hover, var(--bg-card));
+  border-color: var(--border-default);
+}

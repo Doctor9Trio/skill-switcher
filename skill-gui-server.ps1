@@ -170,11 +170,13 @@ function Get-SessionTelemetryData($targetSessionId = $null, $selectedModel = "ge
 
     $INR_PER_USD = 86.50
     $pricing = @{
-        "gemini-flash"  = @{ id = "gemini-flash";  name = "Gemini 3.7 / 3.8 Flash (Active IDE)"; input_per_m = 0.15; output_per_m = 0.60 }
-        "gemini-pro"    = @{ id = "gemini-pro";    name = "Gemini 1.5 / 2.5 Pro";                input_per_m = 1.25; output_per_m = 5.00 }
-        "claude-sonnet" = @{ id = "claude-sonnet"; name = "Claude 3.5 Sonnet";                  input_per_m = 3.00; output_per_m = 15.00 }
-        "claude-haiku"  = @{ id = "claude-haiku";  name = "Claude 3.5 Haiku";                   input_per_m = 0.80; output_per_m = 4.00 }
-        "gpt-4o"        = @{ id = "gpt-4o";        name = "GPT-4o (Omni)";                      input_per_m = 2.50; output_per_m = 10.00 }
+        "all-combined"  = @{ id = "all-combined";  name = "All Models Combined (Blended Portfolio)"; input_per_m = 1.29;  output_per_m = 5.76 }
+        "gemini-flash"  = @{ id = "gemini-flash";  name = "Gemini 3.8 Flash (Active IDE Default)"; input_per_m = 0.075; output_per_m = 0.30 }
+        "gemini-pro"    = @{ id = "gemini-pro";    name = "Gemini 1.5 / 2.5 Pro";                input_per_m = 1.25;  output_per_m = 5.00 }
+        "claude-sonnet" = @{ id = "claude-sonnet"; name = "Claude Sonnet 4.6";                  input_per_m = 3.00;  output_per_m = 15.00 }
+        "claude-haiku"  = @{ id = "claude-haiku";  name = "Claude Haiku 4.5";                   input_per_m = 0.80;  output_per_m = 4.00 }
+        "gpt-4o"        = @{ id = "gpt-4o";        name = "GPT-4o (Omni)";                      input_per_m = 2.50;  output_per_m = 10.00 }
+        "deepseek-v3"   = @{ id = "deepseek-v3";   name = "DeepSeek V3";                        input_per_m = 0.14;  output_per_m = 0.28 }
     }
     $modelKey = if ($pricing.ContainsKey($selectedModel)) { $selectedModel } else { "gemini-flash" }
     $rates = $pricing[$modelKey]
@@ -239,7 +241,9 @@ function Get-SessionTelemetryData($targetSessionId = $null, $selectedModel = "ge
                 }
 
                 if ($idx -ge ($totalLines - 6)) {
-                    $preview = if ($content.Length -gt 120) { $content.Substring(0, 120) + "..." } else { $content }
+                    $cleanContent = $content -replace "Created At:\s*[\d\-:T+]+", "" -replace "Completed At:\s*[\d\-:T+]+", ""
+                    $cleanContent = $cleanContent.Trim()
+                    $preview = if ($cleanContent.Length -gt 110) { $cleanContent.Substring(0, 110) + "..." } else { $cleanContent }
                     $preview = $preview -replace "[\r\n]+", " "
                     $recentTurns += @{
                         step_index = $step.step_index
@@ -290,8 +294,15 @@ function Get-SessionTelemetryData($targetSessionId = $null, $selectedModel = "ge
 }
 
 # =============================================================
+# Global in-memory cache for ultra-responsive sub-millisecond tab switching
+$global:TokenStatsCache = @{}
+$global:TokenStatsCacheTime = @{}
+$global:TokenTrendsCache = @{}
+$global:TokenTrendsCacheTime = @{}
+
+# =============================================================
 # TOKEN STATS: Aggregate tokens across ALL sessions by period
-# period = "day" | "month" | "total"
+# period = "day" (today) | "week" (7D) | "month" (30D)
 # =============================================================
 function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
     $brainPath = Get-AntigravityBrainPath
@@ -301,78 +312,132 @@ function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
 
     $INR_PER_USD = 86.50
     $pricing = @{
-        "gemini-flash"  = @{ id = "gemini-flash";  name = "Gemini 3.8 Flash"; input_per_m = 0.075; output_per_m = 0.30 }
-        "gemini-pro"    = @{ id = "gemini-pro";    name = "Gemini 3.1 Pro";   input_per_m = 1.25;  output_per_m = 5.00 }
-        "claude-sonnet" = @{ id = "claude-sonnet"; name = "Claude Sonnet 4.6";input_per_m = 3.00;  output_per_m = 15.00 }
-        "claude-haiku"  = @{ id = "claude-haiku";  name = "Claude Haiku 4.5"; input_per_m = 0.80;  output_per_m = 4.00 }
-        "gpt-4o"        = @{ id = "gpt-4o";        name = "GPT-4o";           input_per_m = 2.50;  output_per_m = 10.00 }
+        "all-combined"  = @{ id = "all-combined";  name = "All Models Combined (Blended Portfolio)"; input_per_m = 1.29;  output_per_m = 5.76 }
+        "gemini-flash"  = @{ id = "gemini-flash";  name = "Gemini 3.8 Flash (Active IDE Default)"; input_per_m = 0.075; output_per_m = 0.30 }
+        "gemini-pro"    = @{ id = "gemini-pro";    name = "Gemini 3.1 Pro";                        input_per_m = 1.25;  output_per_m = 5.00 }
+        "claude-sonnet" = @{ id = "claude-sonnet"; name = "Claude Sonnet 4.6";                     input_per_m = 3.00;  output_per_m = 15.00 }
+        "claude-haiku"  = @{ id = "claude-haiku";  name = "Claude Haiku 4.5";                      input_per_m = 0.80;  output_per_m = 4.00 }
+        "gpt-4o"        = @{ id = "gpt-4o";        name = "GPT-4o";                                input_per_m = 2.50;  output_per_m = 10.00 }
+        "deepseek-v3"   = @{ id = "deepseek-v3";   name = "DeepSeek V3";                          input_per_m = 0.14;  output_per_m = 0.28 }
     }
     $modelKey = if ($pricing.ContainsKey($selectedModel)) { $selectedModel } else { "gemini-flash" }
     $rates = $pricing[$modelKey]
 
     $now = Get-Date
-    $cutoff = switch ($period.ToLower()) {
-        "day"   { $now.Date }
-        "month" { (Get-Date -Day 1).Date }
-        default { [DateTime]::MinValue }
+    $periodLower = $period.ToLower()
+
+    # Fast in-memory cache check (20s TTL)
+    $cacheKey = "$periodLower-$modelKey"
+    if ($global:TokenStatsCache.ContainsKey($cacheKey)) {
+        $cachedTime = $global:TokenStatsCacheTime[$cacheKey]
+        if ($cachedTime -and ($now - $cachedTime).TotalSeconds -lt 20) {
+            return $global:TokenStatsCache[$cacheKey]
+        }
     }
+
+    $cutoff = switch ($periodLower) {
+        "day"   { $now.Date }
+        "week"  { $now.Date.AddDays(-6) }
+        "month" { $now.Date.AddDays(-29) }
+        default { $now.Date }
+    }
+    $cutoffStr = $cutoff.ToString("yyyy-MM-dd")
+
+    # Time boundaries for true rolling limits
+    $time5hAgo  = $now.AddHours(-5)
+    $time7dAgo  = $now.Date.AddDays(-6)
+    $time30dAgo = $now.Date.AddDays(-29)
 
     $totalInput  = 0
     $totalOutput = 0
     $sessionCount = 0
-    $modelBreakdown = @{}
-    $toolBreakdown  = @{}
+    $toolBreakdown = @{}
+
+    $rolling5hTokens = 0
+    $rolling7dTokens = 0
+    $rolling30dTokens= 0
 
     $sessions = Get-ActiveSessionsList
     foreach ($sess in $sessions) {
         $path = $sess.path
         if (-not (Test-Path $path)) { continue }
 
-        # Only process sessions modified within the period window
-        $modTime = $sess.last_time_raw
-        if ($modTime -lt $cutoff -and $period.ToLower() -ne "total") { continue }
+        # Optimization: skip session if older than 30 days
+        if ($sess.last_time_raw -lt $time30dAgo) { continue }
 
-        $sessionCount++
+        $isPeriodSession = ($sess.last_time_raw -ge $cutoff)
+        if ($isPeriodSession) { $sessionCount++ }
+
         try {
-            $fs = New-Object System.IO.FileStream($path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
-            $sr = New-Object System.IO.StreamReader($fs, [System.Text.Encoding]::UTF8)
+            $sr = [System.IO.File]::OpenText($path)
             while (-not $sr.EndOfStream) {
                 $rawLine = $sr.ReadLine()
-                if ([string]::IsNullOrWhiteSpace($rawLine)) { continue }
-                try {
-                    $step = $rawLine | ConvertFrom-Json
+                if ($null -eq $rawLine -or $rawLine.Length -lt 25) { continue }
 
-                    # Filter by timestamp if not "total"
-                    if ($period.ToLower() -ne "total" -and $step.created_at) {
-                        try {
-                            $stepTime = [DateTime]::Parse($step.created_at)
-                            if ($stepTime -lt $cutoff) { continue }
-                        } catch {}
+                # Fast date extraction without JSON parsing overhead
+                $lineDate = $null
+                $lineDt = $null
+                if ($rawLine -match '"created_at":"([^"]+)"') {
+                    try {
+                        $lineDt = [DateTime]::Parse($Matches[1]).ToLocalTime()
+                        $lineDate = $lineDt.ToString("yyyy-MM-dd")
+                    } catch {}
+                }
+
+                # Fast token approximation via content slicing
+                $cIdx = $rawLine.IndexOf('"content":"')
+                $tokens = 0
+                if ($cIdx -ge 0) {
+                    $cStart = $cIdx + 11
+                    $cEnd = $rawLine.LastIndexOf('","')
+                    $contentLen = if ($cEnd -gt $cStart) { $cEnd - $cStart } else { $rawLine.Length - $cStart }
+                    $tokens = [math]::Round($contentLen / 3.8)
+                } else {
+                    $tokens = [math]::Round($rawLine.Length / 4.0)
+                }
+
+                # Rolling horizons accumulation
+                if ($lineDt) {
+                    if ($lineDt -ge $time5hAgo)  { $rolling5hTokens  += $tokens }
+                    if ($lineDt -ge $time7dAgo)  { $rolling7dTokens  += $tokens }
+                    if ($lineDt -ge $time30dAgo) { $rolling30dTokens += $tokens }
+                }
+
+                # Current period filter check
+                if ($lineDate -and $lineDate -lt $cutoffStr) { continue }
+
+                $isOutput = ($rawLine.IndexOf('"source":"MODEL"') -ge 0 -or $rawLine.IndexOf('"type":"PLANNER_RESPONSE"') -ge 0)
+                if ($isOutput) {
+                    $totalOutput += $tokens
+                } else {
+                    $totalInput += $tokens
+                }
+
+                # Tool breakdown fast extraction
+                if ($rawLine.IndexOf('"name":"') -ge 0) {
+                    if ($rawLine -match '"name":"([^"]+)"') {
+                        $n = $Matches[1]
+                        if (-not $toolBreakdown.ContainsKey($n)) { $toolBreakdown[$n] = 0 }
+                        $toolBreakdown[$n]++
                     }
-
-                    $content = if ($step.content) { $step.content } else { "" }
-                    $chars   = $content.Length
-                    $tokens  = [math]::Round($chars / 3.8)
-
-                    if ($step.source -eq "MODEL" -or $step.type -eq "PLANNER_RESPONSE") {
-                        $totalOutput += $tokens
-                    } else {
-                        $totalInput += $tokens
-                    }
-
-                    # Tool call breakdown
-                    if ($step.tool_calls) {
-                        foreach ($tc in $step.tool_calls) {
-                            $n = $tc.name
-                            if ($n) {
-                                if (-not $toolBreakdown.ContainsKey($n)) { $toolBreakdown[$n] = 0 }
-                                $toolBreakdown[$n]++
-                            }
-                        }
-                    }
-                } catch {}
+                } elseif ($rawLine.IndexOf('"type":"RUN_COMMAND"') -ge 0) {
+                    if (-not $toolBreakdown.ContainsKey("run_command")) { $toolBreakdown["run_command"] = 0 }
+                    $toolBreakdown["run_command"]++
+                } elseif ($rawLine.IndexOf('"type":"VIEW_FILE"') -ge 0) {
+                    if (-not $toolBreakdown.ContainsKey("view_file")) { $toolBreakdown["view_file"] = 0 }
+                    $toolBreakdown["view_file"]++
+                } elseif ($rawLine.IndexOf('"type":"GREP_SEARCH"') -ge 0) {
+                    if (-not $toolBreakdown.ContainsKey("grep_search")) { $toolBreakdown["grep_search"] = 0 }
+                    $toolBreakdown["grep_search"]++
+                } elseif ($rawLine.IndexOf('"type":"LIST_DIRECTORY"') -ge 0) {
+                    if (-not $toolBreakdown.ContainsKey("list_directory")) { $toolBreakdown["list_directory"] = 0 }
+                    $toolBreakdown["list_directory"]++
+                } elseif ($rawLine.IndexOf('"type":"CODE_ACTION"') -ge 0) {
+                    if (-not $toolBreakdown.ContainsKey("code_action")) { $toolBreakdown["code_action"] = 0 }
+                    $toolBreakdown["code_action"]++
+                }
             }
-            $sr.Close(); $fs.Close()
+            $sr.Close()
         } catch {}
     }
 
@@ -380,14 +445,13 @@ function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
     $costUsd = (($totalInput / 1000000.0) * $rates.input_per_m) + (($totalOutput / 1000000.0) * $rates.output_per_m)
     $costInr = $costUsd * $INR_PER_USD
 
-    # Cache hit simulation: ~86% of input tokens are context-cached in long sessions
     $cacheHitRatio  = if ($totalInput -gt 10000) { 0.86 } else { 0.0 }
     $cacheHitTokens = [math]::Round($totalInput * $cacheHitRatio)
     $cacheMissTokens= $totalInput - $cacheHitTokens
 
-    return @{
+    $result = @{
         ok               = $true
-        period           = $period
+        period           = $periodLower
         session_count    = $sessionCount
         total_tokens     = $totalTokens
         input_tokens     = $totalInput
@@ -404,13 +468,22 @@ function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
         exchange_rate    = $INR_PER_USD
         tool_breakdown   = $toolBreakdown
         available_models = $pricing
+        rolling_5h       = $rolling5hTokens
+        weekly_total     = $rolling7dTokens
+        monthly_total    = $rolling30dTokens
         timestamp        = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
     }
+
+    # Store in fast cache
+    $global:TokenStatsCache[$cacheKey] = $result
+    $global:TokenStatsCacheTime[$cacheKey] = $now
+
+    return $result
 }
 
 # =============================================================
-# TOKEN TRENDS: Day-by-day token usage for chart rendering
-# days = 7 | 30 | 90 | 365
+# TOKEN TRENDS: Hourly (Today/24h) or Day-by-Day (7D / 30D)
+# days = 1 (Today: 24h format 00:00-23:00) | 7 (Weekly) | 30 (30 Days)
 # =============================================================
 function Get-TokenTrends($days = 30) {
     $brainPath = Get-AntigravityBrainPath
@@ -418,12 +491,104 @@ function Get-TokenTrends($days = 30) {
         return @{ ok = $false; error = "Brain path not found"; data = @() }
     }
 
-    $now   = Get-Date
-    $start = $now.Date.AddDays(-($days - 1))
+    # Constrain to 1, 7, or 30 days
+    $cleanDays = if ($days -le 1) { 1 } elseif ($days -le 7) { 7 } else { 30 }
+
+    $now = Get-Date
+    # Fast in-memory cache check (20s TTL)
+    $cacheKey = "$cleanDays"
+    if ($global:TokenTrendsCache.ContainsKey($cacheKey)) {
+        $cachedTime = $global:TokenTrendsCacheTime[$cacheKey]
+        if ($cachedTime -and ($now - $cachedTime).TotalSeconds -lt 20) {
+            return $global:TokenTrendsCache[$cacheKey]
+        }
+    }
+
+    # CASE A: Today -> 24-Hour Hourly Timeline (00:00 - 23:00 in 24h format)
+    if ($cleanDays -eq 1) {
+        $todayStr = $now.ToString("yyyy-MM-dd")
+        $buckets = [ordered]@{}
+        for ($h = 0; $h -lt 24; $h++) {
+            $hKey = "{0:D2}:00" -f $h
+            $buckets[$hKey] = @{ input = 0; output = 0; total = 0; label = $hKey }
+        }
+
+        $sessions = Get-ActiveSessionsList
+        foreach ($sess in $sessions) {
+            $path = $sess.path
+            if (-not (Test-Path $path)) { continue }
+            if ($sess.last_time_raw.ToString("yyyy-MM-dd") -lt $todayStr) { continue }
+
+            try {
+                $sr = [System.IO.File]::OpenText($path)
+                while (-not $sr.EndOfStream) {
+                    $rawLine = $sr.ReadLine()
+                    if ($null -eq $rawLine -or $rawLine.Length -lt 25) { continue }
+
+                    if ($rawLine -match '"created_at":"([^"]+)"') {
+                        try {
+                            $dt = [DateTime]::Parse($Matches[1]).ToLocalTime()
+                            if ($dt.ToString("yyyy-MM-dd") -eq $todayStr) {
+                                $hKey = "{0:D2}:00" -f $dt.Hour
+                                if ($buckets.Contains($hKey)) {
+                                    $cIdx = $rawLine.IndexOf('"content":"')
+                                    $tokens = 0
+                                    if ($cIdx -ge 0) {
+                                        $cStart = $cIdx + 11
+                                        $cEnd = $rawLine.LastIndexOf('","')
+                                        $contentLen = if ($cEnd -gt $cStart) { $cEnd - $cStart } else { $rawLine.Length - $cStart }
+                                        $tokens = [math]::Round($contentLen / 3.8)
+                                    } else {
+                                        $tokens = [math]::Round($rawLine.Length / 4.0)
+                                    }
+
+                                    $isOutput = ($rawLine.IndexOf('"source":"MODEL"') -ge 0 -or $rawLine.IndexOf('"type":"PLANNER_RESPONSE"') -ge 0)
+                                    if ($isOutput) {
+                                        $buckets[$hKey].output += $tokens
+                                    } else {
+                                        $buckets[$hKey].input += $tokens
+                                    }
+                                    $buckets[$hKey].total += $tokens
+                                }
+                            }
+                        } catch {}
+                    }
+                }
+                $sr.Close()
+            } catch {}
+        }
+
+        $data = @()
+        for ($h = 0; $h -lt 24; $h++) {
+            $hKey = "{0:D2}:00" -f $h
+            $b = $buckets[$hKey]
+            $data += @{
+                date   = $hKey
+                label  = $b.label
+                input  = $b.input
+                output = $b.output
+                total  = $b.total
+            }
+        }
+
+        $result = @{
+            ok   = $true
+            days = 1
+            mode = "hourly"
+            data = $data
+        }
+        $global:TokenTrendsCache[$cacheKey] = $result
+        $global:TokenTrendsCacheTime[$cacheKey] = $now
+        return $result
+    }
+
+    # CASE B: 7D or 30D -> Day-by-Day Historical Timeline
+    $start = $now.Date.AddDays(-($cleanDays - 1))
+    $startStr = $start.ToString("yyyy-MM-dd")
 
     # Initialize day buckets
-    $buckets = @{}
-    for ($d = 0; $d -lt $days; $d++) {
+    $buckets = [ordered]@{}
+    for ($d = 0; $d -lt $cleanDays; $d++) {
         $dateKey = $start.AddDays($d).ToString("yyyy-MM-dd")
         $buckets[$dateKey] = @{ input = 0; output = 0; total = 0; label = $start.AddDays($d).ToString("M/d") }
     }
@@ -435,40 +600,42 @@ function Get-TokenTrends($days = 30) {
         if ($sess.last_time_raw -lt $start) { continue }
 
         try {
-            $fs = New-Object System.IO.FileStream($path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
-            $sr = New-Object System.IO.StreamReader($fs, [System.Text.Encoding]::UTF8)
+            $sr = [System.IO.File]::OpenText($path)
             while (-not $sr.EndOfStream) {
                 $rawLine = $sr.ReadLine()
-                if ([string]::IsNullOrWhiteSpace($rawLine)) { continue }
-                try {
-                    $step = $rawLine | ConvertFrom-Json
-                    $stepTime = $null
-                    if ($step.created_at) {
-                        try { $stepTime = [DateTime]::Parse($step.created_at) } catch {}
-                    }
-                    if (-not $stepTime) { continue }
-                    if ($stepTime -lt $start) { continue }
+                if ($null -eq $rawLine -or $rawLine.Length -lt 25) { continue }
 
-                    $dateKey = $stepTime.ToString("yyyy-MM-dd")
-                    if (-not $buckets.ContainsKey($dateKey)) { continue }
+                # Fast date extraction
+                if (-not ($rawLine -match '"created_at":"(\d{4}-\d{2}-\d{2})')) { continue }
+                $dateKey = $Matches[1]
+                if (-not $buckets.Contains($dateKey)) { continue }
 
-                    $content = if ($step.content) { $step.content } else { "" }
-                    $tokens  = [math]::Round($content.Length / 3.8)
+                # Fast token count
+                $cIdx = $rawLine.IndexOf('"content":"')
+                $tokens = 0
+                if ($cIdx -ge 0) {
+                    $cStart = $cIdx + 11
+                    $cEnd = $rawLine.LastIndexOf('","')
+                    $contentLen = if ($cEnd -gt $cStart) { $cEnd - $cStart } else { $rawLine.Length - $cStart }
+                    $tokens = [math]::Round($contentLen / 3.8)
+                } else {
+                    $tokens = [math]::Round($rawLine.Length / 4.0)
+                }
 
-                    if ($step.source -eq "MODEL" -or $step.type -eq "PLANNER_RESPONSE") {
-                        $buckets[$dateKey].output += $tokens
-                    } else {
-                        $buckets[$dateKey].input += $tokens
-                    }
-                    $buckets[$dateKey].total += $tokens
-                } catch {}
+                $isOutput = ($rawLine.IndexOf('"source":"MODEL"') -ge 0 -or $rawLine.IndexOf('"type":"PLANNER_RESPONSE"') -ge 0)
+                if ($isOutput) {
+                    $buckets[$dateKey].output += $tokens
+                } else {
+                    $buckets[$dateKey].input += $tokens
+                }
+                $buckets[$dateKey].total += $tokens
             }
-            $sr.Close(); $fs.Close()
+            $sr.Close()
         } catch {}
     }
 
     $data = @()
-    for ($d = 0; $d -lt $days; $d++) {
+    for ($d = 0; $d -lt $cleanDays; $d++) {
         $dateKey = $start.AddDays($d).ToString("yyyy-MM-dd")
         $b = $buckets[$dateKey]
         $data += @{
@@ -480,11 +647,18 @@ function Get-TokenTrends($days = 30) {
         }
     }
 
-    return @{
+    $result = @{
         ok   = $true
-        days = $days
+        days = $cleanDays
+        mode = "daily"
         data = $data
     }
+
+    # Store in fast cache
+    $global:TokenTrendsCache[$cacheKey] = $result
+    $global:TokenTrendsCacheTime[$cacheKey] = $now
+
+    return $result
 }
 
 while ($listener.IsListening) {

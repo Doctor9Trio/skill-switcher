@@ -452,7 +452,7 @@ function runIntentRouter() {
     });
 
     if (activatedCount > 0) {
-      showToast(`⚡ Staged ${activatedCount} matching skills in active workspace selection!`);
+      showToast(`Staged ${activatedCount} matching skills in active workspace selection!`);
     }
   } catch (err) {
     console.error('Task-to-Skill Matcher execution error:', err);
