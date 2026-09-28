@@ -60,26 +60,165 @@ Modern AI coding agents (Antigravity IDE, Claude Code, Gemini CLI, Cursor, Winds
 
 ---
 
-## 🚀 Quick Start
+## ⚙️ Prerequisites & Requirements
 
-### Method 1: Web GUI Mode (Recommended)
-
-1. Double-click **`skill-gui.bat`** (or run `powershell -ExecutionPolicy Bypass -File .\skill-gui-server.ps1`).
-2. The local server launches at `http://localhost:7891` and automatically opens in your default browser.
-3. Select any skill, repository, or 1-click preset.
-4. Click **Apply to Antigravity Memory**.
-5. Start or resume your AI coding session — your agent immediately executes with active skills!
-
-### Method 2: Terminal Interactive CLI
-
-For terminal users:
-1. Double-click **`skill-loader.bat`** (or run `powershell -ExecutionPolicy Bypass -File .\skill-loader.ps1`).
-2. Press numbers `1-11` to toggle skill packs on/off.
-3. Press `A` to apply directly to `active-skills.md` on disk.
-4. Press `S` to inspect disk memory status, or `W` to wipe memory.
-5. Press `T` to test the Laya System 1 decision engine live in terminal.
+| Component | Minimum Version | Notes |
+|---|---|---|
+| **OS** | Windows 10/11, macOS 12+, Ubuntu 20.04+ | Cross-platform |
+| **Shell** | Windows PowerShell 5.1+, PowerShell 7+, or Bash | Built-in on Windows/Mac/Linux |
+| **Browser** | Chrome, Edge, Firefox, Brave, Safari | Any modern web browser |
+| **Python** *(Optional)* | Python 3.8+ | Only needed if running the local Laya classifier test script |
+| **AI Tooling** | Antigravity IDE, Claude Code, or Gemini CLI | Automatically reads generated `active-skills.md` rules |
 
 ---
+
+## 📦 Setup & Installation Guide
+
+### Step 1: Clone or Download the Repository
+
+Clone the project to your local workstation or workspace directory:
+
+```bash
+git clone https://github.com/Doctor9Trio/skill-switcher.git
+cd skill-switcher
+```
+
+*(Alternatively, download the ZIP archive from GitHub and extract it into any local folder.)*
+
+### Step 2: (Windows) Enable Script Execution Policy
+
+On Windows, PowerShell may block local script execution by default. Open PowerShell and run this one-time command to allow local scripts to execute:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+```
+
+*(Note: Both `.bat` files automatically invoke PowerShell with `-ExecutionPolicy Bypass`, so double-clicking the batch files works out of the box without changing system-wide policies.)*
+
+### Step 3: Verify the Antigravity Memory Folder
+
+Skill Switcher writes its active rules directly to your user configuration directory at:
+- **Windows**: `C:\Users\<Username>\.gemini\config\rules\active-skills.md`
+- **macOS / Linux**: `~/.gemini/config/rules/active-skills.md`
+
+The server and CLI automatically create this folder structure if it does not already exist.
+
+---
+
+## 🚀 How to Run
+
+Skill Switcher offers three execution modes depending on your preferred workflow:
+
+### Mode 1: Web GUI Server (Recommended)
+
+The Web GUI provides a full GitHub Primer interface, live token calculation, task matcher, full markdown inspection, and 1-click Antigravity IDE memory sync.
+
+#### On Windows:
+- **Method A (Easiest)**: Double-click **`skill-gui.bat`**.
+- **Method B (PowerShell)**:
+  ```powershell
+  powershell.exe -ExecutionPolicy Bypass -File .\skill-gui-server.ps1
+  ```
+  *To specify a custom port:*
+  ```powershell
+  powershell.exe -ExecutionPolicy Bypass -File .\skill-gui-server.ps1 -Port 7895
+  ```
+
+#### On macOS / Linux:
+Make the shell script executable and run it:
+```bash
+chmod +x skill-gui.sh
+./skill-gui.sh
+```
+
+> [!TIP]
+> Once launched, the server starts at `http://localhost:7891` and automatically opens in your default browser. Press `Ctrl + C` in the terminal window to stop the server when finished.
+
+---
+
+### Mode 2: Interactive Terminal CLI
+
+For keyboard-driven terminal workflows without opening a browser:
+
+#### On Windows:
+- **Method A (Easiest)**: Double-click **`skill-loader.bat`**.
+- **Method B (PowerShell)**:
+  ```powershell
+  powershell.exe -ExecutionPolicy Bypass -File .\skill-loader.ps1
+  ```
+
+#### CLI Keybindings & Commands:
+- `1` – `11`: Toggle individual skill packs (GSAP, Emil Kowalski Motion, Apple HIG, Laya, Appllama, etc.)
+- `A`: **Apply** active selection directly to `active-skills.md` on disk
+- `S`: **Status** check showing currently loaded skills and timestamp
+- `W`: **Wipe** / reset agent memory back to clean state
+- `C`: **Combo mode** — enter multiple comma-separated IDs (e.g., `1,3,9`)
+- `V`: **View** file list and size breakdown of all selected skills
+- `X`: **Copy** active context rules directly to clipboard
+- `T`: **Test** local Laya System 1 decision engine in terminal
+- `R`: **Reset** current in-memory selection
+- `Q`: **Quit** the CLI
+
+---
+
+### Mode 3: Offline Static Mode (Zero Server Required)
+
+If you cannot run PowerShell or Python servers, you can open the GUI directly as a local HTML document:
+1. Double-click **`index.html`** or **`skill-gui.html`**.
+2. Select your skills or choose a 1-click preset.
+3. Click **"Copy Prompt"** to copy the generated rules to your clipboard and paste them into your session.
+
+---
+
+## 🔄 How It Works With Your AI Coding Assistant
+
+1. **You select skills** in Skill Switcher (e.g. *GSAP Suite* + *Impeccable Design*).
+2. **Click "Apply to Antigravity Memory"** (or press `A` in the CLI).
+3. The server generates an optimized, validated markdown ruleset and saves it to:
+   ```
+   ~/.gemini/config/rules/active-skills.md
+   ```
+4. **Start or resume your AI session**: Antigravity IDE, Claude Code, and Gemini automatically ingest `active-skills.md` as active project instructions!
+5. When your session task changes, simply switch presets or click **"Wipe Memory"** to clean your context window.
+
+---
+
+## 🔧 Troubleshooting & FAQ
+
+<details>
+<summary><strong>Q: Port 7891 is already in use by another service.</strong></summary>
+
+The `skill-gui-server.ps1` script automatically tests up to 20 consecutive ports (`7891`–`7911`) and binds to the first available port. You can also explicitly specify a custom port:
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File .\skill-gui-server.ps1 -Port 8080
+```
+</details>
+
+<details>
+<summary><strong>Q: PowerShell displays "running scripts is disabled on this system".</strong></summary>
+
+Run the script with execution policy bypass:
+```powershell
+powershell.exe -NoLogo -ExecutionPolicy Bypass -File .\skill-gui-server.ps1
+```
+Or use the provided `skill-gui.bat` launcher, which includes the bypass flag automatically.
+</details>
+
+<details>
+<summary><strong>Q: How do I know the AI agent has recognized the active skills?</strong></summary>
+
+At session start, the rules instruct the agent to confirm active skills in one line. You can also prompt:
+```
+Confirm active skills currently loaded in memory.
+```
+The agent will report all active skills and line references from `active-skills.md`.
+</details>
+
+<details>
+<summary><strong>Q: Can I add my own custom skills?</strong></summary>
+
+Yes! Place any skill folder inside `.agents/skills/<your-skill-name>/` containing a `SKILL.md` file. Skill Switcher will automatically detect and verify it.
+</details>
 
 ## 📁 Repository Structure
 
@@ -121,9 +260,25 @@ The local server (`skill-gui-server.ps1`) exposes the following endpoints on por
 | `GET /verify-skills` | `GET` | Scans and verifies all skills in workspace and global directories |
 | `GET /get-skill-content?skill=X` | `GET` | Streams the full content of `SKILL.md` for live in-GUI inspection |
 | `GET /active-rules` | `GET` | Returns the raw markdown content of `active-skills.md` |
+| `GET /session-telemetry` | `GET` | Streams real-time incoming/outgoing token usage and estimated cost in **₹ INR** and **$ USD** |
+| `GET /sessions-list` | `GET` | Lists all historical and active agent trajectories detected on disk |
 | `POST /apply` | `POST` | Writes generated markdown rules to `~/.gemini/config/rules/active-skills.md` |
 | `POST /clear` | `POST` | Wipes active skills from `active-skills.md` |
 | `POST /run-laya` | `POST` | Executes `laya_runner.py` with custom text and preset, returning instant classification |
+
+---
+
+## ⚡ Live Agent Session Token & Cost Telemetry Engine (INR & USD)
+
+Skill Switcher features an integrated, **zero-overhead telemetry engine** that reads the running AI agent's trajectory stream (`transcript.jsonl`) non-intrusively in real time.
+
+### Key Capabilities:
+- **Primary Currency in Indian Rupees (₹ INR)** with secondary US Dollar ($ USD) toggle (Benchmark rate: `₹86.50/USD`).
+- **Zero Performance Overhead**: Reads trajectory logs lock-free via non-blocking file streams (`[System.IO.FileShare]::ReadWrite`). Zero extra LLM queries are made.
+- **Full Model Pricing Matrix**: Switch between Gemini Flash, Gemini Pro, Claude 3.5 Sonnet, Claude 3.5 Haiku, and GPT-4o pricing tiers with instant recalculation.
+- **Granular Token Tracking**: Separates incoming context (prompts, tool responses, file snippets) from outgoing context (agent thoughts, plans, code generation).
+- **Tool Execution Breakdown**: Real-time matrix of executed CLI commands, file views, directory listings, and edits.
+- **Dual UI Badges**: Live cost displays on both the top navigation bar and the right-hand "About Active Context" panel.
 
 ---
 

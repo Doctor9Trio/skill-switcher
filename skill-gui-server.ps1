@@ -69,6 +69,8 @@ Write-Host "     GET  /get-skill-content   - Full SKILL.md documentation"
 Write-Host "     POST /apply               - Apply skills to active-skills.md"
 Write-Host "     POST /clear               - Clear active-skills.md"
 Write-Host "     POST /run-laya            - Execute System 1 decision engine"
+Write-Host "     GET  /session-telemetry   - Real-time agent tokens & INR cost telemetry"
+Write-Host "     GET  /sessions-list       - List active Antigravity IDE sessions"
 Write-Host "  ============================================================="
 Write-Host "   Press Ctrl+C to stop."
 Write-Host ""
@@ -89,6 +91,202 @@ function Send-Json($res, $data, [int]$status = 200) {
     $bytes = [System.Text.Encoding]::UTF8.GetBytes($json)
     $res.ContentLength64 = $bytes.Length
     $res.OutputStream.Write($bytes, 0, $bytes.Length)
+}
+
+function Get-AntigravityBrainPath() {
+    $candidates = @(
+        (Join-Path $env:USERPROFILE ".gemini\antigravity-ide\brain"),
+        (Join-Path $env:LOCALAPPDATA "antigravity-ide\brain"),
+        (Join-Path $env:APPDATA "antigravity-ide\brain")
+    )
+    foreach ($c in $candidates) {
+        if (Test-Path $c) { return $c }
+    }
+    return $null
+}
+
+function Get-ActiveSessionsList() {
+    $brainPath = Get-AntigravityBrainPath
+    if (-not $brainPath -or -not (Test-Path $brainPath)) {
+        return @()
+    }
+    $sessions = @()
+    Get-ChildItem -Path $brainPath -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+        $transcript = Join-Path $_.FullName ".system_generated\logs\transcript.jsonl"
+        if (Test-Path $transcript) {
+            $item = Get-Item $transcript -ErrorAction SilentlyContinue
+            if ($item) {
+                $sessions += [PSCustomObject]@{
+                    id            = $_.Name
+                    last_active   = $item.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+                    last_time_raw = $item.LastWriteTime
+                    size_bytes    = $item.Length
+                    path          = $transcript
+                }
+            }
+        }
+    }
+    return @($sessions | Sort-Object last_time_raw -Descending)
+}
+
+function Get-SessionTelemetryData($targetSessionId = $null, $selectedModel = "gemini-flash") {
+    $sessions = Get-ActiveSessionsList
+    if ($sessions.Count -eq 0) {
+        return @{
+            ok                 = $true
+            has_sessions       = $false
+            session_id         = $null
+            is_active          = $false
+            total_tokens       = 0
+            input_tokens       = 0
+            output_tokens      = 0
+            cost_inr           = 0.00
+            cost_usd           = 0.00
+            cost_inr_formatted = "₹0.00"
+            cost_usd_formatted = "$0.00"
+            currency           = "INR"
+            message            = "No Antigravity IDE agent session transcripts found yet."
+            tools_breakdown    = @{}
+            recent_turns       = @()
+            sessions_list      = @()
+        }
+    }
+
+    $targetSession = $null
+    if ($targetSessionId) {
+        $targetSession = $sessions | Where-Object { $_.id -eq $targetSessionId } | Select-Object -First 1
+    }
+    if (-not $targetSession) {
+        $targetSession = $sessions[0]
+    }
+
+    $transcriptPath = $targetSession.path
+    if (-not (Test-Path $transcriptPath)) {
+        return @{
+            ok    = $false
+            error = "Transcript not found for session $($targetSession.id)"
+        }
+    }
+
+    $INR_PER_USD = 86.50
+    $pricing = @{
+        "gemini-flash"  = @{ id = "gemini-flash";  name = "Gemini 3.7 / 3.8 Flash (Active IDE)"; input_per_m = 0.15; output_per_m = 0.60 }
+        "gemini-pro"    = @{ id = "gemini-pro";    name = "Gemini 1.5 / 2.5 Pro";                input_per_m = 1.25; output_per_m = 5.00 }
+        "claude-sonnet" = @{ id = "claude-sonnet"; name = "Claude 3.5 Sonnet";                  input_per_m = 3.00; output_per_m = 15.00 }
+        "claude-haiku"  = @{ id = "claude-haiku";  name = "Claude 3.5 Haiku";                   input_per_m = 0.80; output_per_m = 4.00 }
+        "gpt-4o"        = @{ id = "gpt-4o";        name = "GPT-4o (Omni)";                      input_per_m = 2.50; output_per_m = 10.00 }
+    }
+    $modelKey = if ($pricing.ContainsKey($selectedModel)) { $selectedModel } else { "gemini-flash" }
+    $rates = $pricing[$modelKey]
+
+    $inputChars = 0
+    $outputChars = 0
+    $inputTokens = 0
+    $outputTokens = 0
+    $stepCount = 0
+    $toolsBreakdown = @{}
+    $recentTurns = @()
+
+    try {
+        $fs = New-Object System.IO.FileStream($transcriptPath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+        $sr = New-Object System.IO.StreamReader($fs, [System.Text.Encoding]::UTF8)
+
+        $allLines = [System.Collections.Generic.List[string]]::new()
+        while (-not $sr.EndOfStream) {
+            $line = $sr.ReadLine()
+            if (-not [string]::IsNullOrWhiteSpace($line)) {
+                $allLines.Add($line)
+            }
+        }
+        $sr.Close()
+        $fs.Close()
+
+        $totalLines = $allLines.Count
+        for ($idx = 0; $idx -lt $totalLines; $idx++) {
+            $rawLine = $allLines[$idx]
+            try {
+                $step = $rawLine | ConvertFrom-Json
+                $stepCount++
+                $type = $step.type
+                $source = $step.source
+                $content = if ($step.content) { $step.content } else { "" }
+
+                if ($step.tool_calls) {
+                    foreach ($tc in $step.tool_calls) {
+                        $n = $tc.name
+                        if ($n) {
+                            if (-not $toolsBreakdown.ContainsKey($n)) { $toolsBreakdown[$n] = 0 }
+                            $toolsBreakdown[$n]++
+                        }
+                    }
+                }
+
+                if ($type -eq "RUN_COMMAND" -or $type -eq "VIEW_FILE" -or $type -eq "GREP_SEARCH" -or $type -eq "LIST_DIRECTORY" -or $type -eq "CODE_ACTION") {
+                    $toolKey = $type.ToLower()
+                    if (-not $toolsBreakdown.ContainsKey($toolKey)) { $toolsBreakdown[$toolKey] = 0 }
+                    $toolsBreakdown[$toolKey]++
+                }
+
+                $stepChars = $content.Length
+                $stepTokens = [math]::Round($stepChars / 3.8)
+
+                if ($source -eq "MODEL" -or $type -eq "PLANNER_RESPONSE") {
+                    $outputChars += $stepChars
+                    $outputTokens += $stepTokens
+                } else {
+                    $inputChars += $stepChars
+                    $inputTokens += $stepTokens
+                }
+
+                if ($idx -ge ($totalLines - 6)) {
+                    $preview = if ($content.Length -gt 120) { $content.Substring(0, 120) + "..." } else { $content }
+                    $preview = $preview -replace "[\r\n]+", " "
+                    $recentTurns += @{
+                        step_index = $step.step_index
+                        type       = $type
+                        source     = $source
+                        tokens     = $stepTokens
+                        preview    = $preview
+                        created_at = $step.created_at
+                    }
+                }
+            } catch {}
+        }
+    } catch {}
+
+    $totalTokens = $inputTokens + $outputTokens
+    $costUsd = (($inputTokens / 1000000.0) * $rates.input_per_m) + (($outputTokens / 1000000.0) * $rates.output_per_m)
+    $costInr = $costUsd * $INR_PER_USD
+
+    $now = Get-Date
+    $lastActiveTime = $targetSession.last_time_raw
+    $isCurrentlyActive = ($now - $lastActiveTime).TotalMinutes -lt 15
+
+    return @{
+        ok                 = $true
+        has_sessions       = $true
+        session_id         = $targetSession.id
+        is_active          = $isCurrentlyActive
+        last_updated       = $targetSession.last_active
+        step_count         = $stepCount
+        input_tokens       = $inputTokens
+        output_tokens      = $outputTokens
+        total_tokens       = $totalTokens
+        input_chars        = $inputChars
+        output_chars       = $outputChars
+        cost_usd           = [math]::Round($costUsd, 4)
+        cost_inr           = [math]::Round($costInr, 2)
+        cost_inr_formatted = "₹" + ([math]::Round($costInr, 2)).ToString("N2")
+        cost_usd_formatted = "$" + ([math]::Round($costUsd, 4)).ToString("N4")
+        currency           = "INR"
+        model_key          = $modelKey
+        model_name         = $rates.name
+        exchange_rate      = $INR_PER_USD
+        tools_breakdown    = $toolsBreakdown
+        recent_turns       = $recentTurns
+        available_models   = $pricing
+        sessions_list      = ($sessions | Select-Object -First 10 | ForEach-Object { @{ id = $_.id; last_active = $_.last_active; size_kb = [math]::Round($_.size_bytes / 1024, 1) } })
+    }
 }
 
 while ($listener.IsListening) {
@@ -229,15 +427,26 @@ while ($listener.IsListening) {
             $query = $req.Url.Query
             $skillId = $null
             $subPath = $null
-            if ($query -match "skill=([^&]+)") { $skillId = [System.Web.HttpUtility]::UrlDecode($Matches[1]) }
-            if ($query -match "path=([^&]+)")  { $subPath = [System.Web.HttpUtility]::UrlDecode($Matches[1]) }
+            if ($query -match "skill=([^&]+)") { $skillId = [System.Net.WebUtility]::UrlDecode($Matches[1]) }
+            if ($query -match "path=([^&]+)")  { $subPath = [System.Net.WebUtility]::UrlDecode($Matches[1]) }
 
             $targetFile = $null
 
             if ($subPath) {
                 $cleanSub = $subPath.TrimStart("/\").Replace("/", "\")
-                $cand = Join-Path $PROJECT_ROOT $cleanSub
-                if (Test-Path $cand) { $targetFile = $cand }
+                if ($subPath.StartsWith("~")) {
+                    $homeSub = $subPath.TrimStart("~/\\").Replace("/", "\")
+                    $cand = Join-Path $env:USERPROFILE $homeSub
+                    if (Test-Path $cand) { $targetFile = $cand }
+                }
+                if (-not $targetFile) {
+                    $cand = Join-Path $PROJECT_ROOT $cleanSub
+                    if (Test-Path $cand) { $targetFile = $cand }
+                }
+                if (-not $targetFile) {
+                    $cand = Join-Path $TOOL_DIR $cleanSub
+                    if (Test-Path $cand) { $targetFile = $cand }
+                }
             }
 
             if (-not $targetFile -and $skillId) {
@@ -250,6 +459,20 @@ while ($listener.IsListening) {
                     if (Test-Path $c) {
                         $targetFile = $c
                         break
+                    }
+                }
+
+                # Fuzzy prefix/suffix matching if direct match not found
+                if (-not $targetFile) {
+                    $skillsDir = Join-Path $PROJECT_ROOT ".agents\skills"
+                    if (Test-Path $skillsDir) {
+                        $match = Get-ChildItem -Directory $skillsDir | Where-Object { 
+                            $_.Name -eq $skillId -or $_.Name -like "*$skillId*" -or $skillId -like "*$($_.Name)*" 
+                        } | Select-Object -First 1
+                        if ($match) {
+                            $candMd = Join-Path $match.FullName "SKILL.md"
+                            if (Test-Path $candMd) { $targetFile = $candMd }
+                        }
                     }
                 }
             }
@@ -333,6 +556,23 @@ while ($listener.IsListening) {
                 }
             } catch {
                 Send-Json $res @{ ok = $false; error = $_.Exception.Message } 500
+            }
+        }
+        elseif ($method -eq "GET" -and $path -eq "/session-telemetry") {
+            $query = $req.Url.Query
+            $targetSid = $null
+            $targetModel = "gemini-flash"
+            if ($query -match "sessionId=([^&]+)") { $targetSid = [System.Net.WebUtility]::UrlDecode($Matches[1]) }
+            if ($query -match "model=([^&]+)")     { $targetModel = [System.Net.WebUtility]::UrlDecode($Matches[1]) }
+            $telemetry = Get-SessionTelemetryData $targetSid $targetModel
+            Send-Json $res $telemetry
+        }
+        elseif ($method -eq "GET" -and $path -eq "/sessions-list") {
+            $sessions = Get-ActiveSessionsList
+            Send-Json $res @{
+                ok       = $true
+                count    = $sessions.Count
+                sessions = ($sessions | ForEach-Object { @{ id = $_.id; last_active = $_.last_active; size_kb = [math]::Round($_.size_bytes / 1024, 1) } })
             }
         }
         else {

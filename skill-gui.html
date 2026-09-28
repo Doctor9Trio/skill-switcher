@@ -1138,6 +1138,57 @@ html.dark .cred-state-pill.state-saved {
   border: 1px solid rgba(52, 211, 153, 0.4);
 }
 
+/* Collapsed Repository Header API Key Badges & Indicators */
+.repo-key-badge {
+  height: 24px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.2px;
+}
+.repo-key-badge:hover {
+  transform: translateY(-1px);
+}
+.repo-key-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin-left: 5px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.repo-key-indicator.needed {
+  color: #b45309;
+  background: rgba(217, 119, 6, 0.15);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+}
+html.dark .repo-key-indicator.needed {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.18);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+.repo-key-indicator.configured {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+html.dark .repo-key-indicator.configured {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.18);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+}
+.btn-gh.active-filter {
+  background: var(--accent-blue, #0969da) !important;
+  color: #fff !important;
+  border-color: var(--accent-blue, #0969da) !important;
+}
+
 /* Circular Selection Checkmark Badge on Subskill Card */
 .check-pill {
   width: 20px;
@@ -2259,7 +2310,11 @@ code, pre, .prism-box, .modal-code-box, .keyvault-input, .repo-filter-input, #in
       <svg class="octicon" width="12" height="12" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z"></path></svg>
       85 Verified on Disk
     </span>
-            <button class="btn-gh" onclick="openLayaPlayground()" title="Test Laya System 1 Decision Engine live on local machine">
+    <button class="btn-gh" id="agent-telemetry-nav-btn" onclick="openTelemetryModal()" title="View live agent session tokens and estimated cost in INR (₹)">
+      <span class="status-indicator-dot active" style="margin-right:2px;background:#2ea043;width:7px;height:7px;display:inline-block;border-radius:50%;"></span>
+      <span id="nav-telemetry-label" style="font-weight:600;color:var(--accent-green);">Live Agent: ₹0.00</span>
+    </button>
+    <button class="btn-gh" onclick="openLayaPlayground()" title="Test Laya System 1 Decision Engine live on local machine">
       <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" style="color:#8250df;"><path d="M6 1.75a.75.75 0 0 1 .75.75v1h2.5v-1a.75.75 0 0 1 1.5 0v1h.5A2.75 2.75 0 0 1 14 6.25v.5h1a.75.75 0 0 1 0 1.5h-1v2.5h1a.75.75 0 0 1 0 1.5h-1v.5A2.75 2.75 0 0 1 11.25 14h-.5v1a.75.75 0 0 1-1.5 0v-1h-2.5v1a.75.75 0 0 1-1.5 0v-1h-.5A2.75 2.75 0 0 1 2 11.25v-.5H1a.75.75 0 0 1 0-1.5h1v-2.5H1a.75.75 0 0 1 0-1.5h1v-.5A2.75 2.75 0 0 1 4.75 3.5h.5v-1A.75.75 0 0 1 6 1.75Z"></path></svg>
       Laya Playground
     </button>
@@ -2440,7 +2495,11 @@ code, pre, .prism-box, .modal-code-box, .keyvault-input, .repo-filter-input, #in
         <button class="ir-btn-clear" onclick="clearIntentRouter()" title="Clear text and matched results"><svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg></button>
       </div>
 
-
+      <!-- Thinking indicator -->
+      <div class="ir-thinking" id="ir-thinking">
+        <div class="ir-dots"><span></span><span></span><span></span></div>
+        <span>Evaluating skills & context window...</span>
+      </div>
 
       <!-- Results -->
       <div id="intent-results"></div>
@@ -2492,6 +2551,13 @@ code, pre, .prism-box, .modal-code-box, .keyvault-input, .repo-filter-input, #in
           <button class="btn-gh btn-gh-sm" onclick="openTokenInspectorModal()" style="font-size:10px;padding:1px 6px;height:20px;gap:3px;" title="Inspect real-time token metrics and context window savings">
             <svg class="octicon" width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M1 3.5C1 2.12 4.13 1 8 1s7 1.12 7 2.5v9c0 1.38-3.13 2.5-7 2.5s-7-1.12-7-2.5v-9Zm1.5 0v1.78c1.19.67 3.26 1.02 5.5 1.02s4.31-.35 5.5-1.02V3.5C13.5 2.86 11.23 2.5 8 2.5S2.5 2.86 2.5 3.5Zm11 4.28c-1.19.67-3.26 1.02-5.5 1.02s-4.31-.35-5.5-1.02v1.72c0 .64 2.27 1 5.5 1s5.5-.36 5.5-1V7.78Zm0 3.5c-1.19.67-3.26 1.02-5.5 1.02s-4.31-.35-5.5-1.02v1.72c0 .64 2.27 1 5.5 1s5.5-.36 5.5-1v-1.72Z"/></svg>
             Live Math
+          </button>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px dashed var(--border-muted);">
+          <span style="color:var(--fg-muted);">Live Agent Cost</span>
+          <button class="btn-gh btn-gh-sm" onclick="openTelemetryModal()" style="font-size:10px;padding:1px 6px;height:20px;gap:3px;font-weight:600;color:var(--accent-green);" title="View real-time agent token telemetry and cost in INR (₹)">
+            <span class="status-indicator-dot active" style="width:6px;height:6px;background:#2ea043;display:inline-block;border-radius:50%;"></span>
+            <span id="sidebar-live-cost">₹0.00</span>
           </button>
         </div>
       </div>
@@ -2943,6 +3009,150 @@ code, pre, .prism-box, .modal-code-box, .keyvault-input, .repo-filter-input, #in
     <div class="modal-foot">
       <button class="btn-gh" onclick="copyActivePrompt()">Copy active-skills.md</button>
       <button class="btn-gh btn-gh-primary" onclick="closeTokenInspectorModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Live Agent Session Token & Cost Telemetry Modal (INR & USD) -->
+<div class="modal-overlay" id="agent-telemetry-modal-overlay" onclick="closeTelemetryModalOnBackdrop(event)">
+  <div class="modal-window" style="max-width:840px;" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <svg class="octicon" width="22" height="22" viewBox="0 0 16 16" style="color:var(--accent-green);"><path d="M1.5 1.75a.75.75 0 0 0-1.5 0v12.5c0 .414.336.75.75.75h14.5a.75.75 0 0 0 0-1.5H1.5V1.75Zm14.28 4.03-4.5 4.5a.75.75 0 0 1-1.06 0L7.5 7.56 4.28 10.78a.75.75 0 0 1-1.06-1.06l3.75-3.75a.75.75 0 0 1 1.06 0l2.72 2.72 3.97-3.97a.75.75 0 0 1 1.06 1.06Z"/></svg>
+        <div>
+          <div style="font-weight:600;font-size:15px;color:var(--fg-default);display:flex;align-items:center;gap:8px;">
+            <span>Live Agent Session Telemetry & Cost Engine</span>
+            <span class="gh-pill green" id="tel-live-pill" style="font-size:10px;padding:1px 6px;">
+              <span class="status-indicator-dot active" style="width:6px;height:6px;background:#2ea043;display:inline-block;border-radius:50%;margin-right:4px;"></span>
+              Active Session
+            </span>
+          </div>
+          <div style="font-size:11px;color:var(--fg-muted);">Real-time incoming/outgoing token usage & Indian Rupee (₹ INR) cost tracking</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn-gh btn-gh-sm" onclick="fetchSessionTelemetry(false)" title="Refresh telemetry now" id="tel-refresh-btn">
+          <svg class="octicon" width="12" height="12" viewBox="0 0 16 16"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"></path></svg> Refresh
+        </button>
+        <button class="btn-gh btn-gh-sm" onclick="closeTelemetryModal()"><svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg></button>
+      </div>
+    </div>
+
+    <div class="modal-body" style="gap:14px;max-height:560px;overflow-y:auto;">
+      <!-- Hero Metric Bar: Live Cost in INR -->
+      <div style="background:var(--accent-green-bg, rgba(46,160,67,0.08));border:1px solid var(--accent-green-border, rgba(46,160,67,0.3));border-radius:8px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+            <span style="font-size:12px;font-weight:600;color:var(--accent-green);">Estimated Live Session Cost</span>
+            <span class="gh-pill green" style="font-size:10px;padding:0 5px;">0% Agent Overhead</span>
+          </div>
+          <div style="font-size:34px;font-weight:800;color:var(--accent-green);line-height:1.1;" id="tel-hero-cost-inr">₹0.00</div>
+          <div style="font-size:11px;color:var(--fg-muted);margin-top:4px;" id="tel-hero-cost-usd">≈ $0.0000 USD (Exchange Rate: ₹86.50/USD)</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+          <div style="display:flex;gap:4px;background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:2px;">
+            <button class="btn-gh btn-gh-sm" id="curr-toggle-inr" onclick="setTelemetryCurrency('INR')" style="background:var(--accent-green);color:#fff;font-weight:700;border:none;">₹ INR</button>
+            <button class="btn-gh btn-gh-sm btn-gh-ghost" id="curr-toggle-usd" onclick="setTelemetryCurrency('USD')">$ USD</button>
+          </div>
+          <div style="font-size:10.5px;color:var(--fg-muted);" id="tel-last-sync-time">Last Synced: Just now</div>
+        </div>
+      </div>
+
+      <!-- Controls Row: Model Selector & Session Selector -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:var(--bg-subtle);border:1px solid var(--border-default);border-radius:6px;padding:8px 12px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:600;color:var(--fg-default);">Model Pricing:</span>
+          <select id="tel-model-select" onchange="changeTelemetryModel(this.value)" class="repo-filter-input" style="width:auto;margin-bottom:0;padding:3px 8px;font-size:11px;font-weight:600;">
+            <option value="gemini-flash">⚡ Gemini 3.7 / 3.8 Flash (Active IDE Default)</option>
+            <option value="gemini-pro">🧠 Gemini 1.5 / 2.5 Pro</option>
+            <option value="claude-sonnet">🟣 Claude 3.5 Sonnet</option>
+            <option value="claude-haiku">⚡ Claude 3.5 Haiku</option>
+            <option value="gpt-4o">🟢 GPT-4o (Omni)</option>
+          </select>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:600;color:var(--fg-muted);">Session:</span>
+          <select id="tel-session-select" onchange="changeTelemetrySession(this.value)" class="repo-filter-input" style="width:auto;margin-bottom:0;padding:3px 8px;font-size:11px;max-width:240px;">
+            <option value="">Latest Active Session</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 4 Stat Cards Grid -->
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;">
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">📥 Incoming (Input) Tokens</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent-blue);" id="tel-stat-input">0</div>
+          <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;" id="tel-stat-input-chars">Prompts + File Context</div>
+        </div>
+
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">📤 Outgoing (Output) Tokens</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent-purple,#8250df);" id="tel-stat-output">0</div>
+          <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;" id="tel-stat-output-chars">Thoughts + Code Edits</div>
+        </div>
+
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">⚡ Cumulative Total</div>
+          <div style="font-size:20px;font-weight:700;color:var(--fg-default);" id="tel-stat-total">0</div>
+          <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;" id="tel-stat-steps">0 interaction steps</div>
+        </div>
+
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">💵 Net Cost (INR / USD)</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent-green);" id="tel-stat-cost">₹0.00</div>
+          <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;" id="tel-stat-cost-usd">$0.0000 USD</div>
+        </div>
+      </div>
+
+      <!-- Two-Column Breakdown: Tools Matrix & Recent Activity Feed -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <!-- Left: Tools Executions Breakdown -->
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
+          <div style="font-weight:600;font-size:12px;margin-bottom:8px;color:var(--fg-default);display:flex;justify-content:space-between;align-items:center;">
+            <span>Agent Tools Execution Breakdown</span>
+            <span class="gh-pill" style="font-size:10px;" id="tel-tools-total-badge">0 calls</span>
+          </div>
+          <div style="max-height:180px;overflow-y:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:11px;text-align:left;">
+              <thead>
+                <tr style="background:var(--bg-subtle);border-bottom:1px solid var(--border-default);color:var(--fg-muted);">
+                  <th style="padding:4px 8px;">Tool</th>
+                  <th style="padding:4px 8px;text-align:right;">Calls</th>
+                  <th style="padding:4px 8px;text-align:right;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="tel-tools-tbody">
+                <tr><td colspan="3" style="padding:8px;text-align:center;color:var(--fg-muted);">Scanning tool activity...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right: Recent Turn Activity Stream -->
+        <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
+          <div style="font-weight:600;font-size:12px;margin-bottom:8px;color:var(--fg-default);display:flex;justify-content:space-between;align-items:center;">
+            <span>Recent Trajectory Interactions</span>
+            <span style="font-size:10.5px;color:var(--fg-muted);">Live from transcript.jsonl</span>
+          </div>
+          <div id="tel-recent-feed" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;">
+            <div style="padding:8px;text-align:center;color:var(--fg-muted);font-size:11px;">Loading trajectory...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot" style="justify-content:space-between;">
+      <div style="font-size:11px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
+        <span class="status-indicator-dot active" style="width:6px;height:6px;background:#2ea043;"></span>
+        <span>Zero-overhead polling active (4s interval)</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-gh" onclick="fetchSessionTelemetry(false)">Refresh Now</button>
+        <button class="btn-gh btn-gh-primary" onclick="closeTelemetryModal()">Close</button>
+      </div>
     </div>
   </div>
 </div>
@@ -5759,6 +5969,109 @@ function renderSkillHeaderKeyBadge(s) {
   }
 }
 
+function getRepoCredentialInfo(r) {
+  if (!r) return { hasCredentials: false };
+
+  const credSkills = (r.subskills || []).filter(s => {
+    const info = getSkillCredentialInfo(s);
+    return info && info.hasCredentials;
+  });
+
+  if (!credSkills.length && !r.hasApiKey) {
+    return { hasCredentials: false };
+  }
+
+  const items = [];
+  const seenVars = new Set();
+  let allConfigured = true;
+
+  credSkills.forEach(s => {
+    const info = getSkillCredentialInfo(s);
+    const varName = info.isPasswordPrimary ? info.passVar : info.keyVar;
+    if (!seenVars.has(varName)) {
+      seenVars.add(varName);
+      items.push({
+        skillId: s.id,
+        skillName: s.name,
+        varName: varName,
+        label: info.keyLabel,
+        isPassword: info.isPasswordPrimary,
+        isConfigured: info.isConfigured
+      });
+    }
+    if (!info.isConfigured) {
+      allConfigured = false;
+    }
+  });
+
+  if (!items.length && r.hasApiKey) {
+    const fallbackVar = r.apiKeyName || (r.name.split('/')[1] || r.id).toUpperCase().replace(/[^A-Z0-9]/g, '_') + '_API_KEY';
+    const saved = localStorage.getItem('apikey_' + fallbackVar) || '';
+    const isConfigured = Boolean(saved && saved.trim());
+    items.push({
+      skillId: r.subskills && r.subskills[0] ? r.subskills[0].id : null,
+      skillName: r.name,
+      varName: fallbackVar,
+      label: 'API Key',
+      isPassword: false,
+      isConfigured: isConfigured
+    });
+    allConfigured = isConfigured;
+  }
+
+  const primary = items[0] || {};
+  const isPass = items.length > 0 && items.every(i => i.isPassword);
+  
+  return {
+    hasCredentials: true,
+    allConfigured,
+    items,
+    credSkills,
+    primaryVar: primary.varName || '',
+    primarySkillId: primary.skillId || (credSkills[0] ? credSkills[0].id : null),
+    isPassword: isPass,
+    varNames: items.map(i => i.varName).join(', ')
+  };
+}
+
+function renderRepoHeaderKeyBadge(r) {
+  const cred = getRepoCredentialInfo(r);
+  if (!cred || !cred.hasCredentials) return '';
+
+  const isPass = cred.isPassword;
+  const label = isPass ? 'Password' : 'API Key';
+  const targetSkillId = cred.primarySkillId;
+  const clickAction = targetSkillId
+    ? `openDirectSkillCredentialModal('${targetSkillId}')`
+    : `openKeyVaultFor('${cred.primaryVar}')`;
+
+  if (cred.allConfigured) {
+    return `
+      <button class="skill-key-badge saved repo-key-badge" 
+              onclick="event.stopPropagation(); ${clickAction}" 
+              title="Configured in localStorage (${cred.varNames}) - Click to view or edit">
+        <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/>
+        </svg>
+        <span>${label} Saved</span>
+      </button>
+    `;
+  } else {
+    const icon = isPass
+      ? `<svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M4 4a4 4 0 0 1 8 0v2h.25c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25v-5.5C2 6.784 2.784 6 3.75 6H4V4Zm2 2h4V4a2 2 0 1 0-4 0v2Zm-2.25 1.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25h-8.5Z"/></svg>`
+      : `<svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6.5 5.5a4 4 0 1 1 5.656 5.657l-1.077 1.077a.75.75 0 0 1-1.06 0L8.75 11l-.97.97a.75.75 0 0 1-1.06 0L5.45 10.7a.75.75 0 0 1 0-1.06l1.05-1.05V6.5a1 1 0 0 1 0-1ZM8 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/></svg>`;
+
+    return `
+      <button class="skill-key-badge needed ${isPass ? 'pass' : ''} repo-key-badge" 
+              onclick="event.stopPropagation(); ${clickAction}" 
+              title="Requires ${cred.varNames} - Click to configure key">
+        ${icon}
+        <span>Needs ${label}</span>
+      </button>
+    `;
+  }
+}
+
 function openDirectSkillCredentialModal(skillId) {
   const skill = ALL_SKILLS.find(s => s.id === skillId);
   if (!skill) return;
@@ -5779,6 +6092,13 @@ function openDirectSkillCredentialModal(skillId) {
   updateSkillCredModalStatuses(info);
   
   document.getElementById('skill-cred-modal-overlay').style.display = 'flex';
+  setTimeout(() => {
+    if (info.isPasswordPrimary && passInput) {
+      passInput.focus();
+    } else if (keyInput) {
+      keyInput.focus();
+    }
+  }, 100);
 }
 
 function updateSkillCredModalStatuses(info) {
@@ -6347,6 +6667,18 @@ function clearAllSelections() {
   showToast('Reset all selections', false);
 }
 
+let apiKeyOnlyFilter = false;
+
+function toggleApiKeyFilter() {
+  apiKeyOnlyFilter = !apiKeyOnlyFilter;
+  updateUI();
+  if (apiKeyOnlyFilter) {
+    showToast('Showing repositories that require API credentials');
+  } else {
+    showToast('Showing all repositories');
+  }
+}
+
 function getFilteredRepos() {
   let list = REPOS;
 
@@ -6366,6 +6698,13 @@ function getFilteredRepos() {
     } else {
       list = list.filter(r => r.cat === curSubCat);
     }
+  }
+
+  if (apiKeyOnlyFilter) {
+    list = list.filter(r => {
+      const cred = getRepoCredentialInfo(r);
+      return cred && cred.hasCredentials;
+    });
   }
 
 // Keeping all repositories visible in sidebar and feed
@@ -6429,6 +6768,17 @@ function renderLeftNav() {
             ? `<span class="repo-owner-muted">${owner}/</span><span class="repo-name-bold">${repo}</span>` 
             : `<span class="repo-name-bold">${repo}</span>`;
         })()}</span>
+        ${(() => {
+          const cred = getRepoCredentialInfo(r);
+          if (!cred.hasCredentials) return '';
+          return `
+            <svg class="octicon" width="11" height="11" viewBox="0 0 16 16" fill="currentColor" 
+                 style="color:${cred.allConfigured ? 'var(--accent-green, #2ea043)' : 'var(--accent-orange, #d29922)'};margin-left:4px;flex-shrink:0;" 
+                 title="${cred.allConfigured ? 'API credentials configured (' + cred.varNames + ')' : 'Requires API credentials (' + cred.varNames + ')'}">
+              <path d="M6.5 5.5a4 4 0 1 1 5.656 5.657l-1.077 1.077a.75.75 0 0 1-1.06 0L8.75 11l-.97.97a.75.75 0 0 1-1.06 0L5.45 10.7a.75.75 0 0 1 0-1.06l1.05-1.05V6.5a1 1 0 0 1 0-1ZM8 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/>
+            </svg>
+          `;
+        })()}
       </div>
       <div>
         ${(() => {
@@ -6453,16 +6803,26 @@ function renderCenter() {
 
   const repos = getFilteredRepos();
   const allExpanded = repos.length > 0 && repos.every(r => !collapsedRepos.has(r.id));
+  const allCredReposCount = REPOS.filter(r => getRepoCredentialInfo(r).hasCredentials).length;
 
   // Feed Controls Header
   const controls = document.createElement('div');
   controls.className = 'feed-header-strip';
   controls.innerHTML = `
-    <div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <span class="feed-count-text">${repos.length} Repositories (${getFilteredSkills().length} subskills total)</span>
-      <span style="font-size:12px;color:var(--fg-muted);margin-left:8px;">Collapsed by default &middot; Direct 1-click selection</span>
+      <span style="font-size:12px;color:var(--fg-muted);">Collapsed by default &middot; Direct 1-click selection</span>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <button class="btn-gh btn-gh-sm ${apiKeyOnlyFilter ? 'active-filter' : ''}" 
+              onclick="toggleApiKeyFilter()" 
+              title="${apiKeyOnlyFilter ? 'Click to show all repositories' : 'Filter to show only repositories that require API keys'}">
+        <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M6.5 5.5a4 4 0 1 1 5.656 5.657l-1.077 1.077a.75.75 0 0 1-1.06 0L8.75 11l-.97.97a.75.75 0 0 1-1.06 0L5.45 10.7a.75.75 0 0 1 0-1.06l1.05-1.05V6.5a1 1 0 0 1 0-1ZM8 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/>
+        </svg>
+        <span>${apiKeyOnlyFilter ? 'Showing API Key Repos (' + repos.length + ')' : 'Filter: Needs API (' + allCredReposCount + ')'}</span>
+      </button>
+
       <button class="btn-gh btn-gh-sm" onclick="toggleAllReposCollapse()" title="${allExpanded ? 'Collapse all visible repositories' : 'Expand all visible repositories'}">
         ${allExpanded 
           ? `<svg class="octicon" width="12" height="12" viewBox="0 0 16 16"><path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"></path></svg> Collapse All` 
@@ -6490,6 +6850,7 @@ function renderCenter() {
     const activeCount = subIds.filter(id => sel.has(id)).length;
     const allSelected = activeCount === r.subskills.length && r.subskills.length > 0;
     const isCollapsed = collapsedRepos.has(r.id);
+    const cred = getRepoCredentialInfo(r);
 
     const banner = document.createElement('div');
     banner.className = 'repo-group-banner' + (isCollapsed ? ' collapsed' : '');
@@ -6528,9 +6889,22 @@ function renderCenter() {
               return `<span class="counter-bubble active-partial">${activeCount} of ${r.subskills.length} active</span>`;
             }
           })() }
+          ${cred.hasCredentials ? `
+            <span class="repo-key-indicator ${cred.allConfigured ? 'configured' : 'needed'}" 
+                  title="${cred.allConfigured ? 'API credentials configured (' + cred.varNames + ')' : 'Requires API credentials (' + cred.varNames + ')'}">
+              <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                ${cred.isPassword 
+                  ? '<path d="M4 4a4 4 0 0 1 8 0v2h.25c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25v-5.5C2 6.784 2.784 6 3.75 6H4V4Zm2 2h4V4a2 2 0 1 0-4 0v2Zm-2.25 1.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25h-8.5Z"/>'
+                  : '<path d="M6.5 5.5a4 4 0 1 1 5.656 5.657l-1.077 1.077a.75.75 0 0 1-1.06 0L8.75 11l-.97.97a.75.75 0 0 1-1.06 0L5.45 10.7a.75.75 0 0 1 0-1.06l1.05-1.05V6.5a1 1 0 0 1 0-1ZM8 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/>'
+                }
+              </svg>
+            </span>
+          ` : ''}
         </div>
 
         <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation()">
+          ${renderRepoHeaderKeyBadge(r)}
+
           <!-- Direct Select All in Repo Button -->
           <button class="btn-gh btn-gh-sm ${allSelected ? 'btn-gh-primary' : ''}" onclick="toggleSelectRepoDirect('${r.id}', event)">
             ${allSelected ? 'Deselect All' : 'Direct Select'}
@@ -7269,7 +7643,7 @@ function runIntentRouter() {
       </div>
 
       <div class="ir-footer-note">
-        ${activatedCount} of ${totalSkills} skills active &middot; Target: <code>~/.gemini/config/rules/active-skills.md</code>
+        ${activatedCount} of ${ALL_SKILLS.length} skills active &middot; Target: <code>~/.gemini/config/rules/active-skills.md</code>
       </div>
     `;
 
@@ -7291,6 +7665,22 @@ function runIntentRouter() {
       analyzeBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6.5 0a6.5 6.5 0 0 1 5.31 10.25l3.22 3.22a.75.75 0 1 1-1.06 1.06l-3.22-3.22A6.5 6.5 0 1 1 6.5 0Zm0 1.5a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm.25 2a.75.75 0 0 1 .75.75v1.75H9.25a.75.75 0 0 1 0 1.5H7.5v1.75a.75.75 0 0 1-1.5 0V7.5H4.25a.75.75 0 0 1 0-1.5H6V3.75a.75.75 0 0 1 .75-.75Z"/></svg> Analyze & Auto-Stage';
     }
   }
+}
+
+function irToggleCollapse(btn) {
+  const body = document.getElementById('ir-result-body');
+  if (!body) return;
+  if (body.style.display === 'none') {
+    body.style.display = 'flex';
+    if (btn) btn.textContent = 'Hide details';
+  } else {
+    body.style.display = 'none';
+    if (btn) btn.textContent = 'Show details';
+  }
+}
+
+function copyContextPrompt() {
+  copyActivePrompt();
 }
 
 function clearIntentRouter() {
@@ -7712,13 +8102,300 @@ function renderHealthTable(filter = '') {
   `;
 }
 
+// ========================================================
+// LIVE AGENT SESSION TOKEN & COST TELEMETRY CONTROLLERS
+// ========================================================
+
+let currentTelemetryData = null;
+let selectedTelemetryModel = 'gemini-flash';
+let selectedTelemetrySessionId = '';
+let telemetryPollTimer = null;
+let activeTelemetryCurrency = 'INR'; // INR is primary per user requirement
+let isTelemetryModalOpen = false;
+
+function openTelemetryModal() {
+  const overlay = document.getElementById('agent-telemetry-modal-overlay');
+  if (!overlay) return;
+  overlay.classList.add('open');
+  isTelemetryModalOpen = true;
+  fetchSessionTelemetry(false);
+
+  // Accelerated polling when modal is in focus (4 seconds)
+  if (telemetryPollTimer) clearInterval(telemetryPollTimer);
+  telemetryPollTimer = setInterval(() => {
+    if (isTelemetryModalOpen) {
+      fetchSessionTelemetry(true);
+    }
+  }, 4000);
+}
+
+function closeTelemetryModal() {
+  const overlay = document.getElementById('agent-telemetry-modal-overlay');
+  if (overlay) overlay.classList.remove('open');
+  isTelemetryModalOpen = false;
+  
+  // Revert to background polling (15s) for navbar badge
+  if (telemetryPollTimer) clearInterval(telemetryPollTimer);
+  telemetryPollTimer = setInterval(() => {
+    fetchSessionTelemetry(true);
+  }, 15000);
+}
+
+function closeTelemetryModalOnBackdrop(e) {
+  if (e.target.id === 'agent-telemetry-modal-overlay') {
+    closeTelemetryModal();
+  }
+}
+
+function setTelemetryCurrency(curr) {
+  activeTelemetryCurrency = curr;
+  const btnInr = document.getElementById('curr-toggle-inr');
+  const btnUsd = document.getElementById('curr-toggle-usd');
+
+  if (curr === 'INR') {
+    if (btnInr) {
+      btnInr.className = 'btn-gh btn-gh-sm';
+      btnInr.style.cssText = 'background:var(--accent-green);color:#fff;font-weight:700;border:none;';
+    }
+    if (btnUsd) {
+      btnUsd.className = 'btn-gh btn-gh-sm btn-gh-ghost';
+      btnUsd.style.cssText = '';
+    }
+  } else {
+    if (btnUsd) {
+      btnUsd.className = 'btn-gh btn-gh-sm';
+      btnUsd.style.cssText = 'background:var(--accent-blue);color:#fff;font-weight:700;border:none;';
+    }
+    if (btnInr) {
+      btnInr.className = 'btn-gh btn-gh-sm btn-gh-ghost';
+      btnInr.style.cssText = '';
+    }
+  }
+
+  if (currentTelemetryData) {
+    renderTelemetryUI(currentTelemetryData);
+    updateGlobalTelemetryBadges(currentTelemetryData);
+  }
+}
+
+function changeTelemetryModel(modelKey) {
+  selectedTelemetryModel = modelKey;
+  fetchSessionTelemetry(false);
+}
+
+function changeTelemetrySession(sessionId) {
+  selectedTelemetrySessionId = sessionId;
+  fetchSessionTelemetry(false);
+}
+
+async function fetchSessionTelemetry(isSilent = false) {
+  const refreshBtn = document.getElementById('tel-refresh-btn');
+  if (refreshBtn && !isSilent) {
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '<span class="status-indicator-dot active" style="background:var(--accent-blue);width:6px;height:6px;display:inline-block;border-radius:50%;margin-right:4px;"></span> Syncing...';
+  }
+
+  try {
+    const params = new URLSearchParams();
+    if (selectedTelemetryModel) params.append('model', selectedTelemetryModel);
+    if (selectedTelemetrySessionId) params.append('sessionId', selectedTelemetrySessionId);
+
+    const res = await fetch(`/session-telemetry?${params.toString()}`);
+    if (res.ok) {
+      const data = await res.json();
+      currentTelemetryData = data;
+      renderTelemetryUI(data);
+      updateGlobalTelemetryBadges(data);
+      syncSessionDropdown(data.sessions_list, data.session_id);
+    } else {
+      if (!isSilent) showToast('Telemetry service unreachable');
+    }
+  } catch (err) {
+    // Offline / standalone HTML mode graceful handling
+    if (!isSilent) showToast('Start server to enable live telemetry');
+  } finally {
+    if (refreshBtn && !isSilent) {
+      refreshBtn.disabled = false;
+      refreshBtn.innerHTML = '<svg class="octicon" width="12" height="12" viewBox="0 0 16 16"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"></path></svg> Refresh';
+    }
+    const syncTimeEl = document.getElementById('tel-last-sync-time');
+    if (syncTimeEl) {
+      syncTimeEl.textContent = 'Last Synced: ' + new Date().toLocaleTimeString();
+    }
+  }
+}
+
+function syncSessionDropdown(sessionsList, activeId) {
+  const select = document.getElementById('tel-session-select');
+  if (!select || !sessionsList) return;
+
+  const currentVal = select.value;
+  let opts = '<option value="">Latest Active Session</option>';
+  sessionsList.forEach(s => {
+    const isSelected = (currentVal === s.id || (!currentVal && s.id === activeId));
+    opts += `<option value="${s.id}" ${isSelected ? 'selected' : ''}>${s.id.substring(0, 8)}... (${s.size_kb} KB)</option>`;
+  });
+  select.innerHTML = opts;
+}
+
+function renderTelemetryUI(data) {
+  if (!data || !data.ok) return;
+
+  const costInr = typeof data.cost_inr === 'number' ? data.cost_inr : 0;
+  const costUsd = typeof data.cost_usd === 'number' ? data.cost_usd : 0;
+  const inTokens = data.input_tokens || 0;
+  const outTokens = data.output_tokens || 0;
+  const totalTokens = data.total_tokens || (inTokens + outTokens);
+  const steps = data.step_count || 0;
+
+  // Hero Card
+  const heroInrEl = document.getElementById('tel-hero-cost-inr');
+  const heroUsdEl = document.getElementById('tel-hero-cost-usd');
+  if (heroInrEl) {
+    if (activeTelemetryCurrency === 'INR') {
+      heroInrEl.textContent = '₹' + costInr.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    } else {
+      heroInrEl.textContent = '$' + costUsd.toFixed(4) + ' USD';
+    }
+  }
+  if (heroUsdEl) {
+    if (activeTelemetryCurrency === 'INR') {
+      heroUsdEl.textContent = `≈ $${costUsd.toFixed(4)} USD (Exchange Benchmark: ₹86.50/USD)`;
+    } else {
+      heroUsdEl.textContent = `≈ ₹${costInr.toFixed(2)} INR (Exchange Benchmark: ₹86.50/USD)`;
+    }
+  }
+
+  // 4 Stats Grid
+  const statInputEl = document.getElementById('tel-stat-input');
+  const statInputCharsEl = document.getElementById('tel-stat-input-chars');
+  const statOutputEl = document.getElementById('tel-stat-output');
+  const statOutputCharsEl = document.getElementById('tel-stat-output-chars');
+  const statTotalEl = document.getElementById('tel-stat-total');
+  const statStepsEl = document.getElementById('tel-stat-steps');
+  const statCostEl = document.getElementById('tel-stat-cost');
+  const statCostUsdEl = document.getElementById('tel-stat-cost-usd');
+
+  if (statInputEl) statInputEl.textContent = inTokens.toLocaleString();
+  if (statInputCharsEl) statInputCharsEl.textContent = `${Math.round((data.input_chars || 0) / 1024)} KB system & user context`;
+
+  if (statOutputEl) statOutputEl.textContent = outTokens.toLocaleString();
+  if (statOutputCharsEl) statOutputCharsEl.textContent = `${Math.round((data.output_chars || 0) / 1024)} KB agent thoughts & code`;
+
+  if (statTotalEl) statTotalEl.textContent = totalTokens.toLocaleString();
+  if (statStepsEl) statStepsEl.textContent = `${steps} trajectory steps logged`;
+
+  if (statCostEl) statCostEl.textContent = '₹' + costInr.toFixed(2);
+  if (statCostUsdEl) statCostUsdEl.textContent = '$' + costUsd.toFixed(4) + ' USD';
+
+  // Live Pill
+  const pillEl = document.getElementById('tel-live-pill');
+  if (pillEl) {
+    if (data.is_active) {
+      pillEl.className = 'gh-pill green';
+      pillEl.innerHTML = '<span class="status-indicator-dot active" style="width:6px;height:6px;background:#2ea043;display:inline-block;border-radius:50%;margin-right:4px;"></span> Active Session';
+    } else {
+      pillEl.className = 'gh-pill';
+      pillEl.innerHTML = '<span class="status-indicator-dot" style="width:6px;height:6px;background:var(--fg-muted);display:inline-block;border-radius:50%;margin-right:4px;"></span> Completed';
+    }
+  }
+
+  // Tools Matrix Breakdown Table
+  const tbody = document.getElementById('tel-tools-tbody');
+  const badge = document.getElementById('tel-tools-total-badge');
+  const tools = data.tools_breakdown || {};
+  const toolEntries = Object.entries(tools).sort((a, b) => b[1] - a[1]);
+  let totalCalls = 0;
+
+  if (tbody) {
+    if (toolEntries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" style="padding:10px;text-align:center;color:var(--fg-muted);">No tool calls recorded in this session.</td></tr>';
+    } else {
+      let html = '';
+      toolEntries.forEach(([tool, count]) => {
+        totalCalls += count;
+        html += `
+          <tr style="border-bottom:1px solid var(--border-muted);">
+            <td style="padding:6px 8px;font-family:'Geist Mono',monospace;font-weight:600;color:var(--fg-default);">${tool}</td>
+            <td style="padding:6px 8px;text-align:right;font-weight:700;color:var(--accent-blue);">${count.toLocaleString()}</td>
+            <td style="padding:6px 8px;text-align:right;">
+              <span class="gh-pill green" style="font-size:9.5px;padding:1px 5px;">Executed</span>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+  }
+  if (badge) badge.textContent = `${totalCalls.toLocaleString()} calls`;
+
+  // Recent Trajectory Stream
+  const feedEl = document.getElementById('tel-recent-feed');
+  const turns = data.recent_turns || [];
+  if (feedEl) {
+    if (turns.length === 0) {
+      feedEl.innerHTML = '<div style="padding:10px;text-align:center;color:var(--fg-muted);font-size:11px;">No trajectory entries yet.</div>';
+    } else {
+      feedEl.innerHTML = turns.map(t => {
+        const isModel = t.source === 'MODEL' || t.type === 'PLANNER_RESPONSE';
+        const typeColor = isModel ? 'var(--accent-purple,#8250df)' : 'var(--accent-blue)';
+        const safeSnippet = (t.preview || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `
+          <div style="background:var(--bg-subtle);border:1px solid var(--border-muted);border-radius:6px;padding:6px 8px;font-size:11px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+              <span style="font-weight:600;color:${typeColor};">#${t.step_index || 0} ${t.type || 'STEP'}</span>
+              <span style="font-size:10px;color:var(--fg-muted);">${(t.tokens || 0).toLocaleString()} tok</span>
+            </div>
+            <div style="color:var(--fg-default);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Geist Mono',monospace;font-size:10.5px;">${safeSnippet || 'Tool execution result'}</div>
+          </div>
+        `;
+      }).reverse().join('');
+    }
+  }
+}
+
+function updateGlobalTelemetryBadges(data) {
+  if (!data || !data.ok) return;
+
+  const costInr = typeof data.cost_inr === 'number' ? data.cost_inr : 0;
+  const costUsd = typeof data.cost_usd === 'number' ? data.cost_usd : 0;
+
+  // Header Nav button label
+  const navLabel = document.getElementById('nav-telemetry-label');
+  if (navLabel) {
+    if (activeTelemetryCurrency === 'INR') {
+      navLabel.textContent = `Live Agent: ₹${costInr.toFixed(2)}`;
+    } else {
+      navLabel.textContent = `Live Agent: $${costUsd.toFixed(3)}`;
+    }
+  }
+
+  // Sidebar "About Active Context" live cost badge
+  const sidebarCost = document.getElementById('sidebar-live-cost');
+  if (sidebarCost) {
+    sidebarCost.textContent = `₹${costInr.toFixed(2)}`;
+    sidebarCost.title = `Estimated Session Cost: ₹${costInr.toFixed(2)} INR ($${costUsd.toFixed(4)} USD). Click to inspect token telemetry.`;
+  }
+}
+
 // Window focus listener for live sync
 window.addEventListener('focus', () => {
   initServerSync();
+  fetchSessionTelemetry(true);
 });
 
 // Boot sync
-setTimeout(initServerSync, 300);
+setTimeout(() => {
+  initServerSync();
+  fetchSessionTelemetry(true);
+  
+  // Background interval poll (every 15s)
+  if (!telemetryPollTimer) {
+    telemetryPollTimer = setInterval(() => {
+      fetchSessionTelemetry(true);
+    }, 15000);
+  }
+}, 300);
 
 </script>
 
