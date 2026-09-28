@@ -51,9 +51,9 @@
       <svg class="octicon" width="12" height="12" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z"></path></svg>
       85 Verified on Disk
     </span>
-    <button class="btn-gh" id="agent-telemetry-nav-btn" onclick="openTelemetryModal()" title="View live agent session tokens and estimated cost in INR (???)">
+    <button class="btn-gh" id="agent-telemetry-nav-btn" onclick="openTelemetryModal()" title="View live agent session tokens and estimated cost in INR (₹)">
       <span class="status-indicator-dot active" style="margin-right:2px;background:#2ea043;width:7px;height:7px;display:inline-block;border-radius:50%;"></span>
-      <span id="nav-telemetry-label" style="font-weight:600;color:var(--accent-green);">Live Agent: ???0.00</span>
+      <span id="nav-telemetry-label" style="font-weight:600;color:var(--accent-green);">Live Agent: ₹0.00</span>
     </button>
     <button class="btn-gh" onclick="openLayaPlayground()" title="Test Laya System 1 Decision Engine live on local machine">
       <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" style="color:#8250df;"><path d="M6 1.75a.75.75 0 0 1 .75.75v1h2.5v-1a.75.75 0 0 1 1.5 0v1h.5A2.75 2.75 0 0 1 14 6.25v.5h1a.75.75 0 0 1 0 1.5h-1v2.5h1a.75.75 0 0 1 0 1.5h-1v.5A2.75 2.75 0 0 1 11.25 14h-.5v1a.75.75 0 0 1-1.5 0v-1h-2.5v1a.75.75 0 0 1-1.5 0v-1h-.5A2.75 2.75 0 0 1 2 11.25v-.5H1a.75.75 0 0 1 0-1.5h1v-2.5H1a.75.75 0 0 1 0-1.5h1v-.5A2.75 2.75 0 0 1 4.75 3.5h.5v-1A.75.75 0 0 1 6 1.75Z"></path></svg>
@@ -106,6 +106,10 @@
       <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z"></path></svg>
       Code Review <span class="counter-bubble" id="count-review">6</span>
     </button>
+    <a href="pages/token-monitor.html" class="subnav-tab" style="text-decoration:none;" title="Live Token & Cost Telemetry Monitor">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M1.5 14.25a.75.75 0 0 1 0-1.5H2v-6.25a.75.75 0 0 1 1.5 0V12.75h2V8a.75.75 0 0 1 1.5 0v4.75h2V5a.75.75 0 0 1 1.5 0v7.75h2V3a.75.75 0 0 1 1.5 0v9.75h.5a.75.75 0 0 1 0 1.5Z"/></svg>
+      Token Monitor <span class="counter-bubble" style="background:var(--accent-blue-bg);color:var(--accent-blue);">Live</span>
+    </a>
   </div>
 </nav>
 
@@ -300,9 +304,9 @@
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px dashed var(--border-muted);">
           <span style="color:var(--fg-muted);">Live Agent Cost</span>
-          <button class="btn-gh btn-gh-sm" onclick="openTelemetryModal()" style="font-size:10px;padding:1px 6px;height:20px;gap:3px;font-weight:600;color:var(--accent-green);" title="View real-time agent token telemetry and cost in INR (???)">
+          <button class="btn-gh btn-gh-sm" onclick="openTelemetryModal()" style="font-size:10px;padding:1px 6px;height:20px;gap:3px;font-weight:600;color:var(--accent-green);" title="View real-time agent token telemetry and cost in INR (₹)">
             <span class="status-indicator-dot active" style="width:6px;height:6px;background:#2ea043;display:inline-block;border-radius:50%;"></span>
-            <span id="sidebar-live-cost">???0.00</span>
+            <span id="sidebar-live-cost">₹0.00</span>
           </button>
         </div>
       </div>
@@ -772,7 +776,7 @@
               Active Session
             </span>
           </div>
-          <div style="font-size:11px;color:var(--fg-muted);">Real-time incoming/outgoing token usage & Indian Rupee (??? INR) cost tracking</div>
+          <div style="font-size:11px;color:var(--fg-muted);">Real-time incoming/outgoing token usage & Indian Rupee (₹ INR) cost tracking</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
@@ -791,13 +795,13 @@
             <span style="font-size:12px;font-weight:600;color:var(--accent-green);">Estimated Live Session Cost</span>
             <span class="gh-pill green" style="font-size:10px;padding:0 5px;">0% Agent Overhead</span>
           </div>
-          <div style="font-size:34px;font-weight:800;color:var(--accent-green);line-height:1.1;" id="tel-hero-cost-inr">???0.00</div>
-          <div style="font-size:11px;color:var(--fg-muted);margin-top:4px;" id="tel-hero-cost-usd">??? $0.0000 USD (Exchange Rate: ???86.50/USD)</div>
+          <div style="font-size:34px;font-weight:800;color:var(--accent-green);line-height:1.1;" id="tel-hero-cost-inr">₹0.00</div>
+          <div style="font-size:11px;color:var(--fg-muted);margin-top:4px;" id="tel-hero-cost-usd">??? $0.0000 USD (Exchange Rate: ₹86.50/USD)</div>
         </div>
 
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
           <div style="display:flex;gap:4px;background:var(--bg-canvas);border:1px solid var(--border-default);border-radius:6px;padding:2px;">
-            <button class="btn-gh btn-gh-sm" id="curr-toggle-inr" onclick="setTelemetryCurrency('INR')" style="background:var(--accent-green);color:#fff;font-weight:700;border:none;">??? INR</button>
+            <button class="btn-gh btn-gh-sm" id="curr-toggle-inr" onclick="setTelemetryCurrency('INR')" style="background:var(--accent-green);color:#fff;font-weight:700;border:none;">₹ INR</button>
             <button class="btn-gh btn-gh-sm btn-gh-ghost" id="curr-toggle-usd" onclick="setTelemetryCurrency('USD')">$ USD</button>
           </div>
           <div style="font-size:10.5px;color:var(--fg-muted);" id="tel-last-sync-time">Last Synced: Just now</div>
@@ -809,11 +813,11 @@
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <span style="font-size:11px;font-weight:600;color:var(--fg-default);">Model Pricing:</span>
           <select id="tel-model-select" onchange="changeTelemetryModel(this.value)" class="repo-filter-input" style="width:auto;margin-bottom:0;padding:3px 8px;font-size:11px;font-weight:600;">
-            <option value="gemini-flash">??? Gemini 3.7 / 3.8 Flash (Active IDE Default)</option>
-            <option value="gemini-pro">???? Gemini 1.5 / 2.5 Pro</option>
-            <option value="claude-sonnet">???? Claude 3.5 Sonnet</option>
-            <option value="claude-haiku">??? Claude 3.5 Haiku</option>
-            <option value="gpt-4o">???? GPT-4o (Omni)</option>
+            <option value="gemini-flash">⚡ Gemini 3.7 / 3.8 Flash (Active IDE Default)</option>
+            <option value="gemini-pro">🔷 Gemini 1.5 / 2.5 Pro</option>
+            <option value="claude-sonnet">🧠 Claude 3.5 Sonnet</option>
+            <option value="claude-haiku">⚡ Claude 3.5 Haiku</option>
+            <option value="gpt-4o">🟢 GPT-4o (Omni)</option>
           </select>
         </div>
 
@@ -828,26 +832,26 @@
       <!-- 4 Stat Cards Grid -->
       <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;">
         <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
-          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">???? Incoming (Input) Tokens</div>
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">📥 Incoming (Input) Tokens</div>
           <div style="font-size:20px;font-weight:700;color:var(--accent-blue);" id="tel-stat-input">0</div>
           <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;" id="tel-stat-input-chars">Prompts + File Context</div>
         </div>
 
         <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
-          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">???? Outgoing (Output) Tokens</div>
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">📤 Outgoing (Output) Tokens</div>
           <div style="font-size:20px;font-weight:700;color:var(--accent-purple,#8250df);" id="tel-stat-output">0</div>
           <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;" id="tel-stat-output-chars">Thoughts + Code Edits</div>
         </div>
 
         <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
-          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">??? Cumulative Total</div>
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">📊 Cumulative Total</div>
           <div style="font-size:20px;font-weight:700;color:var(--fg-default);" id="tel-stat-total">0</div>
           <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;" id="tel-stat-steps">0 interaction steps</div>
         </div>
 
         <div style="background:var(--bg-card);border:1px solid var(--border-default);border-radius:8px;padding:12px;">
-          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">???? Net Cost (INR / USD)</div>
-          <div style="font-size:20px;font-weight:700;color:var(--accent-green);" id="tel-stat-cost">???0.00</div>
+          <div style="font-size:11px;color:var(--fg-muted);margin-bottom:4px;">💰 Net Cost (INR / USD)</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent-green);" id="tel-stat-cost">₹0.00</div>
           <div style="font-size:10px;color:var(--fg-muted);margin-top:2px;" id="tel-stat-cost-usd">$0.0000 USD</div>
         </div>
       </div>
@@ -895,6 +899,7 @@
         <span>Zero-overhead polling active (4s interval)</span>
       </div>
       <div style="display:flex;gap:8px;">
+        <a href="pages/token-monitor.html" target="_blank" class="btn-gh" style="text-decoration:none;gap:5px;" title="Open full-screen live Token Monitor dashboard"><svg class="octicon" width="12" height="12" viewBox="0 0 16 16"><path d="M1.5 14.25a.75.75 0 0 1 0-1.5H2v-6.25a.75.75 0 0 1 1.5 0V12.75h2V8a.75.75 0 0 1 1.5 0v4.75h2V5a.75.75 0 0 1 1.5 0v7.75h2V3a.75.75 0 0 1 1.5 0v9.75h.5a.75.75 0 0 1 0 1.5Z"/></svg> Open Full Monitor ↗</a>
         <button class="btn-gh" onclick="fetchSessionTelemetry(false)">Refresh Now</button>
         <button class="btn-gh btn-gh-primary" onclick="closeTelemetryModal()">Close</button>
       </div>
@@ -902,24 +907,6 @@
   </div>
 </div>
 
-
-<!-- Skill Switcher JavaScript (load order: data → state → services → ui) -->
-<!-- 1. Data: static catalog, presets, categories -->
-<script src="js/data/repos-catalog.js"></script>
-<script src="js/data/presets.js"></script>
-
-<!-- 2. State: Redux store, reducers, localStorage persistence -->
-<script src="js/state/store.js"></script>
-
-<!-- 3. Services: key vault, server API, telemetry engine -->
-<script src="js/services/key-vault.js"></script>
-<script src="js/services/api-client.js"></script>
-<script src="js/services/telemetry.js"></script>
-
-<!-- 4. UI: feed renderer, modal handler, app entry -->
-<script src="js/ui/render-feed.js"></script>
-<script src="js/ui/render-modals.js"></script>
-<script src="js/ui/app.js"></script>
 
 
 <!-- Laya System 1 Decision Playground Modal -->
@@ -982,6 +969,24 @@
     </div>
   </div>
 </div>
+
+<!-- Skill Switcher JavaScript (load order: data → state → services → ui) -->
+<!-- 1. Data: static catalog, presets, categories -->
+<script src="js/data/repos-catalog.js"></script>
+<script src="js/data/presets.js"></script>
+
+<!-- 2. State: Redux store, reducers, localStorage persistence -->
+<script src="js/state/store.js"></script>
+
+<!-- 3. Services: key vault, server API, telemetry engine -->
+<script src="js/services/key-vault.js"></script>
+<script src="js/services/api-client.js"></script>
+<script src="js/services/telemetry.js"></script>
+
+<!-- 4. UI: feed renderer, modal handler, app entry -->
+<script src="js/ui/render-feed.js"></script>
+<script src="js/ui/render-modals.js"></script>
+<script src="js/ui/app.js"></script>
 
 </body>
 </html>

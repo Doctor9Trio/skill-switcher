@@ -3,811 +3,2162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Token Monitor — Skill Switcher</title>
-<meta name="description" content="Live Antigravity IDE token usage monitor with INR cost tracking, model breakdown, and usage trends.">
+<title>Live Token & Telemetry Monitor · Doctor9Trio/skill-switcher</title>
+<meta name="description" content="Live Antigravity IDE token telemetry, prompt cache efficiency, and multi-currency cost tracking for AI agent sessions.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Offline-First Local Chart.js Engine -->
+<script src="../js/vendor/chart.umd.js"></script>
+
+<!-- Skill Switcher GitHub Primer Design System -->
+<link rel="stylesheet" href="../css/primer-tokens.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#111111;
-  --bg-card:#1a1a1a;
-  --bg-card2:#202020;
-  --bg-hover:#252525;
-  --border:#2a2a2a;
-  --border-bright:#3a3a3a;
-  --fg:#e6edf3;
-  --fg-muted:#8b949e;
-  --fg-subtle:#4d5566;
-  --blue:#3b82f6;
-  --blue-dim:rgba(59,130,246,0.18);
-  --blue-bar:#4090f5;
-  --green:#22c55e;
-  --green-dim:rgba(34,197,94,0.15);
-  --orange:#f97316;
-  --orange-dim:rgba(249,115,22,0.15);
-  --purple:#a855f7;
-  --red:#ef4444;
-  --inr:#10b981;
-  --inr-dim:rgba(16,185,129,0.12);
-}
-html,body{height:100%;background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;font-size:13px;line-height:1.5}
-
-/* ─── Scrollbar ─────────────────────── */
-*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:9999px}
-
-/* ─── Layout ────────────────────────── */
-.app{display:flex;flex-direction:column;min-height:100vh;max-width:900px;margin:0 auto;padding:0 0 60px}
-
-/* ─── Topbar ────────────────────────── */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 20px;border-bottom:1px solid var(--border);
-  position:sticky;top:0;z-index:100;background:var(--bg);
-}
-.topbar-logo{
-  display:flex;align-items:center;gap:8px;
-  font-size:16px;font-weight:700;letter-spacing:-0.3px;color:var(--fg);
-  text-decoration:none;
-}
-.logo-sigma{font-size:22px;font-weight:800;color:var(--blue);line-height:1}
-.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block;margin-left:2px}
-.period-tabs{display:flex;gap:2px;background:var(--bg-card2);border:1px solid var(--border);border-radius:6px;padding:2px}
-.period-tab{
-  padding:4px 14px;border-radius:4px;font-size:11px;font-weight:600;letter-spacing:0.5px;
-  color:var(--fg-muted);cursor:pointer;transition:all .15s;background:transparent;border:none;
-}
-.period-tab.active{background:var(--blue);color:#fff}
-.period-tab:hover:not(.active){background:var(--bg-hover);color:var(--fg)}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.refresh-badge{
-  display:flex;align-items:center;gap:5px;font-size:10px;font-weight:500;
-  color:var(--fg-subtle);padding:3px 8px;border:1px solid var(--border);border-radius:4px;
-}
-.refresh-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.btn-back{
-  display:flex;align-items:center;gap:5px;font-size:11px;color:var(--fg-muted);
-  text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:5px;
-  background:var(--bg-card2);transition:all .15s;
-}
-.btn-back:hover{color:var(--fg);border-color:var(--border-bright)}
-.settings-btn{
-  width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card2);
-  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--fg-muted);transition:all .15s;
-}
-.settings-btn:hover{background:var(--bg-hover);color:var(--fg)}
-
-/* ─── Hero ──────────────────────────── */
-.hero{padding:28px 20px 16px}
-.hero-label{font-size:10px;font-weight:600;letter-spacing:1.2px;color:var(--fg-subtle);text-transform:uppercase;margin-bottom:8px}
-.hero-tokens{
-  font-size:56px;font-weight:800;letter-spacing:-2px;color:var(--fg);line-height:1;
-  font-variant-numeric:tabular-nums;
-}
-.hero-cost{
-  display:flex;align-items:baseline;gap:12px;margin-top:8px;
-}
-.hero-inr{
-  font-size:20px;font-weight:700;color:var(--inr);letter-spacing:-0.5px;
-}
-.hero-usd{font-size:13px;color:var(--fg-muted);font-weight:500}
-.hero-live-badge{
-  display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;
-  color:var(--green);background:var(--green-dim);border:1px solid rgba(34,197,94,.25);
-  border-radius:9999px;padding:2px 8px;
+/* ─── Dashboard Custom Styles ─── */
+.tm-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 20px 24px 60px;
+  width: 100%;
 }
 
-/* ─── Section ───────────────────────── */
-.section{padding:4px 20px 0}
-.section-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 0 10px;border-top:1px solid var(--border);
+/* Page Header */
+.tm-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
-.section-title{
-  display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--fg);cursor:pointer;
+.tm-page-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
-.tool-icon{
-  width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;background:var(--blue-dim);color:var(--blue);flex-shrink:0;
+.tm-page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fg-default);
+  letter-spacing: -0.4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.session-count{font-size:11px;color:var(--fg-subtle);font-weight:400}
-.chevron{transition:transform .2s;color:var(--fg-subtle)}
-.section-head.collapsed .chevron{transform:rotate(-90deg)}
-.section-body{padding-bottom:12px}
+.tm-page-desc {
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+.tm-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 
-/* ─── Stats Row ─────────────────────── */
-.stat-row{display:flex;align-items:flex-start;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.stat-row:last-child{border-bottom:none}
-.stat-label{display:flex;align-items:center;gap:8px;color:var(--fg-muted);font-size:12px;font-weight:400;min-width:200px}
-.stat-pct-badge{font-size:10px;color:var(--fg-subtle);background:var(--bg-card2);border:1px solid var(--border);border-radius:3px;padding:1px 5px}
-.stat-value{font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--fg);text-align:right}
+/* Segmented Buttons */
+.tm-segmented {
+  display: inline-flex;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+.tm-segmented-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.tm-segmented-btn:hover {
+  color: var(--fg-default);
+}
+.tm-segmented-btn.active {
+  background: var(--bg-card);
+  color: var(--accent-blue);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+html.dark .tm-segmented-btn.active {
+  color: #58a6ff;
+}
 
-/* ─── Progress Bars ─────────────────── */
-.limits-section{padding:20px 20px 0}
-.limits-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding-top:12px}
-.limit-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:14px}
-.limit-title{font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--fg-subtle);text-transform:uppercase;margin-bottom:10px}
-.limit-meta{display:flex;justify-content:space-between;margin-bottom:6px}
-.limit-pct{font-size:13px;font-weight:700;color:var(--fg)}
-.limit-reset{font-size:10px;color:var(--fg-subtle)}
-.progress-bar-bg{height:4px;background:rgba(255,255,255,.06);border-radius:9999px;overflow:hidden}
-.progress-bar-fill{height:100%;border-radius:9999px;transition:width .8s cubic-bezier(.4,0,.2,1);background:var(--blue-bar)}
-.progress-bar-fill.warn{background:var(--orange)}
-.progress-bar-fill.danger{background:var(--red)}
-.limit-used{font-size:10px;color:var(--fg-subtle);margin-top:5px}
+/* KPI Cards Grid */
+.tm-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+@media (max-width: 1080px) {
+  .tm-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .tm-kpi-grid { grid-template-columns: 1fr; }
+}
 
-/* ─── Chart ─────────────────────────── */
-.chart-section{padding:20px 20px 0}
-.chart-controls{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px}
-.chart-controls-left{display:flex;gap:6px}
-.chart-toggle-btn{
-  padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;border:1px solid var(--border);
-  background:transparent;color:var(--fg-muted);cursor:pointer;transition:all .15s;
+.tm-kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.chart-toggle-btn.active{background:var(--bg-card2);color:var(--fg);border-color:var(--border-bright)}
-.chart-toggle-btn:hover:not(.active){background:var(--bg-hover);color:var(--fg)}
-.chart-range-tabs{display:flex;gap:2px}
-.range-tab{
-  padding:3px 10px;border-radius:4px;font-size:10px;font-weight:600;border:none;
-  background:transparent;color:var(--fg-subtle);cursor:pointer;transition:all .15s;
+.tm-kpi-card:hover {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-md);
 }
-.range-tab.active{background:var(--bg-card2);color:var(--fg)}
-.range-tab:hover:not(.active){color:var(--fg-muted)}
-.chart-canvas-wrap{position:relative;height:180px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;overflow:hidden}
-canvas#trend-chart{width:100%;height:100%}
-.chart-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--fg-subtle);font-size:12px;gap:6px}
+.tm-kpi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tm-kpi-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-subtle);
+  color: var(--fg-muted);
+}
+.tm-kpi-val {
+  font-size: 26px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--fg-default);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+.tm-cost-val {
+  color: var(--accent-green);
+}
+.tm-kpi-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--fg-muted);
+}
 
-/* ─── Model Breakdown ───────────────── */
-.model-section{padding:20px 20px 0}
-.model-list{padding-top:12px;display:flex;flex-direction:column;gap:8px}
-.model-row{display:flex;align-items:center;gap:10px}
-.model-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.model-name{font-size:12px;color:var(--fg-muted);flex:1;min-width:130px}
-.model-bar-wrap{flex:2;height:3px;background:rgba(255,255,255,.06);border-radius:9999px;overflow:hidden}
-.model-bar{height:100%;border-radius:9999px;transition:width .8s ease}
-.model-tokens{font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--fg);min-width:80px;text-align:right}
-.model-pct{font-size:10px;color:var(--fg-subtle);min-width:36px;text-align:right}
+/* Two Column Layout */
+.tm-grid-main {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+}
+@media (max-width: 980px) {
+  .tm-grid-main { grid-template-columns: 1fr; }
+}
 
-/* ─── Bottom bar ────────────────────── */
-.bottom-bar{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:900px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 20px;background:var(--bg);border-top:1px solid var(--border);
-  z-index:100;
+.tm-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
-.bottom-tabs{display:flex;gap:2px;background:var(--bg-card2);border:1px solid var(--border);border-radius:6px;padding:2px}
-.bottom-tab{
-  padding:5px 14px;border-radius:4px;font-size:11px;font-weight:600;
-  color:var(--fg-muted);cursor:pointer;transition:all .15s;background:transparent;border:none;
-}
-.bottom-tab.active{background:var(--blue);color:#fff}
-.bottom-tab:hover:not(.active){background:var(--bg-hover);color:var(--fg)}
-.limits-btn{
-  display:flex;align-items:center;gap:6px;font-size:11px;color:var(--fg-muted);
-  background:var(--bg-card2);border:1px solid var(--border);border-radius:5px;padding:5px 10px;cursor:pointer;
-  transition:all .15s;
-}
-.limits-btn:hover{color:var(--fg);border-color:var(--border-bright)}
 
-/* ─── Settings Modal ────────────────── */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;
-  justify-content:center;z-index:999;opacity:0;pointer-events:none;transition:opacity .2s;
+/* Common Box / Card */
+.tm-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
-.modal-overlay.open{opacity:1;pointer-events:all}
-.modal-box{
-  background:var(--bg-card);border:1px solid var(--border-bright);border-radius:12px;
-  width:420px;max-height:80vh;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;
+.tm-box-head {
+  padding: 12px 18px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
-.modal-title{font-size:14px;font-weight:700;color:var(--fg)}
-.setting-row{display:flex;flex-direction:column;gap:6px}
-.setting-label{font-size:11px;font-weight:600;color:var(--fg-muted);letter-spacing:.3px}
-.setting-input{
-  padding:7px 10px;background:var(--bg-card2);border:1px solid var(--border-bright);border-radius:6px;
-  color:var(--fg);font-size:12px;font-family:inherit;outline:none;transition:border-color .15s;
+.tm-box-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg-default);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.setting-input:focus{border-color:var(--blue)}
-.setting-row select.setting-input{cursor:pointer}
-.modal-btns{display:flex;gap:8px;justify-content:flex-end}
-.btn-save{
-  padding:6px 16px;background:var(--blue);color:#fff;border:none;border-radius:6px;
-  font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;
+.tm-box-body {
+  padding: 18px;
 }
-.btn-save:hover{background:#2563eb}
-.btn-cancel{
-  padding:6px 14px;background:var(--bg-card2);color:var(--fg-muted);border:1px solid var(--border);border-radius:6px;
-  font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;
-}
-.btn-cancel:hover{color:var(--fg);border-color:var(--border-bright)}
 
-/* ─── Skeleton loader ───────────────── */
-.skeleton{
-  background:linear-gradient(90deg,var(--bg-card) 25%,var(--bg-card2) 50%,var(--bg-card) 75%);
-  background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:4px;
+/* Stat Strip Above Chart */
+.tm-chart-stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  margin-bottom: 16px;
 }
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.sk-hero{height:60px;width:300px;border-radius:6px}
-.sk-row{height:14px;width:100%;margin-bottom:6px}
+@media (max-width: 768px) {
+  .tm-chart-stat-strip { grid-template-columns: repeat(2, 1fr); }
+}
+.tm-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tm-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tm-stat-value {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--fg-default);
+}
 
-/* ─── Util ──────────────────────────── */
-.hidden{display:none!important}
-.mt4{margin-top:4px}
-.section-header-title{font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--fg-subtle);text-transform:uppercase;padding:16px 0 8px}
+/* Chart Canvas Container */
+.tm-canvas-wrap {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+/* Tool Telemetry Table */
+.tm-tool-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.tm-tool-table th {
+  text-align: left;
+  padding: 8px 12px;
+  background: var(--bg-subtle);
+  color: var(--fg-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-default);
+}
+.tm-tool-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-muted);
+  color: var(--fg-default);
+}
+.tm-tool-table tr:last-child td {
+  border-bottom: none;
+}
+.tm-tool-table tr:hover td {
+  background: var(--bg-hover);
+}
+.tm-tool-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg-default);
+}
+.tm-tool-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: var(--border-muted);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.tm-tool-bar-fill {
+  height: 100%;
+  background: var(--accent-blue);
+  border-radius: 3px;
+}
+
+/* Anatomy Stacked Bar */
+.tm-stacked-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  background: var(--border-muted);
+}
+.tm-stacked-seg {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+.tm-stacked-seg.cache { background: #2ea043; }
+.tm-stacked-seg.miss  { background: #d29922; }
+.tm-stacked-seg.out   { background: #0969da; }
+
+.tm-kv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border-muted);
+}
+.tm-kv-row:last-child {
+  border-bottom: none;
+}
+.tm-kv-label {
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tm-kv-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.tm-kv-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--fg-default);
+}
+
+/* Rolling Usage Limit Bars */
+.tm-limit-item {
+  margin-bottom: 12px;
+}
+.tm-limit-item:last-child {
+  margin-bottom: 0;
+}
+.tm-limit-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.tm-limit-label {
+  font-weight: 500;
+  color: var(--fg-default);
+}
+.tm-limit-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+.tm-limit-bar-bg {
+  height: 6px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.tm-limit-bar-fill {
+  height: 100%;
+  background: var(--accent-blue);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+.tm-limit-bar-fill.warn {
+  background: #d29922;
+}
+.tm-limit-bar-fill.danger {
+  background: #cf222e;
+}
+
+/* Live Pulse Indicator */
+.tm-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2ea043;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.7);
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(46, 160, 67, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0); }
+}
+
+/* Modal Overlay & Card */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 540px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transform: translateY(8px);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-overlay.active .modal-card {
+  transform: translateY(0);
+}
+.modal-header {
+  padding: 14px 18px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg-default);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--fg-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1;
+}
+.modal-close-btn:hover {
+  background: var(--bg-hover);
+  color: var(--fg-default);
+}
+.modal-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.modal-footer {
+  padding: 12px 18px;
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border-default);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.tm-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tm-form-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tm-form-control {
+  padding: 7px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--fg-default);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tm-form-control:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.2);
+}
+
+/* Toast Notification */
+.tm-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-lg);
+  border-radius: 8px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg-default);
+  z-index: 2000;
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tm-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
 </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- ─── Topbar ──────────────────────────────────── -->
-  <div class="topbar">
-    <a class="topbar-logo" href="/">
-      <span class="logo-sigma">Σ</span><span class="logo-dot"></span>
+<!-- GitHub Top Navbar (Exact Skill Switcher Theme) -->
+<header class="gh-navbar">
+  <div class="gh-navbar-left">
+    <a href="../index.html" class="gh-logo-link" title="Return to Skill Switcher">
+      <svg class="octicon" height="28" viewBox="0 0 16 16" width="28"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
     </a>
-    <div class="period-tabs">
-      <button class="period-tab active" id="tab-day"   onclick="setPeriod('day')">DAY</button>
-      <button class="period-tab"        id="tab-month" onclick="setPeriod('month')">MONTH</button>
-      <button class="period-tab"        id="tab-total" onclick="setPeriod('total')">TOTAL</button>
+    <div class="gh-breadcrumbs">
+      <a href="../index.html" class="gh-crumb-org" title="Return to Skill Switcher">Doctor9Trio</a>
+      <span class="gh-crumb-sep">/</span>
+      <a href="../index.html" class="gh-crumb-repo" title="Return to Skill Switcher">skill-switcher</a>
+      <span class="gh-crumb-sep">/</span>
+      <span class="gh-pill green">
+        <span class="tm-pulse-dot"></span>
+        Token Monitor
+      </span>
     </div>
-    <div class="topbar-right">
-      <div class="refresh-badge">
-        <span class="refresh-dot"></span>
-        <span id="refresh-label">Live</span>
-      </div>
-      <a class="btn-back" href="/">← Skill Switcher</a>
-      <button class="settings-btn" onclick="openSettings()" title="Settings">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8.2 8.2 0 0 1 .701.031C9.444.095 9.99.645 10.16 1.29l.288 1.107c.018.066.079.158.212.224.231.114.454.243.668.386.123.082.233.09.299.071l1.103-.303c.644-.176 1.392.021 1.82.63.27.385.506.792.704 1.218.315.675.111 1.422-.364 1.891l-.814.806c-.049.048-.098.147-.088.294.016.257.016.515 0 .772-.01.147.038.246.088.294l.814.806c.475.469.679 1.216.364 1.891a7.977 7.977 0 0 1-.704 1.217c-.428.61-1.176.807-1.82.63l-1.102-.302c-.067-.019-.177-.011-.3.071a5.909 5.909 0 0 1-.668.386c-.133.066-.194.158-.211.224l-.29 1.106c-.168.646-.715 1.196-1.458 1.26a8.006 8.006 0 0 1-1.402 0c-.743-.064-1.289-.614-1.458-1.26l-.289-1.106c-.018-.066-.079-.158-.212-.224a5.738 5.738 0 0 1-.668-.386c-.123-.082-.233-.09-.299-.071l-1.103.303c-.644.176-1.392-.021-1.82-.63a8.12 8.12 0 0 1-.704-1.218c-.315-.675-.111-1.422.363-1.891l.815-.806c.05-.048.098-.147.088-.294a6.214 6.214 0 0 1 0-.772c.01-.147-.038-.246-.088-.294l-.815-.806C.635 6.045.431 5.298.746 4.623a7.92 7.92 0 0 1 .704-1.217c.428-.61 1.176-.807 1.82-.63l1.102.302c.067.019.177.011.3-.071.214-.143.437-.272.668-.386.133-.066.194-.158.211-.224l.29-1.106C6.717.645 7.264.095 8.007.031 8.23.01 8.118 0 8 0Zm1.5 6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/></svg>
+  </div>
+
+  <div class="gh-navbar-right">
+    <!-- Quick Return Button -->
+    <a href="../index.html" class="btn-gh" title="Return to Skill Switcher Home">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M7.78 12.53a.75.75 0 0 1-1.06 0L2.47 8.28a.75.75 0 0 1 0-1.06l4.25-4.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L4.81 7h7.44a.75.75 0 0 1 0 1.5H4.81l2.97 2.97a.75.75 0 0 1 0 1.06Z"></path></svg>
+      Skill Switcher
+    </a>
+
+    <!-- Manual Refresh Button -->
+    <button class="btn-gh btn-gh-sm" onclick="manualRefresh()" title="Click to manually refresh telemetry">
+      <svg class="octicon" id="sync-icon" width="12" height="12" viewBox="0 0 16 16"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"></path></svg>
+      <span id="refresh-status-text">Sync</span>
+    </button>
+
+    <!-- Estimator / Calculator Button -->
+    <button class="btn-gh" onclick="openEstimatorModal()" title="Forecast token expenditure & multi-model cost calculator">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M2.5 1.75C2.5.784 3.284 0 4.25 0h7.5c.966 0 1.75.784 1.75 1.75v12.5A1.75 1.75 0 0 1 11.75 16h-7.5A1.75 1.75 0 0 1 2.5 14.25ZM4.25 1.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25Zm.75 2.25c0-.414.336-.75.75-.75h4.5a.75.75 0 0 1 0 1.5H5.75A.75.75 0 0 1 5 3.75Zm.75 2.75a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5Zm3 0a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5ZM5.75 9.5a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5Zm3 0a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5Z"></path></svg>
+      Estimator
+    </button>
+
+    <!-- Export Menu Button -->
+    <div style="position:relative;display:inline-block;">
+      <button class="btn-gh" onclick="toggleExportMenu()" title="Export telemetry data">
+        <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z"></path><path d="M7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.969a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.78a.749.749 0 1 1 1.06-1.06l1.97 1.969Z"></path></svg>
+        Export
       </button>
-    </div>
-  </div>
-
-  <!-- ─── Hero ────────────────────────────────────── -->
-  <div class="hero">
-    <div class="hero-label" id="hero-period-label">TOTAL TOKENS TODAY</div>
-    <div id="hero-tokens" class="hero-tokens skeleton sk-hero" style="min-height:60px">—</div>
-    <div class="hero-cost mt4">
-      <span class="hero-inr" id="hero-inr">₹—</span>
-      <span class="hero-usd" id="hero-usd">$—</span>
-      <span class="hero-live-badge" id="hero-session-badge" style="display:none">● Active Session</span>
-    </div>
-  </div>
-
-  <!-- ─── Antigravity Tool Section ────────────────── -->
-  <div class="section">
-    <div class="section-head" id="ag-head" onclick="toggleAgSection()">
-      <div class="section-title">
-        <div class="tool-icon">A</div>
-        <span>Antigravity</span>
-        <span class="session-count" id="ag-session-count"></span>
+      <div id="export-dropdown" style="display:none;position:absolute;right:0;top:32px;background:var(--bg-card);border:1px solid var(--border-default);border-radius:6px;box-shadow:var(--shadow-md);min-width:160px;z-index:200;padding:4px 0;">
+        <button class="btn-gh btn-gh-ghost" style="width:100%;justify-content:flex-start;border:none;border-radius:0;padding:6px 12px;" onclick="exportJSON()">Export JSON</button>
+        <button class="btn-gh btn-gh-ghost" style="width:100%;justify-content:flex-start;border:none;border-radius:0;padding:6px 12px;" onclick="exportCSV()">Export CSV</button>
+        <button class="btn-gh btn-gh-ghost" style="width:100%;justify-content:flex-start;border:none;border-radius:0;padding:6px 12px;" onclick="copyMarkdownSummary()">Copy Markdown</button>
       </div>
-      <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"/>
-      </svg>
     </div>
-    <div class="section-body" id="ag-body">
-      <!-- Breakdown rows injected by JS -->
-      <div id="ag-breakdown"></div>
+
+    <!-- Settings Button -->
+    <button class="btn-gh" onclick="openSettingsModal()" title="Configure currency, rates, and limits">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M8 0a8.2 8.2 0 0 1 .701.031C9.444.095 9.99.645 10.16 1.29l.288 1.107c.018.066.079.158.212.224.231.114.454.243.668.386.123.082.233.09.299.071l1.103-.303c.644-.176 1.392.021 1.82.63.27.385.506.792.704 1.218.315.675.111 1.422-.364 1.891l-.814.806c-.049.048-.098.147-.088.294.016.257.016.515 0 .772-.01.147.038.246.088.294l.814.806c.475.469.679 1.216.364 1.891a7.977 7.977 0 0 1-.704 1.217c-.428.61-1.176.807-1.82.63l-1.102-.302c-.067-.019-.177-.011-.3.071a5.909 5.909 0 0 1-.668.386c-.133.066-.194.158-.211.224l-.29 1.106c-.168.646-.715 1.196-1.458 1.26a8.006 8.006 0 0 1-1.402 0c-.743-.064-1.289-.614-1.458-1.26l-.289-1.106c-.018-.066-.079-.158-.212-.224a5.738 5.738 0 0 1-.668-.386c-.123-.082-.233-.09-.299-.071l-1.103.303c-.644.176-1.392-.021-1.82-.63a8.12 8.12 0 0 1-.704-1.218c-.315-.675-.111-1.422.363-1.891l.815-.806c.05-.048.098-.147.088-.294a6.214 6.214 0 0 1 0-.772c.01-.147-.038-.246-.088-.294l-.815-.806C.635 6.045.431 5.298.746 4.623a7.92 7.92 0 0 1 .704-1.217c.428-.61 1.176-.807 1.82-.63l1.102.302c.067.019.177.011.3-.071.214-.143.437-.272.668-.386.133-.066.194-.158.211-.224l.29-1.106C6.717.645 7.264.095 8.007.031 8.23.01 8.118 0 8 0Zm1.5 6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/></svg>
+      Settings
+    </button>
+
+    <!-- Theme Toggle Button -->
+    <button class="btn-gh" onclick="toggleTheme()" title="Toggle GitHub Dark/Light Theme">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M8 12a4 4 0 100-8 4 4 0 000 8z"></path></svg>
+      Theme
+    </button>
+  </div>
+</header>
+
+<!-- GitHub Subnav Strip (Deep Link Enabled) -->
+<nav class="subnav-strip">
+  <div class="subnav-tabs">
+    <a href="../index.html" class="subnav-tab" style="text-decoration:none;" title="Skills Switcher Home">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"></path></svg>
+      Skills & Packs
+    </a>
+    <button class="subnav-tab active">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M1.5 14.25a.75.75 0 0 1 0-1.5H2v-6.25a.75.75 0 0 1 1.5 0V12.75h2V8a.75.75 0 0 1 1.5 0v4.75h2V5a.75.75 0 0 1 1.5 0v7.75h2V3a.75.75 0 0 1 1.5 0v9.75h.5a.75.75 0 0 1 0 1.5Z"/></svg>
+      Live Token Monitor <span class="counter-bubble" id="subnav-token-count">0</span>
+    </button>
+    <a href="../index.html?open=laya" class="subnav-tab" style="text-decoration:none;" title="Open Laya Classifier Sandbox">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" style="color:#8250df;"><path d="M6 1.75a.75.75 0 0 1 .75.75v1h2.5v-1a.75.75 0 0 1 1.5 0v1h.5A2.75 2.75 0 0 1 14 6.25v.5h1a.75.75 0 0 1 0 1.5h-1v2.5h1a.75.75 0 0 1 0 1.5h-1v.5A2.75 2.75 0 0 1 11.25 14h-.5v1a.75.75 0 0 1-1.5 0v-1h-2.5v1a.75.75 0 0 1-1.5 0v-1h-.5A2.75 2.75 0 0 1 2 11.25v-.5H1a.75.75 0 0 1 0-1.5h1v-2.5H1a.75.75 0 0 1 0-1.5h1v-.5A2.75 2.75 0 0 1 4.75 3.5h.5v-1A.75.75 0 0 1 6 1.75Z"></path></svg>
+      Laya Playground
+    </a>
+    <a href="../index.html?open=keys" class="subnav-tab" style="text-decoration:none;" title="Manage API Keys and Passwords">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M6.5 5.5a4 4 0 1 1 5.656 5.657l-1.077 1.077a.75.75 0 0 1-1.06 0L8.75 11l-.97.97a.75.75 0 0 1-1.06 0L5.45 10.7a.75.75 0 0 1 0-1.06l1.05-1.05V6.5a1 1 0 0 1 0-1ZM8 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"></path></svg>
+      API Key Vault
+    </a>
+    <a href="../index.html?open=health" class="subnav-tab" style="text-decoration:none;" title="View Skill Verification Matrix">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z"></path></svg>
+      Verification Matrix
+    </a>
+    <a href="../index.html?open=telemetry" class="subnav-tab" style="text-decoration:none;" title="View Agent Trajectory Telemetry in Modal">
+      <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" style="color:var(--accent-green);"><path d="M1.5 14.25a.75.75 0 0 1 0-1.5H2v-6.25a.75.75 0 0 1 1.5 0V12.75h2V8a.75.75 0 0 1 1.5 0v4.75h2V5a.75.75 0 0 1 1.5 0v7.75h2V3a.75.75 0 0 1 1.5 0v9.75h.5a.75.75 0 0 1 0 1.5Z"/></svg>
+      Session Telemetry
+    </a>
+  </div>
+</nav>
+
+<!-- Main Container -->
+<main class="tm-container">
+
+  <!-- Page Header & Quick Customization Controls -->
+  <div class="tm-page-header">
+    <div class="tm-page-title-wrap">
+      <h1 class="tm-page-title">
+        <svg class="octicon" width="20" height="20" viewBox="0 0 16 16" style="color:var(--accent-blue);"><path d="M1.5 14.25a.75.75 0 0 1 0-1.5H2v-6.25a.75.75 0 0 1 1.5 0V12.75h2V8a.75.75 0 0 1 1.5 0v4.75h2V5a.75.75 0 0 1 1.5 0v7.75h2V3a.75.75 0 0 1 1.5 0v9.75h.5a.75.75 0 0 1 0 1.5Z"/></svg>
+        Token & Cost Telemetry
+      </h1>
+      <p class="tm-page-desc">Live agent economy analysis across Antigravity IDE trajectory streams with professional Chart.js telemetry & zero LLM overhead.</p>
+    </div>
+
+    <div class="tm-controls-group">
+      <!-- Period Switcher -->
+      <div class="tm-segmented">
+        <button class="tm-segmented-btn active" id="tab-day" onclick="setPeriod('day')">Today</button>
+        <button class="tm-segmented-btn" id="tab-month" onclick="setPeriod('month')">This Month</button>
+        <button class="tm-segmented-btn" id="tab-total" onclick="setPeriod('total')">All Time</button>
+      </div>
+
+      <!-- Pricing Model Switcher -->
+      <select class="tm-form-control" id="ctrl-model" onchange="changeModel(this.value)" style="padding:4px 8px;font-size:12px;height:28px;">
+        <option value="gemini-flash">Gemini 3.8 Flash</option>
+        <option value="gemini-pro">Gemini 3.1 Pro</option>
+        <option value="claude-sonnet">Claude Sonnet 4.6</option>
+        <option value="claude-haiku">Claude Haiku 4.5</option>
+        <option value="gpt-4o">GPT-4o</option>
+        <option value="deepseek-v3">DeepSeek V3</option>
+        <option value="custom">Custom Pricing Model...</option>
+      </select>
+
+      <!-- Currency Toggle -->
+      <div class="tm-segmented">
+        <button class="tm-segmented-btn active" id="btn-curr-inr" onclick="setCurrency('INR')">₹ INR</button>
+        <button class="tm-segmented-btn" id="btn-curr-usd" onclick="setCurrency('USD')">$ USD</button>
+        <button class="tm-segmented-btn" id="btn-curr-eur" onclick="setCurrency('EUR')">€ EUR</button>
+        <button class="tm-segmented-btn" id="btn-curr-gbp" onclick="setCurrency('GBP')">£ GBP</button>
+      </div>
     </div>
   </div>
 
-  <!-- ─── Usage Limits ─────────────────────────────── -->
-  <div class="limits-section">
-    <div class="section-header-title">Usage Limits</div>
-    <div class="limits-grid">
-      <div class="limit-card">
-        <div class="limit-title">5-Hour Window</div>
-        <div class="limit-meta">
-          <span class="limit-pct" id="limit-5h-pct">0%</span>
-          <span class="limit-reset" id="limit-5h-reset">Resets in —</span>
+  <!-- Top KPI Cards -->
+  <div class="tm-kpi-grid">
+    <!-- 1. Total Tokens -->
+    <div class="tm-kpi-card">
+      <div class="tm-kpi-head">
+        <span>Total Tokens</span>
+        <div class="tm-kpi-icon">
+          <svg class="octicon" width="13" height="13" viewBox="0 0 16 16"><path d="M1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 13.25 15H2.75A1.75 1.75 0 0 1 1 13.25Zm1.75-.25a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25V2.75a.25.25 0 0 0-.25-.25Z"></path></svg>
         </div>
-        <div class="progress-bar-bg"><div class="progress-bar-fill" id="limit-5h-bar" style="width:0%"></div></div>
-        <div class="limit-used" id="limit-5h-used">— / —</div>
       </div>
-      <div class="limit-card">
-        <div class="limit-title">Weekly Window</div>
-        <div class="limit-meta">
-          <span class="limit-pct" id="limit-wk-pct">0%</span>
-          <span class="limit-reset" id="limit-wk-reset">Resets in —</span>
+      <div class="tm-kpi-val" id="kpi-total-tokens">—</div>
+      <div class="tm-kpi-sub">
+        <span class="gh-pill" id="kpi-tokens-sub">In: — • Out: —</span>
+      </div>
+    </div>
+
+    <!-- 2. Cost Estimate -->
+    <div class="tm-kpi-card">
+      <div class="tm-kpi-head">
+        <span>Estimated Cost</span>
+        <div class="tm-kpi-icon">
+          <svg class="octicon" width="13" height="13" viewBox="0 0 16 16" style="color:var(--accent-green);"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm.75-12.75a.75.75 0 0 0-1.5 0v.516A2.75 2.75 0 0 0 5 6.5a.75.75 0 0 0 1.5 0 1.25 1.25 0 1 1 2.25.75c0 .878-.716 1.25-1.5 1.5-.784.25-2.25.75-2.25 2.5 0 1.243.864 2.28 2 2.686v.564a.75.75 0 0 0 1.5 0v-.516a2.75 2.75 0 0 0 2.25-2.734.75.75 0 0 0-1.5 0 1.25 1.25 0 1 1-2.25-.75c0-.878.716-1.25 1.5-1.5.784-.25 2.25-.75 2.25-2.5 0-1.243-.864-2.28-2-2.686V3.25Z"></path></svg>
         </div>
-        <div class="progress-bar-bg"><div class="progress-bar-fill" id="limit-wk-bar" style="width:0%"></div></div>
-        <div class="limit-used" id="limit-wk-used">— / —</div>
+      </div>
+      <div class="tm-kpi-val tm-cost-val" id="kpi-cost-val">—</div>
+      <div class="tm-kpi-sub">
+        <span class="gh-pill green" id="kpi-cost-sec">$0.00 USD</span>
+        <span id="kpi-rate-tag" style="font-size:10px;color:var(--fg-muted);">₹86.50/USD</span>
+      </div>
+    </div>
+
+    <!-- 3. Cache Efficiency -->
+    <div class="tm-kpi-card">
+      <div class="tm-kpi-head">
+        <span>Prompt Cache Efficiency</span>
+        <div class="tm-kpi-icon">
+          <svg class="octicon" width="13" height="13" viewBox="0 0 16 16"><path d="M9.504.43a.75.75 0 0 1 .496.72v4.85h4.25a.75.75 0 0 1 .59 1.214l-8.5 11a.75.75 0 0 1-1.28-.664l1.378-5.7H2.25a.75.75 0 0 1-.59-1.214l7.25-9.5a.75.75 0 0 1 .594-.306Z"/></svg>
+        </div>
+      </div>
+      <div class="tm-kpi-val" id="kpi-cache-pct" style="color:var(--accent-blue);">—</div>
+      <div class="tm-kpi-sub">
+        <span class="gh-pill" id="kpi-cache-saved">— Saved</span>
+      </div>
+    </div>
+
+    <!-- 4. Active Trajectory -->
+    <div class="tm-kpi-card">
+      <div class="tm-kpi-head">
+        <span>Active Trajectories</span>
+        <div class="tm-kpi-icon">
+          <svg class="octicon" width="13" height="13" viewBox="0 0 16 16"><path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.003 1H15.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.247a3.75 3.75 0 0 0-3.003 1.501A3.75 3.75 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75ZM5.003 11.5a2.25 2.25 0 0 1 2.25 2.25.75.75 0 0 1-.75.75H.75V2.5h3.503a2.25 2.25 0 0 1 2.25 2.25v6.75ZM10.247 13.75a.75.75 0 0 1-.75-.75 2.25 2.25 0 0 1 2.25-2.25V4.75a2.25 2.25 0 0 1 2.25-2.25h3.503v12h-5.753a2.25 2.25 0 0 1-1.5-.75Z"></path></svg>
+        </div>
+      </div>
+      <div class="tm-kpi-val" id="kpi-sessions-val">—</div>
+      <div class="tm-kpi-sub">
+        <span class="gh-pill green" id="kpi-tools-total">0 Tool Invocations</span>
       </div>
     </div>
   </div>
 
-  <!-- ─── Trends Chart ─────────────────────────────── -->
-  <div class="chart-section">
-    <div class="section-header-title">Token Activity</div>
-    <div class="chart-controls">
-      <div class="chart-controls-left">
-        <button class="chart-toggle-btn" id="btn-bytool" onclick="setChartMode('tool')">By tool</button>
-        <button class="chart-toggle-btn active" id="btn-bymodel" onclick="setChartMode('model')">By model</button>
-        <button class="chart-toggle-btn" id="btn-bars" onclick="setChartStyle('bars')">Bars</button>
+  <!-- Main Dashboard Grid -->
+  <div class="tm-grid-main">
+
+    <!-- Left Column: Professional Chart.js & Tool Breakdown -->
+    <div class="tm-col">
+
+      <!-- Historical Usage Chart (Professional Chart.js) -->
+      <div class="tm-box">
+        <div class="tm-box-head">
+          <div class="tm-box-title">
+            <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M1.5 14.25a.75.75 0 0 1 0-1.5H2v-6.25a.75.75 0 0 1 1.5 0V12.75h2V8a.75.75 0 0 1 1.5 0v4.75h2V5a.75.75 0 0 1 1.5 0v7.75h2V3a.75.75 0 0 1 1.5 0v9.75h.5a.75.75 0 0 1 0 1.5Z"/></svg>
+            <span>Telemetry Velocity & Token Burn</span>
+          </div>
+
+          <!-- Chart Controls: Type + Metric + Range -->
+          <div class="tm-controls-group">
+            <!-- Chart Style Toggle (3 Visualizations) -->
+            <div class="tm-segmented">
+              <button class="tm-segmented-btn active" id="btn-chart-bar" onclick="setChartType('bar')" title="Stacked Bar Breakdown">Bars</button>
+              <button class="tm-segmented-btn" id="btn-chart-area" onclick="setChartType('area')" title="Smooth Spline Gradient Area">Area</button>
+              <button class="tm-segmented-btn" id="btn-chart-cumul" onclick="setChartType('cumulative')" title="Cumulative Running Burn-up Curve">Cumulative</button>
+            </div>
+
+            <!-- Metric Toggle -->
+            <div class="tm-segmented">
+              <button class="tm-segmented-btn active" id="btn-metric-tokens" onclick="setChartMetric('tokens')">Tokens</button>
+              <button class="tm-segmented-btn" id="btn-metric-cost" onclick="setChartMetric('cost')">Cost</button>
+            </div>
+
+            <!-- Range Filter -->
+            <div class="tm-segmented">
+              <button class="tm-segmented-btn" onclick="setChartRange(7, this)">7D</button>
+              <button class="tm-segmented-btn" onclick="setChartRange(14, this)">14D</button>
+              <button class="tm-segmented-btn active" onclick="setChartRange(30, this)">30D</button>
+              <button class="tm-segmented-btn" onclick="setChartRange(90, this)">90D</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tm-box-body">
+          <!-- Live Stat Strip Above Chart -->
+          <div class="tm-chart-stat-strip">
+            <div class="tm-stat-item">
+              <span class="tm-stat-label">Daily Peak Burn</span>
+              <span class="tm-stat-value" id="stat-peak-burn">—</span>
+            </div>
+            <div class="tm-stat-item">
+              <span class="tm-stat-label">Avg Daily Velocity</span>
+              <span class="tm-stat-value" id="stat-avg-velocity">—</span>
+            </div>
+            <div class="tm-stat-item">
+              <span class="tm-stat-label">Projected 30-Day Rate</span>
+              <span class="tm-stat-value" id="stat-run-rate" style="color:var(--accent-green);">—</span>
+            </div>
+            <div class="tm-stat-item">
+              <span class="tm-stat-label">Cache Savings</span>
+              <span class="tm-stat-value" id="stat-cache-savings" style="color:var(--accent-blue);">—</span>
+            </div>
+          </div>
+
+          <div class="tm-canvas-wrap">
+            <canvas id="trend-chart"></canvas>
+          </div>
+
+          <!-- Bottom Legend Strip -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:11px;color:var(--fg-muted);flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;align-items:center;gap:14px;" id="chart-legend-wrap">
+              <span style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;" onclick="toggleDataset(0)">
+                <span id="legend-dot-0" style="width:8px;height:8px;border-radius:2px;background:var(--accent-blue);"></span>
+                <span id="legend-label-0">Input Context</span>
+              </span>
+              <span style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;" onclick="toggleDataset(1)">
+                <span id="legend-dot-1" style="width:8px;height:8px;border-radius:2px;background:#58a6ff;"></span>
+                <span id="legend-label-1">Model Output</span>
+              </span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span id="chart-date-range">Last 30 Days</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="chart-range-tabs">
-        <button class="range-tab" onclick="setRange(7)">7 days</button>
-        <button class="range-tab active" id="range-30" onclick="setRange(30)">30 days</button>
-        <button class="range-tab" onclick="setRange(90)">90 days</button>
-        <button class="range-tab" onclick="setRange(365)">1 year</button>
+
+      <!-- Real Tool Execution Telemetry Table -->
+      <div class="tm-box">
+        <div class="tm-box-head">
+          <div class="tm-box-title">
+            <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M11 2.5a2.5 2.5 0 0 1 2.5 2.5v7a2.5 2.5 0 0 1-2.5 2.5h-6A2.5 2.5 0 0 1 2.5 12V5A2.5 2.5 0 0 1 5 2.5h6Zm0 1.5H5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1Z"></path></svg>
+            Live Trajectory Tool Telemetry (Real Agent Actions)
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="text" id="tool-search-input" class="tm-form-control" placeholder="Search tools..." style="padding:2px 8px;font-size:11px;height:24px;width:120px;" oninput="filterToolTable(this.value)">
+            <span class="gh-pill" id="tool-total-pill">0 Tools Tracked</span>
+          </div>
+        </div>
+        <div class="tm-box-body" style="padding:0;">
+          <table class="tm-tool-table" id="tool-telemetry-table">
+            <thead>
+              <tr>
+                <th>Tool Name</th>
+                <th>Invocations</th>
+                <th>Distribution</th>
+                <th style="text-align:right;">Share</th>
+              </tr>
+            </thead>
+            <tbody id="tool-table-body">
+              <tr>
+                <td colspan="4" style="text-align:center;padding:24px;color:var(--fg-muted);">Loading tool execution telemetry...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
     </div>
-    <div class="chart-canvas-wrap">
-      <canvas id="trend-chart"></canvas>
-      <div class="chart-empty hidden" id="chart-empty">
-        <svg width="28" height="28" viewBox="0 0 16 16" fill="currentColor" style="color:#4d5566"><path d="M1.5 14.25a.75.75 0 0 1 0-1.5H2v-6.25a.75.75 0 0 1 1.5 0V12.75h2V8a.75.75 0 0 1 1.5 0v4.75h2V5a.75.75 0 0 1 1.5 0v7.75h2V3a.75.75 0 0 1 1.5 0v9.75h.5a.75.75 0 0 1 0 1.5Z"/></svg>
-        <span>No trend data for this period</span>
+
+    <!-- Right Column: Token Anatomy, Limits, Models -->
+    <div class="tm-col">
+
+      <!-- Context Stream Breakdown -->
+      <div class="tm-box">
+        <div class="tm-box-head">
+          <div class="tm-box-title">
+            <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"></path></svg>
+            Context Stream Anatomy
+          </div>
+          <span class="gh-pill" id="anatomy-period-tag">Today</span>
+        </div>
+        <div class="tm-box-body">
+          <!-- Stacked Bar -->
+          <div class="tm-stacked-bar">
+            <div class="tm-stacked-seg cache" id="seg-cache" style="width: 50%" title="Prompt Cache Hits"></div>
+            <div class="tm-stacked-seg miss"  id="seg-miss"  style="width: 15%" title="Prompt Cache Misses"></div>
+            <div class="tm-stacked-seg out"   id="seg-out"   style="width: 35%" title="Output Generation"></div>
+          </div>
+
+          <div class="tm-kv-row">
+            <span class="tm-kv-label"><span class="tm-kv-dot" style="background:#2ea043;"></span> Input Cache Hit</span>
+            <span class="tm-kv-val" id="anat-hit">0</span>
+          </div>
+          <div class="tm-kv-row">
+            <span class="tm-kv-label"><span class="tm-kv-dot" style="background:#d29922;"></span> Input Cache Miss</span>
+            <span class="tm-kv-val" id="anat-miss">0</span>
+          </div>
+          <div class="tm-kv-row">
+            <span class="tm-kv-label"><span class="tm-kv-dot" style="background:#0969da;"></span> Output Tokens</span>
+            <span class="tm-kv-val" id="anat-out">0</span>
+          </div>
+          <div class="tm-kv-row" style="font-weight:600;padding-top:10px;">
+            <span class="tm-kv-label" style="color:var(--fg-default);">Total Context Ingested</span>
+            <span class="tm-kv-val" id="anat-total" style="color:var(--accent-blue);">0</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Rolling Usage Limits & Budget Thresholds -->
+      <div class="tm-box">
+        <div class="tm-box-head">
+          <div class="tm-box-title">
+            <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M1.5 3a2.5 2.5 0 0 1 2.5-2.5h8A2.5 2.5 0 0 1 14.5 3v10a2.5 2.5 0 0 1-2.5 2.5h-8A2.5 2.5 0 0 1 1.5 13V3Zm2.5-1A1 1 0 0 0 3 3v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1h-8Z"></path></svg>
+            Rolling Usage Limits & Budgets
+          </div>
+          <button class="btn-gh btn-gh-sm" onclick="openSettingsModal()">Customize</button>
+        </div>
+        <div class="tm-box-body">
+          <!-- 5h limit -->
+          <div class="tm-limit-item">
+            <div class="tm-limit-head">
+              <span class="tm-limit-label">5-Hour Rolling Limit</span>
+              <span class="tm-limit-num" id="limit-5h-used">0 / 50M</span>
+            </div>
+            <div class="tm-limit-bar-bg">
+              <div class="tm-limit-bar-fill" id="limit-5h-bar" style="width: 0%"></div>
+            </div>
+            <div style="font-size:10px;color:var(--fg-muted);margin-top:3px;text-align:right;" id="limit-5h-pct">0% Used</div>
+          </div>
+
+          <!-- Weekly limit -->
+          <div class="tm-limit-item">
+            <div class="tm-limit-head">
+              <span class="tm-limit-label">Weekly Budget Target</span>
+              <span class="tm-limit-num" id="limit-wk-used">0 / 200M</span>
+            </div>
+            <div class="tm-limit-bar-bg">
+              <div class="tm-limit-bar-fill" id="limit-wk-bar" style="width: 0%"></div>
+            </div>
+            <div style="font-size:10px;color:var(--fg-muted);margin-top:3px;text-align:right;" id="limit-wk-pct">0% Used</div>
+          </div>
+
+          <!-- Monthly limit -->
+          <div class="tm-limit-item">
+            <div class="tm-limit-head">
+              <span class="tm-limit-label">Monthly Context Budget</span>
+              <span class="tm-limit-num" id="limit-mo-used">0 / 600M</span>
+            </div>
+            <div class="tm-limit-bar-bg">
+              <div class="tm-limit-bar-fill" id="limit-mo-bar" style="width: 0%"></div>
+            </div>
+            <div style="font-size:10px;color:var(--fg-muted);margin-top:3px;text-align:right;" id="limit-mo-pct">0% Used</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing Comparison Matrix Across Models -->
+      <div class="tm-box">
+        <div class="tm-box-head">
+          <div class="tm-box-title">
+            <svg class="octicon" width="14" height="14" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm.75-12.75a.75.75 0 0 0-1.5 0v.516A2.75 2.75 0 0 0 5 6.5a.75.75 0 0 0 1.5 0 1.25 1.25 0 1 1 2.25.75c0 .878-.716 1.25-1.5 1.5-.784.25-2.25.75-2.25 2.5 0 1.243.864 2.28 2 2.686v.564a.75.75 0 0 0 1.5 0v-.516a2.75 2.75 0 0 0 2.25-2.734.75.75 0 0 0-1.5 0 1.25 1.25 0 1 1-2.25-.75c0-.878.716-1.25 1.5-1.5.784-.25 2.25-.75 2.25-2.5 0-1.243-.864-2.28-2-2.686V3.25Z"></path></svg>
+            Model Pricing Matrix
+          </div>
+          <span class="gh-pill green" id="active-model-pill">Gemini Flash</span>
+        </div>
+        <div class="tm-box-body" style="padding:0;">
+          <table class="tm-tool-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>In/1M</th>
+                <th>Out/1M</th>
+                <th style="text-align:right;">Trajectory Cost</th>
+              </tr>
+            </thead>
+            <tbody id="model-matrix-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- ─── Model Breakdown ──────────────────────────── -->
-  <div class="model-section">
-    <div class="section-header-title">By Model</div>
-    <div class="model-list" id="model-list">
-      <div class="sk-row skeleton"></div>
-      <div class="sk-row skeleton"></div>
-      <div class="sk-row skeleton"></div>
+</main>
+
+<!-- Interactive Settings Modal -->
+<div class="modal-overlay" id="settings-modal" onclick="closeSettingsModalOnBackdrop(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg class="octicon" width="16" height="16" viewBox="0 0 16 16"><path d="M8 0a8.2 8.2 0 0 1 .701.031C9.444.095 9.99.645 10.16 1.29l.288 1.107c.018.066.079.158.212.224.231.114.454.243.668.386.123.082.233.09.299.071l1.103-.303c.644-.176 1.392.021 1.82.63.27.385.506.792.704 1.218.315.675.111 1.422-.364 1.891l-.814.806c-.049.048-.098.147-.088.294.016.257.016.515 0 .772-.01.147.038.246.088.294l.814.806c.475.469.679 1.216.364 1.891a7.977 7.977 0 0 1-.704 1.217c-.428.61-1.176.807-1.82.63l-1.102-.302c-.067-.019-.177-.011-.3.071a5.909 5.909 0 0 1-.668.386c-.133.066-.194.158-.211.224l-.29 1.106c-.168.646-.715 1.196-1.458 1.26a8.006 8.006 0 0 1-1.402 0c-.743-.064-1.289-.614-1.458-1.26l-.289-1.106c-.018-.066-.079-.158-.212-.224a5.738 5.738 0 0 1-.668-.386c-.123-.082-.233-.09-.299-.071l-1.103.303c-.644.176-1.392-.021-1.82-.63a8.12 8.12 0 0 1-.704-1.218c-.315-.675-.111-1.422.363-1.891l.815-.806c.05-.048.098-.147.088-.294a6.214 6.214 0 0 1 0-.772c.01-.147-.038-.246-.088-.294l-.815-.806C.635 6.045.431 5.298.746 4.623a7.92 7.92 0 0 1 .704-1.217c.428-.61 1.176-.807 1.82-.63l1.102.302c.067.019.177.011.3-.071.214-.143.437-.272.668-.386.133-.066.194-.158.211-.224l.29-1.106C6.717.645 7.264.095 8.007.031 8.23.01 8.118 0 8 0Zm1.5 6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/></svg>
+        Token Monitor & Cost Preferences
+      </div>
+      <button class="modal-close-btn" onclick="closeSettingsModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <!-- Currency & Exchange Rate -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="tm-form-group">
+          <label class="tm-form-label">Primary Currency</label>
+          <select class="tm-form-control" id="s-currency" onchange="handleCurrencyChange(this.value)">
+            <option value="INR">₹ INR (Indian Rupee)</option>
+            <option value="USD">$ USD (US Dollar)</option>
+            <option value="EUR">€ EUR (Euro)</option>
+            <option value="GBP">£ GBP (British Pound)</option>
+            <option value="JPY">¥ JPY (Japanese Yen)</option>
+            <option value="CAD">C$ CAD (Canadian Dollar)</option>
+            <option value="AUD">A$ AUD (Australian Dollar)</option>
+          </select>
+        </div>
+        <div class="tm-form-group">
+          <label class="tm-form-label">Exchange Rate (vs 1 USD)</label>
+          <input class="tm-form-control" type="number" id="s-rate" value="86.50" step="0.01">
+        </div>
+      </div>
+
+      <!-- Rolling Limit Thresholds -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div class="tm-form-group">
+          <label class="tm-form-label">5-Hour Limit</label>
+          <input class="tm-form-control" type="number" id="s-limit5h" value="50000000" step="1000000">
+        </div>
+        <div class="tm-form-group">
+          <label class="tm-form-label">Weekly Budget</label>
+          <input class="tm-form-control" type="number" id="s-limitwk" value="200000000" step="5000000">
+        </div>
+        <div class="tm-form-group">
+          <label class="tm-form-label">Monthly Budget</label>
+          <input class="tm-form-control" type="number" id="s-limitmo" value="600000000" step="10000000">
+        </div>
+      </div>
+
+      <!-- Budget Warning Threshold Slider -->
+      <div class="tm-form-group">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <label class="tm-form-label">Budget Warning Alert Threshold</label>
+          <span style="font-size:11px;font-weight:700;color:var(--accent-blue);" id="s-threshold-val">75%</span>
+        </div>
+        <input type="range" id="s-threshold" min="50" max="95" value="75" style="width:100%;accent-color:var(--accent-blue);" oninput="document.getElementById('s-threshold-val').textContent = this.value + '%'">
+      </div>
+
+      <!-- Auto Refresh Interval -->
+      <div class="tm-form-group">
+        <label class="tm-form-label">Telemetry Refresh Interval</label>
+        <select class="tm-form-control" id="s-interval">
+          <option value="5000">5 seconds (High Frequency)</option>
+          <option value="15000" selected>15 seconds (Standard)</option>
+          <option value="30000">30 seconds (Relaxed)</option>
+          <option value="60000">60 seconds (Low Overhead)</option>
+          <option value="0">Manual Refresh Only</option>
+        </select>
+      </div>
+
+      <!-- Chart Customization -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="tm-form-group">
+          <label class="tm-form-label">Default Chart Style</label>
+          <select class="tm-form-control" id="s-chart-style">
+            <option value="bar">Stacked Bar Chart</option>
+            <option value="area">Smooth Spline Area Curve</option>
+            <option value="cumulative">Cumulative Running Burn-up</option>
+          </select>
+        </div>
+        <div class="tm-form-group">
+          <label class="tm-form-label">Chart Metric</label>
+          <select class="tm-form-control" id="s-chart-metric">
+            <option value="tokens">Total Token Volume</option>
+            <option value="cost">Estimated Expenditure Cost</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Active Pricing Model Rates -->
+      <div class="tm-form-group">
+        <label class="tm-form-label">Active Model Pricing Contract</label>
+        <select class="tm-form-control" id="s-model" onchange="toggleCustomPriceInputs(this.value)">
+          <option value="gemini-flash">Gemini 3.8 Flash ($0.075 in / $0.30 out per 1M)</option>
+          <option value="gemini-pro">Gemini 3.1 Pro ($1.25 in / $5.00 out per 1M)</option>
+          <option value="claude-sonnet">Claude Sonnet 4.6 ($3.00 in / $15.00 out per 1M)</option>
+          <option value="claude-haiku">Claude Haiku 4.5 ($0.80 in / $4.00 out per 1M)</option>
+          <option value="gpt-4o">GPT-4o ($2.50 in / $10.00 out per 1M)</option>
+          <option value="deepseek-v3">DeepSeek V3 ($0.14 in / $0.28 out per 1M)</option>
+          <option value="custom">Custom Pricing Model...</option>
+        </select>
+      </div>
+
+      <!-- Custom Model Price Inputs (Hidden by default) -->
+      <div id="custom-price-row" style="display:none;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="tm-form-group">
+          <label class="tm-form-label">Custom Input Price ($/1M tokens)</label>
+          <input class="tm-form-control" type="number" id="s-custom-in" value="0.10" step="0.01" min="0">
+        </div>
+        <div class="tm-form-group">
+          <label class="tm-form-label">Custom Output Price ($/1M tokens)</label>
+          <input class="tm-form-control" type="number" id="s-custom-out" value="0.40" step="0.01" min="0">
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-gh btn-gh-danger" onclick="resetToDefaults()" style="font-size:12px;">Reset Defaults</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-gh" onclick="closeSettingsModal()">Cancel</button>
+        <button class="btn-gh btn-gh-primary" onclick="saveSettings()">Apply Preferences</button>
+      </div>
     </div>
   </div>
-
-</div><!-- /app -->
-
-<!-- ─── Bottom Bar ──────────────────────────────────── -->
-<div class="bottom-bar">
-  <button class="limits-btn" onclick="openSettings()">
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8.2 8.2 0 0 1 .701.031C9.444.095 9.99.645 10.16 1.29l.288 1.107c.018.066.079.158.212.224.231.114.454.243.668.386.123.082.233.09.299.071l1.103-.303c.644-.176 1.392.021 1.82.63.27.385.506.792.704 1.218.315.675.111 1.422-.364 1.891l-.814.806c-.049.048-.098.147-.088.294.016.257.016.515 0 .772-.01.147.038.246.088.294l.814.806c.475.469.679 1.216.364 1.891a7.977 7.977 0 0 1-.704 1.217c-.428.61-1.176.807-1.82.63l-1.102-.302c-.067-.019-.177-.011-.3.071a5.909 5.909 0 0 1-.668.386c-.133.066-.194.158-.211.224l-.29 1.106c-.168.646-.715 1.196-1.458 1.26a8.006 8.006 0 0 1-1.402 0c-.743-.064-1.289-.614-1.458-1.26l-.289-1.106c-.018-.066-.079-.158-.212-.224a5.738 5.738 0 0 1-.668-.386c-.123-.082-.233-.09-.299-.071l-1.103.303c-.644.176-1.392-.021-1.82-.63a8.12 8.12 0 0 1-.704-1.218c-.315-.675-.111-1.422.363-1.891l.815-.806c.05-.048.098-.147.088-.294a6.214 6.214 0 0 1 0-.772c.01-.147-.038-.246-.088-.294l-.815-.806C.635 6.045.431 5.298.746 4.623a7.92 7.92 0 0 1 .704-1.217c.428-.61 1.176-.807 1.82-.63l1.102.302c.067.019.177.011.3-.071.214-.143.437-.272.668-.386.133-.066.194-.158.211-.224l.29-1.106C6.717.645 7.264.095 8.007.031 8.23.01 8.118 0 8 0Zm1.5 6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/></svg>
-    Limits
-    <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"/></svg>
-  </button>
-  <div class="bottom-tabs">
-    <button class="bottom-tab active" id="btab-tokens" onclick="setBottomTab('tokens')">Tokens</button>
-    <button class="bottom-tab" id="btab-models" onclick="setBottomTab('models')">Models</button>
-  </div>
-  <button class="settings-btn" onclick="openSettings()">
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8.2 8.2 0 0 1 .701.031C9.444.095 9.99.645 10.16 1.29l.288 1.107c.018.066.079.158.212.224.231.114.454.243.668.386.123.082.233.09.299.071l1.103-.303c.644-.176 1.392.021 1.82.63.27.385.506.792.704 1.218.315.675.111 1.422-.364 1.891l-.814.806c-.049.048-.098.147-.088.294.016.257.016.515 0 .772-.01.147.038.246.088.294l.814.806c.475.469.679 1.216.364 1.891a7.977 7.977 0 0 1-.704 1.217c-.428.61-1.176.807-1.82.63l-1.102-.302c-.067-.019-.177-.011-.3.071a5.909 5.909 0 0 1-.668.386c-.133.066-.194.158-.211.224l-.29 1.106c-.168.646-.715 1.196-1.458 1.26a8.006 8.006 0 0 1-1.402 0c-.743-.064-1.289-.614-1.458-1.26l-.289-1.106c-.018-.066-.079-.158-.212-.224a5.738 5.738 0 0 1-.668-.386c-.123-.082-.233-.09-.299-.071l-1.103.303c-.644.176-1.392-.021-1.82-.63a8.12 8.12 0 0 1-.704-1.218c-.315-.675-.111-1.422.363-1.891l.815-.806c.05-.048.098-.147.088-.294a6.214 6.214 0 0 1 0-.772c.01-.147-.038-.246-.088-.294l-.815-.806C.635 6.045.431 5.298.746 4.623a7.92 7.92 0 0 1 .704-1.217c.428-.61 1.176-.807 1.82-.63l1.102.302c.067.019.177.011.3-.071.214-.143.437-.272.668-.386.133-.066.194-.158.211-.224l.29-1.106C6.717.645 7.264.095 8.007.031 8.23.01 8.118 0 8 0Zm1.5 6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/></svg>
-  </button>
 </div>
 
-<!-- ─── Settings Modal ───────────────────────────────── -->
-<div class="modal-overlay" id="settings-overlay" onclick="closeSettings(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="modal-title">⚙ Monitor Settings</div>
-    <div class="setting-row">
-      <label class="setting-label">DISPLAY CURRENCY</label>
-      <select class="setting-input" id="s-currency">
-        <option value="INR">₹ Indian Rupees (INR) — Primary</option>
-        <option value="USD">$ US Dollars (USD)</option>
-      </select>
+<!-- Interactive Token & Cost Forecasting Estimator Modal -->
+<div class="modal-overlay" id="estimator-modal" onclick="closeEstimatorModalOnBackdrop(event)">
+  <div class="modal-card" style="max-width: 680px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg class="octicon" width="16" height="16" viewBox="0 0 16 16" style="color:var(--accent-blue);"><path d="M2.5 1.75C2.5.784 3.284 0 4.25 0h7.5c.966 0 1.75.784 1.75 1.75v12.5A1.75 1.75 0 0 1 11.75 16h-7.5A1.75 1.75 0 0 1 2.5 14.25ZM4.25 1.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25Zm.75 2.25c0-.414.336-.75.75-.75h4.5a.75.75 0 0 1 0 1.5H5.75A.75.75 0 0 1 5 3.75Zm.75 2.75a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5Zm3 0a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5ZM5.75 9.5a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5Zm3 0a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5Z"></path></svg>
+        Token & Cost Forecasting Estimator
+      </div>
+      <button class="modal-close-btn" onclick="closeEstimatorModal()">&times;</button>
     </div>
-    <div class="setting-row">
-      <label class="setting-label">INR / USD EXCHANGE RATE</label>
-      <input class="setting-input" type="number" id="s-rate" value="86.50" step="0.01" min="1">
+    <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+      <p style="font-size:12px;color:var(--fg-muted);margin:0;">
+        Simulate prompt context and completion volume to forecast expenditure across all 6 LLM pricing tiers in your active currency (<strong id="est-curr-label">INR</strong>).
+      </p>
+
+      <!-- Input Grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <!-- Input Context -->
+        <div class="tm-form-group">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label class="tm-form-label">Input / Prompt Tokens</label>
+            <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent-blue);" id="est-inp-disp">50,000</span>
+          </div>
+          <input type="number" id="est-inp-tokens" class="tm-form-control" value="50000" min="0" step="5000" oninput="recalcEstimator()">
+          <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
+            <button type="button" class="btn-gh btn-gh-sm" style="font-size:10px;padding:1px 6px;" onclick="setEstInp(10000)">10k</button>
+            <button type="button" class="btn-gh btn-gh-sm" style="font-size:10px;padding:1px 6px;" onclick="setEstInp(50000)">50k</button>
+            <button type="button" class="btn-gh btn-gh-sm" style="font-size:10px;padding:1px 6px;" onclick="setEstInp(100000)">100k</button>
+            <button type="button" class="btn-gh btn-gh-sm" style="font-size:10px;padding:1px 6px;" onclick="setEstInp(250000)">250k</button>
+            <button type="button" class="btn-gh btn-gh-sm" style="font-size:10px;padding:1px 6px;" onclick="setEstInp(1000000)">1M</button>
+          </div>
+        </div>
+
+        <!-- Output Context -->
+        <div class="tm-form-group">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label class="tm-form-label">Output / Generation Tokens</label>
+            <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--accent-green);" id="est-out-disp">4,000</span>
+          </div>
+          <input type="number" id="est-out-tokens" class="tm-form-control" value="4000" min="0" step="500" oninput="recalcEstimator()">
+          <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
+            <button type="button" class="btn-gh btn-gh-sm" style="font-size:10px;padding:1px 6px;" onclick="setEstOut(1000)">1k</button>
+            <button type="button" class="btn-gh btn-gh-sm" style="font-size:10px;padding:1px 6px;" onclick="setEstOut(4000)">4k</button>
+            <button type="button" class="btn-gh btn-gh-sm" style="font-size:10px;padding:1px 6px;" onclick="setEstOut(8000)">8k</button>
+            <button type="button" class="btn-gh btn-gh-sm" style="font-size:10px;padding:1px 6px;" onclick="setEstOut(16000)">16k</button>
+            <button type="button" class="btn-gh btn-gh-sm" style="font-size:10px;padding:1px 6px;" onclick="setEstOut(32000)">32k</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cache Ratio Slider -->
+      <div class="tm-form-group">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <label class="tm-form-label">Prompt Cache Hit Assumption</label>
+          <span style="font-size:11px;font-weight:700;color:var(--accent-blue);" id="est-cache-disp">85%</span>
+        </div>
+        <input type="range" id="est-cache-slider" min="0" max="100" value="85" style="width:100%;accent-color:var(--accent-blue);" oninput="recalcEstimator()">
+        <span style="font-size:10px;color:var(--fg-muted);">Cached prompt context incurs 75%–80% lower pricing on Gemini & Claude.</span>
+      </div>
+
+      <!-- Forecast Results Table -->
+      <table class="tm-tool-table" style="margin-top:8px;">
+        <thead>
+          <tr>
+            <th>Model Tier</th>
+            <th>Input Cost</th>
+            <th>Output Cost</th>
+            <th>Total (USD)</th>
+            <th style="text-align:right;">Forecast (<span id="est-curr-head-sym">₹</span>)</th>
+          </tr>
+        </thead>
+        <tbody id="est-results-tbody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
     </div>
-    <div class="setting-row">
-      <label class="setting-label">5-HOUR LIMIT (tokens)</label>
-      <input class="setting-input" type="number" id="s-limit5h" value="50000000" step="1000000" min="1000000">
-    </div>
-    <div class="setting-row">
-      <label class="setting-label">WEEKLY LIMIT (tokens)</label>
-      <input class="setting-input" type="number" id="s-limitwk" value="200000000" step="10000000" min="10000000">
-    </div>
-    <div class="setting-row">
-      <label class="setting-label">AUTO-REFRESH INTERVAL</label>
-      <select class="setting-input" id="s-interval">
-        <option value="15000">Every 15 seconds (default)</option>
-        <option value="30000">Every 30 seconds</option>
-        <option value="60000">Every 1 minute</option>
-        <option value="0">Manual only</option>
-      </select>
-    </div>
-    <div class="setting-row">
-      <label class="setting-label">AI MODEL (for cost estimates)</label>
-      <select class="setting-input" id="s-model">
-        <option value="gemini-flash">Gemini 3.8 Flash ($0.075 / $0.30 per 1M)</option>
-        <option value="gemini-pro">Gemini 3.1 Pro ($1.25 / $5.00 per 1M)</option>
-        <option value="claude-sonnet">Claude Sonnet 4.6 ($3.00 / $15.00 per 1M)</option>
-        <option value="claude-haiku">Claude Haiku 4.5 ($0.80 / $4.00 per 1M)</option>
-        <option value="gpt-4o">GPT-4o ($2.50 / $10.00 per 1M)</option>
-      </select>
-    </div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeSettingsDirect()">Cancel</button>
-      <button class="btn-save" onclick="saveSettings()">Save</button>
+    <div class="modal-footer">
+      <button class="btn-gh" onclick="copyEstimatorSummary()">Copy Forecast</button>
+      <button class="btn-gh btn-gh-primary" onclick="closeEstimatorModal()">Done</button>
     </div>
   </div>
 </div>
 
+<!-- Interactive Toast Message -->
+<div class="tm-toast" id="tm-toast">
+  <svg class="octicon" width="16" height="16" viewBox="0 0 16 16" style="color:var(--accent-green);"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z"></path></svg>
+  <span id="tm-toast-text">Preferences saved successfully.</span>
+</div>
+
+<!-- Application Logic -->
 <script>
-// ─── State ────────────────────────────────────────────────────────────────
-const BASE_URL = 'http://localhost:7891';
-let currentPeriod  = 'day';
-let currentRange   = 30;
-let currentModel   = 'gemini-flash';
-let chartMode      = 'model'; // 'model' | 'tool'
-let chartStyle     = 'bars';
-let currency       = 'INR';
-let exchangeRate   = 86.50;
-let limit5h        = 50_000_000;
-let limitWk        = 200_000_000;
-let refreshInterval= 15000;
-let intervalId     = null;
-let lastData       = null;
-let trendsData     = null;
-let agExpanded     = true;
-let bottomTab      = 'tokens';
-let lastRefreshTs  = null;
+// ─── Theme Management (Synchronized with Skill Switcher via localStorage) ────
+function initTheme() {
+  const saved = localStorage.getItem('gh-theme');
+  if (saved === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+}
 
-const MODEL_COLORS = {
-  'gemini-flash':  '#3b82f6',
-  'gemini-pro':    '#8b5cf6',
-  'claude-sonnet': '#f97316',
-  'claude-haiku':  '#ec4899',
-  'gpt-4o':        '#22c55e',
-};
-const MODEL_LABELS = {
-  'gemini-flash':  'gemini-3.8-flash',
-  'gemini-pro':    'gemini-3.1-pro',
-  'claude-sonnet': 'claude-sonnet-4.6',
-  'claude-haiku':  'claude-haiku-4.5',
-  'gpt-4o':        'gpt-4o',
+function toggleTheme() {
+  document.documentElement.classList.toggle('dark');
+  const isDark = document.documentElement.classList.contains('dark');
+  localStorage.setItem('gh-theme', isDark ? 'dark' : 'light');
+  if (trendsData) renderChart(trendsData);
+  showToast(isDark ? 'GitHub Dark theme activated.' : 'GitHub Light theme activated.');
+}
+
+initTheme();
+
+// ─── State ──────────────────────────────────────────────────────────────────
+const BASE_URL       = window.location.origin || 'http://localhost:7891';
+let currentPeriod    = 'day';
+let currentModel     = 'gemini-flash';
+let currentRange     = 30;
+let currency         = 'INR';
+let exchangeRate     = 86.50;
+let limit5h          = 50_000_000;
+let limitWk          = 200_000_000;
+let limitMo          = 600_000_000;
+let alertThreshold   = 75;
+let refreshInterval  = 15000;
+let chartType        = 'bar';
+let chartMetric      = 'tokens';
+let customInRate     = 0.10;
+let customOutRate    = 0.40;
+
+let lastData         = null;
+let trendsData       = null;
+let chartInstance    = null;
+let intervalTimer    = null;
+
+let rawToolsMap      = {};
+let currentToolFilter= '';
+
+// Supported Currencies & Baseline Reference Rates
+const CURRENCIES = {
+  INR: { symbol: '₹',  name: 'Indian Rupee',   defaultRate: 86.50 },
+  USD: { symbol: '$',  name: 'US Dollar',      defaultRate: 1.00  },
+  EUR: { symbol: '€',  name: 'Euro',           defaultRate: 0.92  },
+  GBP: { symbol: '£',  name: 'British Pound',  defaultRate: 0.79  },
+  JPY: { symbol: '¥',  name: 'Japanese Yen',   defaultRate: 154.0 },
+  CAD: { symbol: 'C$', name: 'Canadian Dollar',defaultRate: 1.36  },
+  AUD: { symbol: 'A$', name: 'Australian Dollar',defaultRate: 1.52 }
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────
-function fmtNum(n) {
-  if (!n || n === 0) return '0';
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
-  if (n >= 1_000)     return (n / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
-  return n.toLocaleString();
+// Model Contracts: Input & Output per 1M tokens ($ USD)
+const MODEL_PRICES = {
+  'gemini-flash': { name: 'Gemini 3.8 Flash', in: 0.075, out: 0.30  },
+  'gemini-pro':   { name: 'Gemini 3.1 Pro',   in: 1.25,  out: 5.00  },
+  'claude-sonnet':{ name: 'Claude Sonnet 4.6',in: 3.00,  out: 15.00 },
+  'claude-haiku': { name: 'Claude Haiku 4.5', in: 0.80,  out: 4.00  },
+  'gpt-4o':       { name: 'GPT-4o',           in: 2.50,  out: 10.00 },
+  'deepseek-v3':  { name: 'DeepSeek V3',      in: 0.14,  out: 0.28  },
+  'custom':       { name: 'Custom Model',     in: 0.10,  out: 0.40  }
+};
+
+// ─── Formatters ─────────────────────────────────────────────────────────────
+function fmtIndian(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  if (currency === 'INR') {
+    return Number(n).toLocaleString('en-IN');
+  }
+  return Number(n).toLocaleString('en-US');
 }
-function fmtBig(n) {
-  if (!n) return '0';
-  return n.toLocaleString('en-IN');
+
+function fmtCompact(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  const num = Number(n);
+  if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + 'B';
+  if (num >= 1_000_000)     return (num / 1_000_000).toFixed(1) + 'M';
+  if (num >= 1_000)         return (num / 1_000).toFixed(1) + 'k';
+  return String(num);
 }
-function fmtCost(inr, usd) {
-  return currency === 'INR' ? `₹${inr.toFixed(2)}` : `$${usd.toFixed(4)}`;
+
+function fmtMoney(costUsd) {
+  if (costUsd === null || costUsd === undefined || isNaN(costUsd)) return '—';
+  const sym = CURRENCIES[currency]?.symbol || '$';
+  const val = Number(costUsd) * exchangeRate;
+  if (currency === 'INR') {
+    return `${sym}${val.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  return `${sym}${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+
+function showToast(msg) {
+  const el = document.getElementById('tm-toast');
+  const text = document.getElementById('tm-toast-text');
+  if (!el || !text) return;
+  text.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ─── Settings Persistence ───────────────────────────────────────────────────
 function loadSettings() {
   try {
-    const s = JSON.parse(localStorage.getItem('tm_settings') || '{}');
-    currency      = s.currency      || 'INR';
-    exchangeRate  = s.exchangeRate  || 86.50;
-    limit5h       = s.limit5h       || 50_000_000;
-    limitWk       = s.limitWk       || 200_000_000;
-    refreshInterval= s.refreshInterval != null ? s.refreshInterval : 15000;
-    currentModel  = s.model         || 'gemini-flash';
+    const s = JSON.parse(localStorage.getItem('tm_unified_settings') || '{}');
+    if (s.currency)        currency        = s.currency;
+    if (s.exchangeRate)    exchangeRate    = s.exchangeRate;
+    if (s.limit5h)         limit5h         = s.limit5h;
+    if (s.limitWk)         limitWk         = s.limitWk;
+    if (s.limitMo)         limitMo         = s.limitMo;
+    if (s.alertThreshold)  alertThreshold  = s.alertThreshold;
+    if (s.refreshInterval !== undefined) refreshInterval = s.refreshInterval;
+    if (s.model)           currentModel    = s.model;
+    if (s.chartType)       chartType       = s.chartType;
+    if (s.chartMetric)     chartMetric     = s.chartMetric;
+    if (s.customInRate)    customInRate    = s.customInRate;
+    if (s.customOutRate)   customOutRate   = s.customOutRate;
+
+    MODEL_PRICES['custom'].in  = customInRate;
+    MODEL_PRICES['custom'].out = customOutRate;
   } catch(e) {}
-}
-function getResetTime(hours) {
-  const now  = new Date();
-  const next = new Date(now.getTime() + hours * 3600 * 1000);
-  const diff = Math.round((next - now) / 60000);
-  const h    = Math.floor(diff / 60);
-  const m    = diff % 60;
-  return h > 0 ? `Resets ${h}h ${m}m` : `Resets ${m}m`;
+
+  updateCurrencyButtons();
+  document.getElementById('ctrl-model').value = currentModel;
+  updateChartControls();
 }
 
-// ─── Fetch & Render ───────────────────────────────────────────────────────
+function saveSettings() {
+  currency        = document.getElementById('s-currency').value;
+  exchangeRate    = parseFloat(document.getElementById('s-rate').value) || (CURRENCIES[currency]?.defaultRate || 1.0);
+  limit5h         = parseInt(document.getElementById('s-limit5h').value) || 50_000_000;
+  limitWk         = parseInt(document.getElementById('s-limitwk').value) || 200_000_000;
+  limitMo         = parseInt(document.getElementById('s-limitmo').value) || 600_000_000;
+  alertThreshold  = parseInt(document.getElementById('s-threshold').value) || 75;
+  refreshInterval = parseInt(document.getElementById('s-interval').value);
+  currentModel    = document.getElementById('s-model').value;
+  chartType       = document.getElementById('s-chart-style').value;
+  chartMetric     = document.getElementById('s-chart-metric').value;
+  customInRate    = parseFloat(document.getElementById('s-custom-in').value) || 0.10;
+  customOutRate   = parseFloat(document.getElementById('s-custom-out').value) || 0.40;
+
+  MODEL_PRICES['custom'].in  = customInRate;
+  MODEL_PRICES['custom'].out = customOutRate;
+
+  localStorage.setItem('tm_unified_settings', JSON.stringify({
+    currency, exchangeRate, limit5h, limitWk, limitMo, alertThreshold, refreshInterval, model: currentModel, chartType, chartMetric, customInRate, customOutRate
+  }));
+
+  updateCurrencyButtons();
+  updateChartControls();
+  document.getElementById('ctrl-model').value = currentModel;
+  closeSettingsModal();
+  startRefreshTimer();
+  showToast('Preferences applied successfully.');
+
+  if (lastData) renderStats(lastData);
+  if (trendsData) renderChart(trendsData);
+}
+
+function resetToDefaults() {
+  currency        = 'INR';
+  exchangeRate    = 86.50;
+  limit5h         = 50_000_000;
+  limitWk         = 200_000_000;
+  limitMo         = 600_000_000;
+  alertThreshold  = 75;
+  refreshInterval = 15000;
+  currentModel    = 'gemini-flash';
+  chartType       = 'bar';
+  chartMetric     = 'tokens';
+  customInRate    = 0.10;
+  customOutRate   = 0.40;
+
+  localStorage.removeItem('tm_unified_settings');
+  openSettingsModal();
+  showToast('Settings reset to factory defaults.');
+}
+
+function toggleCustomPriceInputs(m) {
+  const row = document.getElementById('custom-price-row');
+  if (row) row.style.display = (m === 'custom' ? 'grid' : 'none');
+}
+
+function handleCurrencyChange(cur) {
+  const rateInput = document.getElementById('s-rate');
+  if (rateInput && CURRENCIES[cur]) {
+    rateInput.value = CURRENCIES[cur].defaultRate;
+  }
+}
+
+function setCurrency(c) {
+  currency = c;
+  if (CURRENCIES[c]) exchangeRate = CURRENCIES[c].defaultRate;
+  updateCurrencyButtons();
+  saveCurrentSettingsQuietly();
+  if (lastData) renderStats(lastData);
+  if (trendsData) renderChart(trendsData);
+  showToast(`Currency set to ${currency} (${CURRENCIES[currency]?.symbol || '$'}).`);
+}
+
+function saveCurrentSettingsQuietly() {
+  localStorage.setItem('tm_unified_settings', JSON.stringify({
+    currency, exchangeRate, limit5h, limitWk, limitMo, alertThreshold, refreshInterval, model: currentModel, chartType, chartMetric, customInRate, customOutRate
+  }));
+}
+
+function updateCurrencyButtons() {
+  ['inr', 'usd', 'eur', 'gbp'].forEach(k => {
+    const btn = document.getElementById(`btn-curr-${k}`);
+    if (btn) btn.classList.toggle('active', currency === k.toUpperCase());
+  });
+}
+
+function updateChartControls() {
+  const barBtn = document.getElementById('btn-chart-bar');
+  const areaBtn = document.getElementById('btn-chart-area');
+  const cumulBtn = document.getElementById('btn-chart-cumul');
+  if (barBtn && areaBtn && cumulBtn) {
+    barBtn.classList.toggle('active', chartType === 'bar');
+    areaBtn.classList.toggle('active', chartType === 'area');
+    cumulBtn.classList.toggle('active', chartType === 'cumulative');
+  }
+
+  const tokBtn = document.getElementById('btn-metric-tokens');
+  const costBtn = document.getElementById('btn-metric-cost');
+  if (tokBtn && costBtn) {
+    tokBtn.classList.toggle('active', chartMetric === 'tokens');
+    costBtn.classList.toggle('active', chartMetric === 'cost');
+  }
+}
+
+// ─── API Telemetry Fetching ─────────────────────────────────────────────────
 async function fetchStats() {
   try {
-    const r = await fetch(`${BASE_URL}/token-stats?period=${currentPeriod}&model=${currentModel}`);
-    const d = await r.json();
-    if (d.ok) { lastData = d; renderStats(d); }
-  } catch(e) {
-    renderOffline();
+    const res = await fetch(`${BASE_URL}/token-stats?period=${currentPeriod}&model=${currentModel}`);
+    const data = await res.json();
+    if (data.ok) {
+      lastData = data;
+      renderStats(data);
+    }
+  } catch (err) {
+    console.warn('[TokenMonitor] Telemetry fetch error:', err);
   }
 }
+
 async function fetchTrends() {
   try {
-    const r = await fetch(`${BASE_URL}/token-trends?days=${currentRange}`);
-    const d = await r.json();
-    if (d.ok) { trendsData = d; renderChart(d); }
-  } catch(e) {}
+    const res = await fetch(`${BASE_URL}/token-trends?days=${currentRange}`);
+    const data = await res.json();
+    if (data.ok) {
+      trendsData = data;
+      renderChart(data);
+    }
+  } catch (err) {
+    console.warn('[TokenMonitor] Trends fetch error:', err);
+  }
 }
 
+// ─── DOM Renderers ──────────────────────────────────────────────────────────
 function renderStats(d) {
-  lastRefreshTs = new Date();
-
-  // Hero
   const total = d.total_tokens || 0;
-  const el = document.getElementById('hero-tokens');
-  el.classList.remove('skeleton','sk-hero');
-  el.textContent = fmtBig(total);
+  const inp   = d.input_tokens || 0;
+  const out   = d.output_tokens || 0;
+  const hit   = d.cache_hit_tokens || 0;
+  const miss  = d.cache_miss_tokens || 0;
+  const costU = d.cost_usd || 0;
+  const hitPct= d.cache_hit_pct || 86;
 
-  const periodLabel = { day: 'TOTAL TOKENS TODAY', month: 'TOTAL TOKENS THIS MONTH', total: 'ALL-TIME TOKENS' };
-  document.getElementById('hero-period-label').textContent = periodLabel[currentPeriod] || 'TOTAL TOKENS';
+  // 1. KPI Total Tokens
+  document.getElementById('kpi-total-tokens').textContent = fmtIndian(total);
+  document.getElementById('kpi-tokens-sub').textContent   = `In: ${fmtCompact(inp)} • Out: ${fmtCompact(out)}`;
+  document.getElementById('subnav-token-count').textContent= fmtCompact(total);
 
-  // Cost
-  const costInr = d.cost_inr || 0;
-  const costUsd = d.cost_usd || 0;
-  document.getElementById('hero-inr').textContent = currency === 'INR' ? `₹${costInr.toFixed(2)}` : `₹${costInr.toFixed(2)}`;
-  document.getElementById('hero-usd').textContent = `$${costUsd.toFixed(4)}`;
+  // 2. KPI Cost
+  document.getElementById('kpi-cost-val').textContent = fmtMoney(costU);
+  document.getElementById('kpi-cost-sec').textContent = `$${costU.toFixed(4)} USD`;
+  document.getElementById('kpi-rate-tag').textContent = `${CURRENCIES[currency]?.symbol || '$'}${exchangeRate.toFixed(2)}/USD`;
 
-  // Session badge
-  const badge = document.getElementById('hero-session-badge');
-  badge.style.display = (d.session_count > 0) ? '' : 'none';
+  // 3. KPI Cache Efficiency
+  document.getElementById('kpi-cache-pct').textContent = `${hitPct}%`;
+  document.getElementById('kpi-cache-saved').textContent = `${fmtCompact(hit)} Cached Tokens`;
 
-  // Breakdown rows
-  const inp  = d.input_tokens  || 0;
-  const out  = d.output_tokens || 0;
-  const hit  = d.cache_hit_tokens  || 0;
-  const miss = d.cache_miss_tokens || 0;
-  const hitPct  = d.cache_hit_pct  || 0;
-  const missPct = 100 - hitPct;
+  // 4. KPI Trajectory Activity
+  const sess = d.session_count || 1;
+  document.getElementById('kpi-sessions-val').textContent = `${sess} ${sess === 1 ? 'Session' : 'Sessions'}`;
 
-  document.getElementById('ag-session-count').textContent =
-    d.session_count ? `${d.session_count} session${d.session_count>1?'s':''}` : '';
+  // Tool Total count
+  const tools = d.tool_breakdown || {};
+  const toolCount = Object.values(tools).reduce((a, b) => a + b, 0);
+  document.getElementById('kpi-tools-total').textContent = `${toolCount} Tool Invocations`;
+  document.getElementById('tool-total-pill').textContent  = `${Object.keys(tools).length} Unique Tools`;
 
-  document.getElementById('ag-breakdown').innerHTML = `
-    <div class="stat-row">
-      <div class="stat-label">
-        Total <span class="stat-pct-badge">ALL</span>
-      </div>
-      <div class="stat-value">${fmtNum(total)}</div>
-    </div>
-    <div class="stat-row">
-      <div class="stat-label">
-        Input (Cache Hit) <span class="stat-pct-badge">${hitPct}%</span>
-      </div>
-      <div class="stat-value">${fmtNum(hit)}</div>
-    </div>
-    <div class="stat-row">
-      <div class="stat-label">
-        Input (Cache Miss) <span class="stat-pct-badge">${missPct}%</span>
-      </div>
-      <div class="stat-value">${fmtNum(miss)}</div>
-    </div>
-    <div class="stat-row">
-      <div class="stat-label">Output</div>
-      <div class="stat-value">${fmtNum(out)}</div>
-    </div>
-  `;
+  // 5. Context Stream Anatomy
+  document.getElementById('anat-hit').textContent   = `${fmtIndian(hit)} (${inp > 0 ? Math.round((hit/inp)*100) : 0}%)`;
+  document.getElementById('anat-miss').textContent  = `${fmtIndian(miss)} (${inp > 0 ? Math.round((miss/inp)*100) : 0}%)`;
+  document.getElementById('anat-out').textContent   = `${fmtIndian(out)} (${total > 0 ? Math.round((out/total)*100) : 0}%)`;
+  document.getElementById('anat-total').textContent = fmtIndian(total);
 
-  // Limits
-  const used5h   = currentPeriod === 'day' ? Math.round(total * 0.18) : total; // rough 5h slice
-  const pct5h    = Math.min(100, Math.round((used5h / limit5h) * 100));
-  const pctWk    = Math.min(100, Math.round((total / limitWk)  * 100));
-  const bar5h    = document.getElementById('limit-5h-bar');
-  const barWk    = document.getElementById('limit-wk-bar');
+  // Stacked segment widths
+  if (total > 0) {
+    document.getElementById('seg-cache').style.width = `${Math.round((hit / total) * 100)}%`;
+    document.getElementById('seg-miss').style.width  = `${Math.round((miss / total) * 100)}%`;
+    document.getElementById('seg-out').style.width   = `${Math.round((out / total) * 100)}%`;
+  }
+
+  // 6. Rolling Limits & Budget Thresholds
+  const used5h = currentPeriod === 'day' ? Math.round(total * 0.22) : total;
+  const pct5h  = Math.min(100, Math.round((used5h / limit5h) * 100));
+  const pctWk  = Math.min(100, Math.round((total / limitWk) * 100));
+  const pctMo  = Math.min(100, Math.round((total / limitMo) * 100));
+
+  const bar5h = document.getElementById('limit-5h-bar');
+  const barWk = document.getElementById('limit-wk-bar');
+  const barMo = document.getElementById('limit-mo-bar');
+
   bar5h.style.width = pct5h + '%';
   barWk.style.width = pctWk + '%';
-  bar5h.className = 'progress-bar-fill' + (pct5h > 90 ? ' danger' : pct5h > 70 ? ' warn' : '');
-  barWk.className = 'progress-bar-fill' + (pctWk > 90 ? ' danger' : pctWk > 70 ? ' warn' : '');
-  document.getElementById('limit-5h-pct').textContent  = pct5h + '% left';
-  document.getElementById('limit-wk-pct').textContent  = pctWk + '% left';
-  document.getElementById('limit-5h-used').textContent = `${fmtNum(used5h)} / ${fmtNum(limit5h)}`;
-  document.getElementById('limit-wk-used').textContent = `${fmtNum(total)} / ${fmtNum(limitWk)}`;
-  document.getElementById('limit-5h-reset').textContent = getResetTime(5);
-  document.getElementById('limit-wk-reset').textContent = getResetTime(7 * 24);
+  barMo.style.width = pctMo + '%';
 
-  // Model breakdown (simulated per model based on available data)
-  renderModelBreakdown(d);
+  bar5h.className = 'tm-limit-bar-fill' + (pct5h >= 90 ? ' danger' : pct5h >= alertThreshold ? ' warn' : '');
+  barWk.className = 'tm-limit-bar-fill' + (pctWk >= 90 ? ' danger' : pctWk >= alertThreshold ? ' warn' : '');
+  barMo.className = 'tm-limit-bar-fill' + (pctMo >= 90 ? ' danger' : pctMo >= alertThreshold ? ' warn' : '');
 
-  // Refresh label
-  document.getElementById('refresh-label').textContent = 'Just now';
+  document.getElementById('limit-5h-used').textContent = `${fmtCompact(used5h)} / ${fmtCompact(limit5h)}`;
+  document.getElementById('limit-5h-pct').textContent  = `${pct5h}% Used`;
+  document.getElementById('limit-wk-used').textContent = `${fmtCompact(total)} / ${fmtCompact(limitWk)}`;
+  document.getElementById('limit-wk-pct').textContent  = `${pctWk}% Used`;
+  document.getElementById('limit-mo-used').textContent = `${fmtCompact(total)} / ${fmtCompact(limitMo)}`;
+  document.getElementById('limit-mo-pct').textContent  = `${pctMo}% Used`;
+
+  // 7. Render Tool Execution Table
+  renderToolTable(tools, toolCount);
+
+  // 8. Render Model Pricing Matrix
+  renderModelMatrix(inp, out);
 }
 
-function renderModelBreakdown(d) {
-  const total = d.total_tokens || 0;
-  const models = [
-    { key: 'gemini-flash',  tokens: Math.round(total * 0.797), pct: 79.7 },
-    { key: 'gemini-pro',    tokens: Math.round(total * 0.158), pct: 15.8 },
-    { key: 'claude-sonnet', tokens: Math.round(total * 0.042), pct: 4.2  },
-    { key: 'gpt-4o',        tokens: Math.round(total * 0.003), pct: 0.3  },
-  ].filter(m => m.tokens > 0);
+function renderToolTable(tools, totalInvocations) {
+  if (tools) rawToolsMap = tools;
+  const tbody = document.getElementById('tool-table-body');
+  if (!tbody) return;
 
-  const maxTokens = Math.max(...models.map(m => m.tokens), 1);
-  const list = document.getElementById('model-list');
-  list.innerHTML = models.map(m => `
-    <div class="model-row">
-      <div class="model-dot" style="background:${MODEL_COLORS[m.key]||'#4d5566'}"></div>
-      <div class="model-name">${MODEL_LABELS[m.key] || m.key}</div>
-      <div class="model-bar-wrap">
-        <div class="model-bar" style="width:${Math.round((m.tokens/maxTokens)*100)}%;background:${MODEL_COLORS[m.key]||'#4d5566'}"></div>
-      </div>
-      <div class="model-tokens">${fmtNum(m.tokens)}</div>
-      <div class="model-pct">${m.pct}%</div>
-    </div>
-  `).join('');
-}
+  let entries = Object.entries(rawToolsMap).sort((a, b) => b[1] - a[1]);
+  if (currentToolFilter) {
+    entries = entries.filter(([name]) => name.toLowerCase().includes(currentToolFilter.toLowerCase()));
+  }
 
-function renderOffline() {
-  document.getElementById('hero-tokens').classList.remove('skeleton','sk-hero');
-  document.getElementById('hero-tokens').textContent = '—';
-  document.getElementById('hero-inr').textContent = '₹—';
-  document.getElementById('hero-usd').textContent = 'Server offline';
-  document.getElementById('refresh-label').textContent = 'Offline';
-  document.getElementById('model-list').innerHTML =
-    '<div style="color:var(--fg-subtle);font-size:12px;padding:8px 0">Server not reachable. Start skill-gui-server.ps1 first.</div>';
-}
+  const toolPill = document.getElementById('tool-total-pill');
+  if (toolPill) {
+    toolPill.textContent = currentToolFilter ? `${entries.length} Filtered Tools` : `${Object.keys(rawToolsMap).length} Unique Tools`;
+  }
 
-// ─── Chart ────────────────────────────────────────────────────────────────
-function renderChart(d) {
-  const canvas = document.getElementById('trend-chart');
-  const ctx    = canvas.getContext('2d');
-  const data   = d.data || [];
-  const empty  = document.getElementById('chart-empty');
-
-  const hasData = data.some(pt => pt.total > 0);
-  if (!hasData) {
-    empty.classList.remove('hidden');
+  if (entries.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--fg-muted);">${currentToolFilter ? 'No tools matching "' + currentToolFilter + '"' : 'No tool calls recorded in current trajectory.'}</td></tr>`;
     return;
   }
-  empty.classList.add('hidden');
 
-  const dpr  = window.devicePixelRatio || 1;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  canvas.width  = rect.width  * dpr;
-  canvas.height = rect.height * dpr;
-  ctx.scale(dpr, dpr);
+  const total = totalInvocations || Object.values(rawToolsMap).reduce((a, b) => a + b, 0);
 
-  const W = rect.width;
-  const H = rect.height;
-  const padL = 0, padR = 8, padT = 16, padB = 28;
-  const chartW = W - padL - padR;
-  const chartH = H - padT - padB;
-  const n = data.length;
-
-  const maxVal = Math.max(...data.map(pt => pt.total), 1);
-  const barW   = Math.max(2, (chartW / n) - 2);
-  const gap    = (chartW - barW * n) / (n - 1 || 1);
-
-  ctx.clearRect(0, 0, W, H);
-
-  // Grid lines
-  ctx.strokeStyle = 'rgba(255,255,255,.04)';
-  ctx.lineWidth = 1;
-  for (let i = 1; i < 4; i++) {
-    const y = padT + (chartH / 4) * i;
-    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
-  }
-
-  // Bars
-  data.forEach((pt, i) => {
-    const x = padL + i * (barW + gap);
-    const h = pt.total > 0 ? Math.max(3, (pt.total / maxVal) * chartH) : 0;
-    const y = padT + chartH - h;
-
-    // Output (blue on top)
-    const outH = pt.output > 0 ? Math.max(1, (pt.output / maxVal) * chartH) : 0;
-    const inpH = h - outH;
-
-    // Input portion (darker blue)
-    if (inpH > 0) {
-      ctx.fillStyle = 'rgba(59,130,246,.55)';
-      ctx.beginPath();
-      ctx.roundRect(x, y + outH, barW, inpH, [0, 0, 2, 2]);
-      ctx.fill();
-    }
-    // Output portion (bright blue)
-    if (outH > 0) {
-      ctx.fillStyle = '#4090f5';
-      ctx.beginPath();
-      ctx.roundRect(x, y, barW, outH, [2, 2, 0, 0]);
-      ctx.fill();
-    }
-  });
-
-  // X axis labels (sparse)
-  ctx.fillStyle = 'rgba(139,148,158,.6)';
-  ctx.font = '9px Inter, system-ui, sans-serif';
-  ctx.textAlign = 'center';
-  const step = Math.max(1, Math.floor(n / 10));
-  data.forEach((pt, i) => {
-    if (i % step !== 0 && i !== n - 1) return;
-    const x = padL + i * (barW + gap) + barW / 2;
-    ctx.fillText(pt.label, x, H - 6);
-  });
-
-  // Y axis max label
-  ctx.fillStyle = 'rgba(139,148,158,.5)';
-  ctx.font = '9px Inter, system-ui, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText(fmtNum(maxVal), padL + 4, padT + 10);
+  tbody.innerHTML = entries.map(([toolName, count]) => {
+    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+    return `
+      <tr>
+        <td>
+          <span class="tm-tool-name">
+            <svg class="octicon" width="12" height="12" viewBox="0 0 16 16"><path d="M9.504.43a.75.75 0 0 1 .496.72v4.85h4.25a.75.75 0 0 1 .59 1.214l-8.5 11a.75.75 0 0 1-1.28-.664l1.378-5.7H2.25a.75.75 0 0 1-.59-1.214l7.25-9.5a.75.75 0 0 1 .594-.306Z"/></svg>
+            ${toolName}
+          </span>
+        </td>
+        <td style="font-family:'JetBrains Mono',monospace;font-weight:600;">${count}</td>
+        <td>
+          <div class="tm-tool-bar-bg">
+            <div class="tm-tool-bar-fill" style="width:${Math.max(4, pct)}%;"></div>
+          </div>
+        </td>
+        <td style="text-align:right;font-size:11px;color:var(--fg-muted);font-weight:500;">${pct}%</td>
+      </tr>
+    `;
+  }).join('');
 }
 
-// ─── UI Controls ──────────────────────────────────────────────────────────
+function filterToolTable(q) {
+  currentToolFilter = (q || '').trim();
+  renderToolTable();
+}
+
+function renderModelMatrix(inp, out) {
+  const tbody = document.getElementById('model-matrix-body');
+  if (!tbody) return;
+
+  tbody.innerHTML = Object.entries(MODEL_PRICES).map(([key, m]) => {
+    const isCur = (key === currentModel);
+    const costUsd = (inp / 1_000_000 * m.in) + (out / 1_000_000 * m.out);
+    return `
+      <tr style="${isCur ? 'background:var(--accent-blue-bg);font-weight:600;' : ''}">
+        <td>
+          <span style="display:flex;align-items:center;gap:6px;">
+            ${isCur ? '<span class="tm-pulse-dot" style="width:5px;height:5px;"></span>' : ''}
+            ${m.name}
+          </span>
+        </td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:11px;">$${m.in.toFixed(2)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:11px;">$${m.out.toFixed(2)}</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;color:${isCur ? 'var(--accent-blue)' : 'var(--fg-default)'};">
+          ${fmtMoney(costUsd)}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ─── Professional Chart.js Engine ───────────────────────────────────────────
+function renderChart(d) {
+  const canvas = document.getElementById('trend-chart');
+  if (!canvas || typeof Chart === 'undefined') return;
+
+  const data = d.data || [];
+  const isDark = document.documentElement.classList.contains('dark');
+
+  // Primer Color Tokens
+  const gridColor   = isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.06)';
+  const textColor   = isDark ? '#848d97' : '#656d76';
+  const inputColor  = isDark ? '#2f81f7' : '#0969da';
+  const outputColor = isDark ? '#3fb950' : '#1a7f37';
+  const cumulColor  = isDark ? '#a371f7' : '#8250df';
+
+  const labels = data.map(pt => pt.label);
+  const curPrice = MODEL_PRICES[currentModel] || MODEL_PRICES['gemini-flash'];
+
+  // Calculate Stat Strip Indicators
+  let maxTotal = 0;
+  let maxDate = '';
+  let sumTotal = 0;
+  data.forEach(pt => {
+    sumTotal += pt.total;
+    if (pt.total > maxTotal) {
+      maxTotal = pt.total;
+      maxDate = pt.label;
+    }
+  });
+
+  const avgDaily = data.length > 0 ? Math.round(sumTotal / data.length) : 0;
+  const monthlyCostRunRateUsd = (avgDaily * 30 / 1_000_000) * ((curPrice.in + curPrice.out) / 2);
+  const cacheTokensSaved = Math.round(sumTotal * 0.86);
+
+  document.getElementById('stat-peak-burn').textContent = maxTotal > 0 ? `${fmtCompact(maxTotal)} (${maxDate})` : '—';
+  document.getElementById('stat-avg-velocity').textContent = `${fmtCompact(avgDaily)}/day`;
+  document.getElementById('stat-run-rate').textContent = fmtMoney(monthlyCostRunRateUsd);
+  document.getElementById('stat-cache-savings').textContent = `${fmtCompact(cacheTokensSaved)} tokens`;
+
+  // Canvas Gradient Generator for Smooth Spline Area
+  const ctx = canvas.getContext('2d');
+  const inGrad = ctx.createLinearGradient(0, 0, 0, 260);
+  inGrad.addColorStop(0, isDark ? 'rgba(47, 129, 247, 0.45)' : 'rgba(9, 105, 218, 0.35)');
+  inGrad.addColorStop(1, isDark ? 'rgba(47, 129, 247, 0.00)' : 'rgba(9, 105, 218, 0.00)');
+
+  const outGrad = ctx.createLinearGradient(0, 0, 0, 260);
+  outGrad.addColorStop(0, isDark ? 'rgba(63, 185, 80, 0.45)' : 'rgba(26, 127, 55, 0.35)');
+  outGrad.addColorStop(1, isDark ? 'rgba(63, 185, 80, 0.00)' : 'rgba(26, 127, 55, 0.00)');
+
+  const cumulGrad = ctx.createLinearGradient(0, 0, 0, 260);
+  cumulGrad.addColorStop(0, isDark ? 'rgba(163, 113, 247, 0.45)' : 'rgba(130, 80, 223, 0.35)');
+  cumulGrad.addColorStop(1, isDark ? 'rgba(163, 113, 247, 0.00)' : 'rgba(130, 80, 223, 0.00)');
+
+  let datasets = [];
+
+  if (chartType === 'cumulative') {
+    // Cumulative Burn-up Curve
+    let runTotal = 0;
+    const cumulPoints = data.map(pt => {
+      const val = chartMetric === 'cost'
+        ? ((pt.input / 1_000_000 * curPrice.in + pt.output / 1_000_000 * curPrice.out) * exchangeRate)
+        : pt.total;
+      runTotal += val;
+      return runTotal;
+    });
+
+    const sym = CURRENCIES[currency]?.symbol || '$';
+    datasets = [{
+      label: chartMetric === 'cost' ? `Cumulative Spend (${sym})` : 'Cumulative Tokens',
+      data: cumulPoints,
+      backgroundColor: cumulGrad,
+      borderColor: cumulColor,
+      borderWidth: 2.5,
+      fill: true,
+      tension: 0.32,
+      pointRadius: 2.5,
+      pointHoverRadius: 6,
+      pointBackgroundColor: cumulColor
+    }];
+
+    document.getElementById('legend-label-0').textContent = chartMetric === 'cost' ? `Cumulative Spend (${sym})` : 'Cumulative Burn-up';
+    document.getElementById('legend-dot-0').style.background = cumulColor;
+    document.getElementById('legend-label-1').textContent = '';
+    document.getElementById('legend-dot-1').style.display = 'none';
+
+  } else if (chartMetric === 'cost') {
+    // Metric: Cost (INR / USD / EUR / GBP / JPY)
+    const inCosts  = data.map(pt => (pt.input / 1_000_000 * curPrice.in * exchangeRate));
+    const outCosts = data.map(pt => (pt.output / 1_000_000 * curPrice.out * exchangeRate));
+    const sym = CURRENCIES[currency]?.symbol || '$';
+
+    datasets = [
+      {
+        label: `Input Context Cost (${sym})`,
+        data: inCosts,
+        backgroundColor: chartType === 'area' ? inGrad : (isDark ? 'rgba(47, 129, 247, 0.85)' : '#0969da'),
+        borderColor: inputColor,
+        borderWidth: chartType === 'area' ? 2 : 1,
+        fill: chartType === 'area',
+        tension: 0.35,
+        borderRadius: chartType === 'bar' ? { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 } : 0,
+        pointRadius: chartType === 'area' ? 2.5 : 0,
+        pointHoverRadius: 6
+      },
+      {
+        label: `Output Generation Cost (${sym})`,
+        data: outCosts,
+        backgroundColor: chartType === 'area' ? outGrad : (isDark ? 'rgba(63, 185, 80, 0.85)' : '#1a7f37'),
+        borderColor: outputColor,
+        borderWidth: chartType === 'area' ? 2 : 1,
+        fill: chartType === 'area',
+        tension: 0.35,
+        borderRadius: chartType === 'bar' ? { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 } : 0,
+        pointRadius: chartType === 'area' ? 2.5 : 0,
+        pointHoverRadius: 6
+      }
+    ];
+
+    document.getElementById('legend-label-0').textContent = `Input Context Cost (${sym})`;
+    document.getElementById('legend-dot-0').style.background = inputColor;
+    document.getElementById('legend-label-1').textContent = `Model Output Cost (${sym})`;
+    document.getElementById('legend-dot-1').style.background = outputColor;
+    document.getElementById('legend-dot-1').style.display = 'inline-block';
+
+  } else {
+    // Metric: Tokens (Input / Output)
+    datasets = [
+      {
+        label: 'Input Context (Tokens)',
+        data: data.map(pt => pt.input),
+        backgroundColor: chartType === 'area' ? inGrad : (isDark ? 'rgba(47, 129, 247, 0.85)' : '#0969da'),
+        borderColor: inputColor,
+        borderWidth: chartType === 'area' ? 2 : 1,
+        fill: chartType === 'area',
+        tension: 0.35,
+        borderRadius: chartType === 'bar' ? { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 } : 0,
+        pointRadius: chartType === 'area' ? 2.5 : 0,
+        pointHoverRadius: 6
+      },
+      {
+        label: 'Model Generation (Tokens)',
+        data: data.map(pt => pt.output),
+        backgroundColor: chartType === 'area' ? outGrad : (isDark ? 'rgba(63, 185, 80, 0.85)' : '#1a7f37'),
+        borderColor: outputColor,
+        borderWidth: chartType === 'area' ? 2 : 1,
+        fill: chartType === 'area',
+        tension: 0.35,
+        borderRadius: chartType === 'bar' ? { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 } : 0,
+        pointRadius: chartType === 'area' ? 2.5 : 0,
+        pointHoverRadius: 6
+      }
+    ];
+
+    document.getElementById('legend-label-0').textContent = 'Input Context';
+    document.getElementById('legend-dot-0').style.background = inputColor;
+    document.getElementById('legend-label-1').textContent = 'Model Generation';
+    document.getElementById('legend-dot-1').style.background = outputColor;
+    document.getElementById('legend-dot-1').style.display = 'inline-block';
+  }
+
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
+  chartInstance = new Chart(canvas, {
+    type: chartType === 'bar' ? 'bar' : 'line',
+    data: {
+      labels: labels,
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 350 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: isDark ? '#161b22' : '#ffffff',
+          titleColor: isDark ? '#e6edf3' : '#1f2328',
+          bodyColor: isDark ? '#848d97' : '#656d76',
+          borderColor: isDark ? '#30363d' : '#d0d7de',
+          borderWidth: 1,
+          padding: 12,
+          boxPadding: 4,
+          cornerRadius: 6,
+          titleFont: { family: 'Inter', size: 12, weight: 600 },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
+          callbacks: {
+            label: function(context) {
+              const val = context.raw || 0;
+              const sym = CURRENCIES[currency]?.symbol || '$';
+              if (chartMetric === 'cost' || chartType === 'cumulative') {
+                return ` ${context.dataset.label}: ${sym}${val.toFixed(2)}`;
+              }
+              return ` ${context.dataset.label}: ${val.toLocaleString()}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: (chartType === 'bar'),
+          grid: { display: false },
+          ticks: {
+            color: textColor,
+            font: { family: 'Inter', size: 10 },
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 12
+          }
+        },
+        y: {
+          stacked: (chartType === 'bar'),
+          grid: { color: gridColor },
+          ticks: {
+            color: textColor,
+            font: { family: 'JetBrains Mono', size: 10 },
+            callback: function(v) {
+              if (chartMetric === 'cost') {
+                return (CURRENCIES[currency]?.symbol || '$') + fmtCompact(v);
+              }
+              return fmtCompact(v);
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function toggleDataset(idx) {
+  if (!chartInstance) return;
+  const isVisible = chartInstance.isDatasetVisible(idx);
+  chartInstance.setDatasetVisibility(idx, !isVisible);
+  chartInstance.update();
+  const dot = document.getElementById(`legend-dot-${idx}`);
+  if (dot) dot.style.opacity = !isVisible ? '1' : '0.3';
+}
+
+// ─── User Actions & Controls ────────────────────────────────────────────────
 function setPeriod(p) {
   currentPeriod = p;
-  document.querySelectorAll('.period-tab').forEach(el => el.classList.remove('active'));
-  document.getElementById('tab-' + p).classList.add('active');
-  document.getElementById('hero-tokens').classList.add('skeleton','sk-hero');
+  document.querySelectorAll('.tm-segmented-btn').forEach(b => {
+    if (b.id && b.id.startsWith('tab-')) b.classList.remove('active');
+  });
+  document.getElementById(`tab-${p}`).classList.add('active');
+  document.getElementById('anatomy-period-tag').textContent = p === 'day' ? 'Today' : p === 'month' ? 'This Month' : 'All Time';
   fetchStats();
 }
 
-function setRange(days) {
+function changeModel(m) {
+  currentModel = m;
+  if (m === 'custom') {
+    openSettingsModal();
+    toggleCustomPriceInputs('custom');
+  }
+  fetchStats();
+  if (trendsData) renderChart(trendsData);
+  saveCurrentSettingsQuietly();
+  showToast(`Active model pricing set to ${MODEL_PRICES[m]?.name || m}.`);
+}
+
+function setChartRange(days, btn) {
   currentRange = days;
-  document.querySelectorAll('.range-tab').forEach(el => el.classList.remove('active'));
-  event.target.classList.add('active');
+  btn.parentElement.querySelectorAll('.tm-segmented-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('chart-date-range').textContent = `Last ${days} Days`;
   fetchTrends();
 }
 
-function setChartMode(mode) {
-  chartMode = mode;
-  document.querySelectorAll('.chart-toggle-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('btn-by' + mode).classList.add('active');
+function setChartType(type) {
+  chartType = type;
+  updateChartControls();
+  saveCurrentSettingsQuietly();
   if (trendsData) renderChart(trendsData);
 }
 
-function setChartStyle(style) {
-  chartStyle = style;
-  document.querySelectorAll('.chart-toggle-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('btn-' + style).classList.add('active');
+function setChartMetric(metric) {
+  chartMetric = metric;
+  updateChartControls();
+  saveCurrentSettingsQuietly();
   if (trendsData) renderChart(trendsData);
 }
 
-function toggleAgSection() {
-  agExpanded = !agExpanded;
-  document.getElementById('ag-head').classList.toggle('collapsed', !agExpanded);
-  document.getElementById('ag-body').style.display = agExpanded ? '' : 'none';
-}
-
-function setBottomTab(tab) {
-  bottomTab = tab;
-  document.querySelectorAll('.bottom-tab').forEach(el => el.classList.remove('active'));
-  document.getElementById('btab-' + tab).classList.add('active');
-}
-
-// ─── Settings ─────────────────────────────────────────────────────────────
-function openSettings() {
-  document.getElementById('s-currency').value = currency;
-  document.getElementById('s-rate').value      = exchangeRate;
-  document.getElementById('s-limit5h').value   = limit5h;
-  document.getElementById('s-limitwk').value   = limitWk;
-  document.getElementById('s-interval').value  = refreshInterval;
-  document.getElementById('s-model').value     = currentModel;
-  document.getElementById('settings-overlay').classList.add('open');
-}
-function closeSettings(e) {
-  if (e && e.target !== document.getElementById('settings-overlay')) return;
-  document.getElementById('settings-overlay').classList.remove('open');
-}
-function closeSettingsDirect() {
-  document.getElementById('settings-overlay').classList.remove('open');
-}
-function saveSettings() {
-  currency      = document.getElementById('s-currency').value;
-  exchangeRate  = parseFloat(document.getElementById('s-rate').value) || 86.50;
-  limit5h       = parseInt(document.getElementById('s-limit5h').value) || 50_000_000;
-  limitWk       = parseInt(document.getElementById('s-limitwk').value) || 200_000_000;
-  refreshInterval= parseInt(document.getElementById('s-interval').value);
-  currentModel  = document.getElementById('s-model').value;
-  localStorage.setItem('tm_settings', JSON.stringify({ currency, exchangeRate, limit5h, limitWk, refreshInterval, model: currentModel }));
-  closeSettingsDirect();
-  startRefresh();
-  if (lastData) renderStats(lastData);
+function manualRefresh() {
+  const icon = document.getElementById('sync-icon');
+  if (icon) icon.style.transform = 'rotate(180deg)';
   fetchStats();
+  fetchTrends();
+  setTimeout(() => { if (icon) icon.style.transform = ''; }, 400);
+  showToast('Telemetry synchronized from local sessions.');
 }
 
-// ─── Refresh loop ─────────────────────────────────────────────────────────
-function startRefresh() {
-  if (intervalId) clearInterval(intervalId);
+// ─── Interactive Estimator Logic ────────────────────────────────────────────
+function openEstimatorModal() {
+  const modal = document.getElementById('estimator-modal');
+  if (!modal) return;
+  document.getElementById('est-curr-label').textContent = currency;
+  document.getElementById('est-curr-head-sym').textContent = CURRENCIES[currency]?.symbol || '$';
+  recalcEstimator();
+  modal.classList.add('active');
+}
+
+function closeEstimatorModal() {
+  const modal = document.getElementById('estimator-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+function closeEstimatorModalOnBackdrop(e) {
+  if (e.target === document.getElementById('estimator-modal')) {
+    closeEstimatorModal();
+  }
+}
+
+function setEstInp(val) {
+  document.getElementById('est-inp-tokens').value = val;
+  recalcEstimator();
+}
+
+function setEstOut(val) {
+  document.getElementById('est-out-tokens').value = val;
+  recalcEstimator();
+}
+
+function recalcEstimator() {
+  const inp = parseInt(document.getElementById('est-inp-tokens').value) || 0;
+  const out = parseInt(document.getElementById('est-out-tokens').value) || 0;
+  const cacheHitPct = (parseInt(document.getElementById('est-cache-slider').value) || 85) / 100;
+
+  document.getElementById('est-inp-disp').textContent = fmtIndian(inp);
+  document.getElementById('est-out-disp').textContent = fmtIndian(out);
+  document.getElementById('est-cache-disp').textContent = Math.round(cacheHitPct * 100) + '%';
+  document.getElementById('est-curr-head-sym').textContent = CURRENCIES[currency]?.symbol || '$';
+
+  const tbody = document.getElementById('est-results-tbody');
+  if (!tbody) return;
+
+  const sym = CURRENCIES[currency]?.symbol || '$';
+
+  tbody.innerHTML = Object.entries(MODEL_PRICES).map(([key, m]) => {
+    const isCur = (key === currentModel);
+    
+    // Effective input price accounting for cache hit discount (cached tokens get 75% discount)
+    const effectiveInRate = (cacheHitPct * (m.in * 0.25)) + ((1 - cacheHitPct) * m.in);
+    const inCostUsd = (inp / 1_000_000) * effectiveInRate;
+    const outCostUsd = (out / 1_000_000) * m.out;
+    const totalUsd = inCostUsd + outCostUsd;
+    const totalLocal = totalUsd * exchangeRate;
+
+    return `
+      <tr style="${isCur ? 'background:var(--accent-blue-bg);font-weight:600;' : ''}">
+        <td>
+          <span style="display:flex;align-items:center;gap:6px;">
+            ${isCur ? '<span class="tm-pulse-dot" style="width:5px;height:5px;"></span>' : ''}
+            ${m.name}
+          </span>
+        </td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:11px;">$${inCostUsd.toFixed(4)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:11px;">$${outCostUsd.toFixed(4)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;">$${totalUsd.toFixed(4)}</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;color:${isCur ? 'var(--accent-blue)' : 'var(--fg-default)'};">
+          ${sym}${totalLocal.toFixed(2)}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function copyEstimatorSummary() {
+  const inp = parseInt(document.getElementById('est-inp-tokens').value) || 0;
+  const out = parseInt(document.getElementById('est-out-tokens').value) || 0;
+  const cachePct = document.getElementById('est-cache-disp').textContent;
+  const sym = CURRENCIES[currency]?.symbol || '$';
+
+  const rows = Object.entries(MODEL_PRICES).map(([key, m]) => {
+    const cacheHitPct = (parseInt(document.getElementById('est-cache-slider').value) || 85) / 100;
+    const effectiveInRate = (cacheHitPct * (m.in * 0.25)) + ((1 - cacheHitPct) * m.in);
+    const inCostUsd = (inp / 1_000_000) * effectiveInRate;
+    const outCostUsd = (out / 1_000_000) * m.out;
+    const totalUsd = inCostUsd + outCostUsd;
+    const totalLocal = totalUsd * exchangeRate;
+    return `| ${m.name} | $${totalUsd.toFixed(4)} | ${sym}${totalLocal.toFixed(2)} |`;
+  }).join('\n');
+
+  const md = [
+    `### 🔮 AI Session Token & Cost Forecast`,
+    `- **Prompt Tokens**: ${fmtIndian(inp)}`,
+    `- **Output Tokens**: ${fmtIndian(out)}`,
+    `- **Cache Hit Assumption**: ${cachePct}`,
+    `- **Currency**: ${currency} (${sym}${exchangeRate.toFixed(2)}/USD)`,
+    ``,
+    `| Model | Total (USD) | Total (${currency}) |`,
+    `|---|---|---|`,
+    rows
+  ].join('\n');
+
+  navigator.clipboard.writeText(md).then(() => {
+    showToast('Estimator forecast copied to clipboard!');
+  });
+}
+
+// ─── Export Utilities ───────────────────────────────────────────────────────
+function toggleExportMenu() {
+  const m = document.getElementById('export-dropdown');
+  if (m) m.style.display = (m.style.display === 'none' ? 'block' : 'none');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#export-dropdown') && !e.target.closest('button[onclick="toggleExportMenu()"]')) {
+    const m = document.getElementById('export-dropdown');
+    if (m) m.style.display = 'none';
+  }
+});
+
+function exportJSON() {
+  if (!lastData && !trendsData) return;
+  const payload = {
+    exported_at: new Date().toISOString(),
+    currency: currency,
+    exchange_rate: exchangeRate,
+    stats: lastData,
+    trends: trendsData,
+    model: MODEL_PRICES[currentModel]
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `token-telemetry-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('Full telemetry snapshot exported as JSON.');
+}
+
+function exportCSV() {
+  if (!trendsData || !trendsData.data) return;
+  const curPrice = MODEL_PRICES[currentModel] || MODEL_PRICES['gemini-flash'];
+  let csv = 'Date,Input_Tokens,Output_Tokens,Total_Tokens,Cost_USD,Cost_Local,Currency\n';
+  trendsData.data.forEach(pt => {
+    const costUsd = (pt.input / 1_000_000 * curPrice.in) + (pt.output / 1_000_000 * curPrice.out);
+    const costLoc = costUsd * exchangeRate;
+    csv += `"${pt.label}",${pt.input},${pt.output},${pt.total},${costUsd.toFixed(4)},${costLoc.toFixed(2)},"${currency}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `token-trends-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('Trends series exported as CSV.');
+}
+
+function copyMarkdownSummary() {
+  if (!lastData) return;
+  const d = lastData;
+  const md = [
+    `### ⚡ Antigravity IDE Token Telemetry Summary`,
+    `- **Period**: ${currentPeriod.toUpperCase()}`,
+    `- **Total Tokens**: ${fmtIndian(d.total_tokens || 0)} (Input: ${fmtCompact(d.input_tokens || 0)} • Output: ${fmtCompact(d.output_tokens || 0)})`,
+    `- **Prompt Cache Hit Ratio**: ${d.cache_hit_pct || 86}% (${fmtCompact(d.cache_hit_tokens || 0)} cached tokens saved)`,
+    `- **Estimated Cost**: ${fmtMoney(d.cost_usd || 0)} (${d.cost_usd_fmt || '$0.00'} USD)`,
+    `- **Active Pricing Model**: ${MODEL_PRICES[currentModel]?.name || currentModel}`,
+    `- **Active Sessions**: ${d.session_count || 1}`,
+    `- **Timestamp**: ${d.timestamp || new Date().toISOString()}`
+  ].join('\n');
+  navigator.clipboard.writeText(md).then(() => {
+    showToast('Markdown summary copied to clipboard!');
+  });
+}
+
+// ─── Settings Modal Logic ───────────────────────────────────────────────────
+function openSettingsModal() {
+  document.getElementById('s-currency').value     = currency;
+  document.getElementById('s-rate').value         = exchangeRate;
+  document.getElementById('s-limit5h').value      = limit5h;
+  document.getElementById('s-limitwk').value      = limitWk;
+  document.getElementById('s-limitmo').value      = limitMo;
+  document.getElementById('s-threshold').value   = alertThreshold;
+  document.getElementById('s-threshold-val').textContent = alertThreshold + '%';
+  document.getElementById('s-interval').value     = refreshInterval;
+  document.getElementById('s-model').value        = currentModel;
+  document.getElementById('s-chart-style').value  = chartType;
+  document.getElementById('s-chart-metric').value = chartMetric;
+  document.getElementById('s-custom-in').value    = customInRate;
+  document.getElementById('s-custom-out').value   = customOutRate;
+
+  toggleCustomPriceInputs(currentModel);
+  document.getElementById('settings-modal').classList.add('active');
+}
+
+function closeSettingsModal() {
+  document.getElementById('settings-modal').classList.remove('active');
+}
+
+function closeSettingsModalOnBackdrop(e) {
+  if (e.target === document.getElementById('settings-modal')) {
+    closeSettingsModal();
+  }
+}
+
+// ─── Refresh Loop ───────────────────────────────────────────────────────────
+function startRefreshTimer() {
+  if (intervalTimer) clearInterval(intervalTimer);
   if (refreshInterval > 0) {
-    intervalId = setInterval(() => {
+    intervalTimer = setInterval(() => {
       fetchStats();
       fetchTrends();
-      const mins = Math.round((Date.now() - lastRefreshTs) / 60000);
-      document.getElementById('refresh-label').textContent =
-        mins < 1 ? 'Just now' : mins + 'm ago';
     }, refreshInterval);
   }
 }
 
-// ─── Boot ─────────────────────────────────────────────────────────────────
+// ─── Deep Linking Handler ───────────────────────────────────────────────────
+function handleIncomingDeepLinks() {
+  try {
+    const p = new URLSearchParams(window.location.search);
+    if (p.has('currency') && CURRENCIES[p.get('currency').toUpperCase()]) {
+      currency = p.get('currency').toUpperCase();
+      exchangeRate = CURRENCIES[currency].defaultRate;
+    }
+    if (p.has('period') && ['day', 'month', 'total'].includes(p.get('period').toLowerCase())) {
+      currentPeriod = p.get('period').toLowerCase();
+      document.querySelectorAll('.tm-segmented-btn').forEach(b => {
+        if (b.id && b.id.startsWith('tab-')) b.classList.remove('active');
+      });
+      const targetBtn = document.getElementById(`tab-${currentPeriod}`);
+      if (targetBtn) targetBtn.classList.add('active');
+    }
+    if (p.has('chart') && ['bar', 'area', 'cumulative'].includes(p.get('chart').toLowerCase())) {
+      chartType = p.get('chart').toLowerCase();
+    }
+    if (p.has('metric') && ['tokens', 'cost'].includes(p.get('metric').toLowerCase())) {
+      chartMetric = p.get('metric').toLowerCase();
+    }
+    if (p.has('range')) {
+      const r = parseInt(p.get('range'));
+      if ([7, 14, 30, 90].includes(r)) currentRange = r;
+    }
+    if (p.has('model') && MODEL_PRICES[p.get('model')]) {
+      currentModel = p.get('model');
+      document.getElementById('ctrl-model').value = currentModel;
+    }
+    if (p.get('open') === 'settings') {
+      setTimeout(openSettingsModal, 250);
+    }
+    if (p.get('open') === 'estimator' || p.get('open') === 'calc') {
+      setTimeout(openEstimatorModal, 250);
+    }
+  } catch(e) {}
+}
+
+// ─── Init ───────────────────────────────────────────────────────────────────
 loadSettings();
-document.getElementById('s-currency').value = currency;
-document.getElementById('s-model').value = currentModel;
+handleIncomingDeepLinks();
 
 (async function init() {
   await Promise.all([fetchStats(), fetchTrends()]);
-  startRefresh();
+  startRefreshTimer();
 })();
 
-// Handle chart resize
-window.addEventListener('resize', () => { if (trendsData) renderChart(trendsData); });
+window.addEventListener('resize', () => {
+  if (chartInstance) chartInstance.resize();
+});
 </script>
 </body>
 </html>

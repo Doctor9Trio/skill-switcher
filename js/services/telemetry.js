@@ -142,16 +142,16 @@ function renderTelemetryUI(data) {
   const heroUsdEl = document.getElementById('tel-hero-cost-usd');
   if (heroInrEl) {
     if (activeTelemetryCurrency === 'INR') {
-      heroInrEl.textContent = '???' + costInr.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      heroInrEl.textContent = '₹' + costInr.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     } else {
       heroInrEl.textContent = '$' + costUsd.toFixed(4) + ' USD';
     }
   }
   if (heroUsdEl) {
     if (activeTelemetryCurrency === 'INR') {
-      heroUsdEl.textContent = `??? $${costUsd.toFixed(4)} USD (Exchange Benchmark: ???86.50/USD)`;
+      heroUsdEl.textContent = `≈ $${costUsd.toFixed(4)} USD (Exchange Benchmark: ₹86.50/USD)`;
     } else {
-      heroUsdEl.textContent = `??? ???${costInr.toFixed(2)} INR (Exchange Benchmark: ???86.50/USD)`;
+      heroUsdEl.textContent = `≈ ₹${costInr.toFixed(2)} INR (Exchange Benchmark: ₹86.50/USD)`;
     }
   }
 
@@ -174,7 +174,7 @@ function renderTelemetryUI(data) {
   if (statTotalEl) statTotalEl.textContent = totalTokens.toLocaleString();
   if (statStepsEl) statStepsEl.textContent = `${steps} trajectory steps logged`;
 
-  if (statCostEl) statCostEl.textContent = '???' + costInr.toFixed(2);
+  if (statCostEl) statCostEl.textContent = '₹' + costInr.toFixed(2);
   if (statCostUsdEl) statCostUsdEl.textContent = '$' + costUsd.toFixed(4) + ' USD';
 
   // Live Pill
@@ -253,7 +253,7 @@ function updateGlobalTelemetryBadges(data) {
   const navLabel = document.getElementById('nav-telemetry-label');
   if (navLabel) {
     if (activeTelemetryCurrency === 'INR') {
-      navLabel.textContent = `Live Agent: ???${costInr.toFixed(2)}`;
+      navLabel.textContent = `Live Agent: ₹${costInr.toFixed(2)}`;
     } else {
       navLabel.textContent = `Live Agent: $${costUsd.toFixed(3)}`;
     }
@@ -262,8 +262,8 @@ function updateGlobalTelemetryBadges(data) {
   // Sidebar "About Active Context" live cost badge
   const sidebarCost = document.getElementById('sidebar-live-cost');
   if (sidebarCost) {
-    sidebarCost.textContent = `???${costInr.toFixed(2)}`;
-    sidebarCost.title = `Estimated Session Cost: ???${costInr.toFixed(2)} INR ($${costUsd.toFixed(4)} USD). Click to inspect token telemetry.`;
+    sidebarCost.textContent = `₹${costInr.toFixed(2)}`;
+    sidebarCost.title = `Estimated Session Cost: ₹${costInr.toFixed(2)} INR ($${costUsd.toFixed(4)} USD). Click to inspect token telemetry.`;
   }
 }
 

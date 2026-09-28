@@ -296,19 +296,55 @@ Static files under any path are served automatically (CSS, JS, pages/, etc.).
 
 ---
 
-## ⚡ Live Token Monitor (`pages/token-monitor.html`)
+## ⚡ Live Token & Cost Telemetry Monitor (`pages/token-monitor.html`)
 
-A dedicated full-screen dark dashboard available at [http://localhost:7891/pages/token-monitor.html](http://localhost:7891/pages/token-monitor.html) that reads from real Antigravity IDE trajectory files.
+A dedicated full-screen telemetry command center styled with GitHub Primer tokens at [http://localhost:7891/pages/token-monitor.html](http://localhost:7891/pages/token-monitor.html) that non-intrusively streams and analyzes real Antigravity IDE trajectory sessions.
 
-### Features:
-- **Hero token count** — Giant, real-time total token counter for Day / Month / All-time
-- **₹ INR primary cost** with USD secondary (configurable via Settings ⚙)
-- **Token breakdown rows**: Input Cache Hit / Cache Miss / Output tokens
-- **Usage Limit progress bars**: 5-hour window & weekly window with color-coded warnings
-- **30-day trend chart** — Bar chart from actual transcript data (7 / 30 / 90 / 365-day ranges)
-- **Model breakdown** — Per-model token attribution (Gemini Flash, Pro, Claude Sonnet, GPT-4o)
-- **Auto-refresh every 15 seconds** (configurable, or manual-only mode)
-- **Settings modal** — Adjust currency, exchange rate, limits, model, refresh interval
+### 📊 Professional Visualization Engine (Offline Chart.js 4.4.1)
+- **3 Dynamic Charting Styles**:
+  - 📊 **Stacked Bars (`bar`)**: Rounded bar breakdown distinguishing Input Context vs Model Generation.
+  - 📈 **Smooth Spline Gradient Area (`area`)**: Tension-smoothed Bezier curves with 2-stop linear alpha underfill gradients.
+  - 🚀 **Cumulative Running Burn-up (`cumulative`)**: Continuous trajectory burn-up curve across the selected timeframe.
+- **Dual Metric Toggles**: Switch between raw token volume (**Tokens**) and financial expenditure (**Cost**) in any currency.
+- **Timeframe Granularity**: Instant filtering across **7D**, **14D**, **30D**, and **90D** horizons.
+- **Live Stat Highlight Strip**: Real-time peak daily burn, average daily velocity, 30-day run rate projections, and prompt cache savings.
+- **Interactive Tooltips & Legend**: Primer dark/light theme tooltips with formatted currency values and toggleable datasets.
+
+### ⚙️ Deep User Customization Options
+- **Multi-Currency Engine**: Support for **₹ INR** (default @ ₹86.50/USD), **$ USD**, **€ EUR**, **£ GBP**, **¥ JPY**, **C$ CAD**, and **A$ AUD** with customizable live exchange rate inputs.
+- **Rolling Usage Limits & Alerts**:
+  - 5-Hour rolling context limit
+  - Weekly budget target
+  - Monthly context budget
+  - Interactive threshold warning slider (50%–95%) with color-coded alerts (Yellow/Red).
+- **Custom Model Pricing Contract**:
+  - Supports Gemini 3.8 Flash, Gemini 3.1 Pro, Claude Sonnet 4.6, Claude Haiku 4.5, GPT-4o, DeepSeek V3, and a **Custom Model** mode with user-defined input and output rates per 1M tokens.
+- **Configurable Polling Intervals**: 5s (High Frequency), 15s (Standard), 30s (Relaxed), 60s (Low Overhead), or Manual Sync only.
+- **Factory Reset Defaults**: Instant one-click restoration of all initial parameters.
+
+### 🔮 Interactive Token & Cost Forecasting Estimator
+- Accessible via the **Estimator** navbar button or deep link `?open=estimator`.
+- Enter any hypothetical Prompt and Completion token volume with quick presets (`10k`, `50k`, `100k`, `250k`, `1M` input; `1k`, `4k`, `8k`, `16k`, `32k` output).
+- Adjust the Prompt Cache Hit ratio slider (0%–100%) to model caching discounts.
+- Generates a side-by-side cost forecast table across all 6 model tiers in your active currency.
+- **1-Click Markdown Export**: Copies formatted forecast tables directly to your clipboard.
+
+### 🔗 Deep Linking & Bidirectional Redirection
+Seamlessly navigate between Skill Switcher and Token Monitor with URL parameters:
+- `pages/token-monitor.html?currency=EUR&chart=area&metric=cost&range=14`
+- `pages/token-monitor.html?open=settings`
+- `pages/token-monitor.html?open=estimator`
+- Return to main Skill Switcher tabs directly via subnav breadcrumbs:
+  - `../index.html` (Skills & Packs)
+  - `../index.html?open=laya` (Laya Playground)
+  - `../index.html?open=keys` (API Key Vault)
+  - `../index.html?open=health` (Verification Matrix)
+  - `../index.html?open=telemetry` (Session Telemetry Modal)
+
+### 💾 Data Export Utilities
+- **Export JSON**: Complete telemetry snapshot including active model, exchange rates, and session metadata.
+- **Export CSV**: Daily time series table for spreadsheet analysis (Excel, Google Sheets).
+- **Copy Markdown**: Executive summary ready for sharing on GitHub PRs or Slack.
 
 ### How Tokens are Calculated:
 Tokens are estimated from `transcript.jsonl` files in `~/.gemini/antigravity-ide/brain/<session-id>/`:
@@ -318,7 +354,7 @@ Tokens are estimated from `transcript.jsonl` files in `~/.gemini/antigravity-ide
 - Cache hit ratio estimated at 86% for long sessions (>10,000 input tokens)
 
 > [!NOTE]
-> Token counts are estimates using character-based BPE approximation (chars ÷ 3.8). They are not from the LLM API billing system, but provide an accurate-enough ballpark for cost tracking purposes.
+> Token counts are calculated from raw transcript trajectory files using character-based BPE approximation (chars ÷ 3.8) without invoking extra LLM APIs, ensuring zero runtime overhead.
 
 ---
 
