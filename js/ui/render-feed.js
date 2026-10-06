@@ -503,12 +503,31 @@ function generateActiveRules(customSkills) {
   const files = [...new Set(items.flatMap(s => s.files || []))];
   const act = items.map(s => s.act).join('\n');
   const now = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-  const centralVault = detectedProjectRoot || "c:/Users/1000859/Desktop/Skills-Switcher";
+  const centralVault = (detectedProjectRoot || '').replace(/\\/g, '/').replace(/\/+$/, '');
+  const homeDir = (detectedHomeDir || '').replace(/\\/g, '/').replace(/\/+$/, '');
+
+  // Resolve a catalog file pointer to an absolute path on THIS machine.
+  const resolveSkillPath = (f) => {
+    const clean = f.replace(/\\/g, '/');
+    // 1) Prefer the server-verified on-disk location (workspace or global skills dir)
+    const m = clean.match(/^\.agents\/skills\/([^\/]+)\/(.+)$/);
+    const v = m && verifiedSkillsMap ? verifiedSkillsMap[m[1]] : null;
+    if (v && v.full_path) {
+      const skillDir = String(v.full_path).replace(/\\/g, '/').replace(/\/[^\/]+$/, '');
+      return `${skillDir}/${m[2]}`;
+    }
+    // 2) Home-relative pointers -> expand ~ to the real home directory
+    if (clean.startsWith('~')) return homeDir ? homeDir + clean.slice(1) : clean;
+    // 3) Already absolute
+    if (/^([A-Za-z]:\/|\/)/.test(clean)) return clean;
+    // 4) Relative to this repo's root
+    return centralVault ? `${centralVault}/${clean}` : clean;
+  };
+  const toFileUrl = (abs) => /^[A-Za-z]:\//.test(abs) ? `file:///${abs}` : (abs.startsWith('/') ? `file://${abs}` : abs);
 
   const fileLines = files.map((f, i) => {
-    const clean = f.replace(/\\/g, '/');
-    const abs = clean.startsWith('.agents/') ? `${centralVault}/${clean}` : (clean.startsWith('~') ? clean : `${centralVault}/${clean}`);
-    return `${i + 1}. [${f}](file:///${abs}) (Absolute: \`${abs}\`)`;
+    const abs = resolveSkillPath(f);
+    return `${i + 1}. [${f}](${toFileUrl(abs)}) (Absolute: \`${abs}\`)`;
   }).join('\n');
 
   return `# Active Skills - Doctor9Trio / Skill Switcher\n# Generated: ${now}\n# Active: ${names}\n\n## Activation Rules\n${act}\n\n## Skill Files (Universal Pointers)\n${fileLines}\n\n## Session Instruction\nApply all skill rules above to every response. Use the absolute file links above whenever deep skill instructions are needed. At session start, confirm active skills in one line.\n`;
@@ -521,6 +540,11 @@ async function applySkills() {
   if (btnDock) { btnDock.disabled = true; btnDock.textContent = 'Applying...'; }
   if (btnRight) { btnRight.disabled = true; btnRight.textContent = 'Applying...'; }
 
+  // Learn this machine's real paths before generating absolute pointers
+  if (typeof ensureServerContext === 'function') {
+    try { await ensureServerContext(); } catch (e) {}
+  }
+
   const content = generateActiveRules();
 
   try {
@@ -531,7 +555,8 @@ async function applySkills() {
     });
     const data = await res.json();
     if (data.ok) {
-      showToast('Saved to ~/.gemini/config/rules/active-skills.md');
+      const savedTo = data.path ? data.path.replace(/\\/g, '/') : '~/.gemini/config/rules/active-skills.md';
+      showToast('Saved to ' + savedTo);
     } else {
       showToast('Error: ' + (data.error || 'Server error'));
     }

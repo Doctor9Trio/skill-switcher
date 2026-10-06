@@ -11,7 +11,12 @@ if (-not (Test-Path (Join-Path $root ".agents\skills"))) {
     }
 }
 
-$GLOBAL_RULES = Join-Path $env:USERPROFILE ".gemini\config\rules\active-skills.md"
+# Resolve paths for the CURRENT user (never hardcode a machine-specific path).
+# Optional overrides: SKILL_SWITCHER_HOME (default ~/.gemini), SKILL_SWITCHER_RULES_FILE
+$USER_HOME = @($env:USERPROFILE, $env:HOME, [Environment]::GetFolderPath('UserProfile')) |
+    Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
+$GEMINI_HOME  = if ($env:SKILL_SWITCHER_HOME) { $env:SKILL_SWITCHER_HOME } else { [System.IO.Path]::Combine($USER_HOME, ".gemini") }
+$GLOBAL_RULES = if ($env:SKILL_SWITCHER_RULES_FILE) { $env:SKILL_SWITCHER_RULES_FILE } else { [System.IO.Path]::Combine($GEMINI_HOME, "config", "rules", "active-skills.md") }
 $rulesDir = Split-Path $GLOBAL_RULES
 if (!(Test-Path $rulesDir)) { New-Item -ItemType Directory -Force $rulesDir | Out-Null }
 

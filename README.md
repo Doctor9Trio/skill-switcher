@@ -103,6 +103,34 @@ Skill Switcher writes its active rules directly to your user configuration direc
 
 The server and CLI automatically create this folder structure if it does not already exist.
 
+#### 🌐 Works on any PC / any user (no path editing needed)
+
+Nothing in this repo is tied to the original author's machine. Every path is resolved **at runtime** for whoever runs it:
+
+| What | How it is resolved |
+|---|---|
+| Your home folder | `%USERPROFILE%` → `$HOME` → OS profile folder |
+| Antigravity home | `<home>/.gemini` |
+| Active rules file | `<home>/.gemini/config/rules/active-skills.md` |
+| Global skills | `<home>/.gemini/config/skills` |
+| Session telemetry ("brain") | `<home>/.gemini/antigravity-ide/brain` (also checks `antigravity/brain`, `%LOCALAPPDATA%`, `%APPDATA%`) |
+| Skill file pointers | The folder you cloned this repo into (`.agents/skills/...`), or the global skills folder if a skill is installed there |
+
+The skill pointers written into `active-skills.md` are absolute paths to **your** clone, so Antigravity can open them from any workspace.
+
+To see exactly what was detected on your machine, start the server and open `http://localhost:7891/env`. The startup banner prints the same info.
+
+**Optional overrides** (set these environment variables before launching if your Antigravity setup is non-standard):
+
+| Variable | Default |
+|---|---|
+| `SKILL_SWITCHER_HOME` | `<home>/.gemini` |
+| `SKILL_SWITCHER_RULES_FILE` | `<SKILL_SWITCHER_HOME>/config/rules/active-skills.md` |
+| `SKILL_SWITCHER_SKILLS_DIR` | `<SKILL_SWITCHER_HOME>/config/skills` |
+| `SKILL_SWITCHER_BRAIN_DIR` | auto-detected |
+
+> If you move or re-clone the repo, just click **Apply to Antigravity Memory** again so the pointers are regenerated for the new location.
+
 ---
 
 ## 🚀 How to Run
@@ -280,6 +308,7 @@ The local server (`skill-gui-server.ps1`) exposes the following endpoints on por
 | Endpoint | Method | Description |
 |---|---|---|
 | `GET /` | `GET` | Serves the GitHub Primer Web GUI |
+| `GET /env` | `GET` | Returns the paths resolved for the **current user** (home, rules file, global skills, brain, project root) |
 | `GET /status` | `GET` | Returns active skills count, active list, and file timestamp on disk |
 | `GET /verify-skills` | `GET` | Scans and verifies all skills in workspace and global directories |
 | `GET /get-skill-content?skill=X` | `GET` | Streams the full content of `SKILL.md` for live in-GUI inspection |

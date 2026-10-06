@@ -5,24 +5,82 @@
 # =============================================================
 param([int]$Port = 7891)
 
-# Dynamic paths - works on any machine or workspace
+# =============================================================
+#  Dynamic, user-agnostic path resolution
+#  Every path is derived from the CURRENT user's environment, so a
+#  freshly cloned repo works on any PC / any user without edits.
+#
+#  Optional overrides (set as environment variables before launch):
+#    SKILL_SWITCHER_HOME        -> Antigravity/Gemini home   (default: ~/.gemini)
+#    SKILL_SWITCHER_RULES_FILE  -> active-skills.md location (default: <home>/config/rules/active-skills.md)
+#    SKILL_SWITCHER_SKILLS_DIR  -> global skills folder      (default: <home>/config/skills)
+#    SKILL_SWITCHER_BRAIN_DIR   -> Antigravity session brain (default: auto-detected)
+# =============================================================
+function Join-PathParts([string[]]$parts) {
+    return [System.IO.Path]::Combine([string[]]($parts | Where-Object { $_ }))
+}
+
+function Get-UserHome {
+    foreach ($h in @($env:USERPROFILE, $env:HOME, [Environment]::GetFolderPath('UserProfile'))) {
+        if ($h -and (Test-Path $h)) { return $h }
+    }
+    return [Environment]::GetFolderPath('UserProfile')
+}
+
 $TOOL_DIR     = $PSScriptRoot
 $PROJECT_ROOT = $TOOL_DIR
-if (Test-Path (Join-Path $TOOL_DIR ".agents\skills")) {
+if (Test-Path (Join-PathParts @($TOOL_DIR, ".agents", "skills"))) {
     $PROJECT_ROOT = $TOOL_DIR
-} elseif (Test-Path (Join-Path (Split-Path $TOOL_DIR -Parent) ".agents\skills")) {
+} elseif (Test-Path (Join-PathParts @((Split-Path $TOOL_DIR -Parent), ".agents", "skills"))) {
     $PROJECT_ROOT = Split-Path $TOOL_DIR -Parent
 }
 
-$GLOBAL_RULES = Join-Path $env:USERPROFILE ".gemini\config\rules\active-skills.md"
-$GLOBAL_SKILLS= Join-Path $env:USERPROFILE ".gemini\config\skills"
-$GUI_FILE     = Join-Path $TOOL_DIR "skill-gui.html"
+$USER_HOME     = Get-UserHome
+$USER_NAME     = if ($env:USERNAME) { $env:USERNAME } elseif ($env:USER) { $env:USER } else { Split-Path $USER_HOME -Leaf }
+$GEMINI_HOME   = if ($env:SKILL_SWITCHER_HOME) { $env:SKILL_SWITCHER_HOME } else { Join-PathParts @($USER_HOME, ".gemini") }
+$GLOBAL_CONFIG = Join-PathParts @($GEMINI_HOME, "config")
+$GLOBAL_RULES  = if ($env:SKILL_SWITCHER_RULES_FILE) { $env:SKILL_SWITCHER_RULES_FILE } else { Join-PathParts @($GLOBAL_CONFIG, "rules", "active-skills.md") }
+$GLOBAL_SKILLS = if ($env:SKILL_SWITCHER_SKILLS_DIR) { $env:SKILL_SWITCHER_SKILLS_DIR } else { Join-PathParts @($GLOBAL_CONFIG, "skills") }
+$GUI_FILE      = Join-Path $TOOL_DIR "skill-gui.html"
 if (-not (Test-Path $GUI_FILE)) {
     $GUI_FILE = Join-Path $TOOL_DIR "index.html"
 }
 
 $rulesDir = Split-Path $GLOBAL_RULES
 if (!(Test-Path $rulesDir)) { New-Item -ItemType Directory -Force $rulesDir | Out-Null }
+
+function Get-AntigravityBrainPath() {
+    $candidates = @()
+    if ($env:SKILL_SWITCHER_BRAIN_DIR) { $candidates += $env:SKILL_SWITCHER_BRAIN_DIR }
+    $candidates += (Join-PathParts @($GEMINI_HOME, "antigravity-ide", "brain"))
+    $candidates += (Join-PathParts @($GEMINI_HOME, "antigravity", "brain"))
+    if ($env:LOCALAPPDATA) { $candidates += (Join-PathParts @($env:LOCALAPPDATA, "antigravity-ide", "brain")) }
+    if ($env:APPDATA)      { $candidates += (Join-PathParts @($env:APPDATA, "antigravity-ide", "brain")) }
+    foreach ($c in $candidates) {
+        if ($c -and (Test-Path $c)) { return $c }
+    }
+    return $null
+}
+
+function Get-EnvInfo() {
+    $brain = Get-AntigravityBrainPath
+    return @{
+        ok                   = $true
+        user                 = $USER_NAME
+        home_dir             = $USER_HOME
+        gemini_home          = $GEMINI_HOME
+        global_config        = $GLOBAL_CONFIG
+        global_rules         = $GLOBAL_RULES
+        global_rules_exists  = (Test-Path $GLOBAL_RULES)
+        global_skills        = $GLOBAL_SKILLS
+        global_skills_exists = (Test-Path $GLOBAL_SKILLS)
+        brain_path           = $brain
+        project_root         = $PROJECT_ROOT
+        tool_dir             = $TOOL_DIR
+        workspace_skills     = (Join-PathParts @($PROJECT_ROOT, ".agents", "skills"))
+        platform             = [System.Environment]::OSVersion.Platform.ToString()
+    }
+}
 
 $listener = $null
 $actualPort = $Port
@@ -57,11 +115,15 @@ Write-Host "  ============================================================="
 Write-Host "   Skill Switcher Server  |  Running on Port $actualPort"
 Write-Host "  ============================================================="
 Write-Host "   GUI URL  -> http://localhost:$actualPort"
+Write-Host "   User     -> $USER_NAME ($USER_HOME)"
 Write-Host "   Static   -> $GUI_FILE"
 Write-Host "   Root     -> $PROJECT_ROOT"
 Write-Host "   Config   -> $GLOBAL_RULES"
+Write-Host "   Skills   -> $GLOBAL_SKILLS"
+Write-Host "   Brain    -> $(if ($b = Get-AntigravityBrainPath) { $b } else { '(not found yet)' })"
 Write-Host "  ============================================================="
 Write-Host "   APIs Available:"
+Write-Host "     GET  /env                 - Resolved user/Antigravity paths"
 Write-Host "     GET  /verify-skills       - Verify all installed skills"
 Write-Host "     GET  /status              - Active memory status"
 Write-Host "     GET  /active-rules        - Current active markdown rules"
@@ -91,18 +153,6 @@ function Send-Json($res, $data, [int]$status = 200) {
     $bytes = [System.Text.Encoding]::UTF8.GetBytes($json)
     $res.ContentLength64 = $bytes.Length
     $res.OutputStream.Write($bytes, 0, $bytes.Length)
-}
-
-function Get-AntigravityBrainPath() {
-    $candidates = @(
-        (Join-Path $env:USERPROFILE ".gemini\antigravity-ide\brain"),
-        (Join-Path $env:LOCALAPPDATA "antigravity-ide\brain"),
-        (Join-Path $env:APPDATA "antigravity-ide\brain")
-    )
-    foreach ($c in $candidates) {
-        if (Test-Path $c) { return $c }
-    }
-    return $null
 }
 
 function Get-ActiveSessionsList() {
@@ -683,6 +733,9 @@ while ($listener.IsListening) {
             $res.ContentLength64 = $content.Length
             $res.OutputStream.Write($content, 0, $content.Length)
         }
+        elseif ($method -eq "GET" -and $path -eq "/env") {
+            Send-Json $res (Get-EnvInfo)
+        }
         elseif ($method -eq "GET" -and $path -eq "/verify-skills") {
             $skillsMap = @{}
             
@@ -712,7 +765,7 @@ while ($listener.IsListening) {
                 }
             }
             
-            # Global skills check (~/.gemini/config/skills)
+            # Global skills check (<SKILL_SWITCHER_HOME or ~/.gemini>/config/skills)
             if (Test-Path $GLOBAL_SKILLS) {
                 Get-ChildItem -Directory $GLOBAL_SKILLS | ForEach-Object {
                     $skillId = $_.Name
@@ -723,7 +776,7 @@ while ($listener.IsListening) {
                         $skillsMap[$skillId] = @{
                             installed = $exists
                             location  = "global"
-                            path      = "~/.gemini/config/skills/$skillId/SKILL.md"
+                            path      = $skillMd.Replace("\", "/")
                             full_path = $skillMd
                             size      = $size
                         }
@@ -744,6 +797,9 @@ while ($listener.IsListening) {
             $respData = @{
                 ok           = $true
                 project_root = $PROJECT_ROOT
+                home_dir     = $USER_HOME
+                global_rules = $GLOBAL_RULES
+                global_skills= $GLOBAL_SKILLS
                 total_found  = $skillsMap.Count
                 active_count = $activeCount
                 active_skills= $activeList
@@ -807,9 +863,14 @@ while ($listener.IsListening) {
             if ($subPath) {
                 $cleanSub = $subPath.TrimStart("/\").Replace("/", "\")
                 if ($subPath.StartsWith("~")) {
-                    $homeSub = $subPath.TrimStart("~/\\").Replace("/", "\")
-                    $cand = Join-Path $env:USERPROFILE $homeSub
-                    if (Test-Path $cand) { $targetFile = $cand }
+                    $homeSub = $subPath.TrimStart("~").TrimStart("/\")
+                    $homeCands = @()
+                    # "~/.gemini/..." honours a SKILL_SWITCHER_HOME override
+                    if ($homeSub -match '^\.gemini[\\/](.+)$') { $homeCands += (Join-Path $GEMINI_HOME $Matches[1]) }
+                    $homeCands += (Join-Path $USER_HOME $homeSub)
+                    foreach ($hc in $homeCands) {
+                        if (-not $targetFile -and (Test-Path $hc)) { $targetFile = $hc }
+                    }
                 }
                 if (-not $targetFile) {
                     $cand = Join-Path $PROJECT_ROOT $cleanSub
@@ -870,6 +931,8 @@ while ($listener.IsListening) {
             try {
                 $data    = $body | ConvertFrom-Json
                 $content = $data.content
+                $rd = Split-Path $GLOBAL_RULES
+                if (!(Test-Path $rd)) { New-Item -ItemType Directory -Force $rd | Out-Null }
                 Set-Content -Path $GLOBAL_RULES -Value $content -Encoding UTF8
                 $ts = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
                 Write-Host "  [$ts] Skills applied -> $GLOBAL_RULES"
