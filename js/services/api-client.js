@@ -3,7 +3,63 @@
 /*           applyPreset, saveCustomPreset, loadCustomPreset, loadSkillContent, */
 /*           executeLayaPlayground, openHealthModal, renderHealthTable */
 
+/* ---------------------------------------------------------------
+ * Machine-aware context: learn THIS user's real paths from the
+ * local server so generated rules never point at another PC.
+ * --------------------------------------------------------------- */
+function normalizeSlashes(p) {
+  return (p || '').replace(/\\/g, '/').replace(/\/+$/, '');
+}
+
+function getActiveRulesPath() {
+  return (detectedEnv && detectedEnv.global_rules)
+    ? normalizeSlashes(detectedEnv.global_rules)
+    : '~/.gemini/config/rules/active-skills.md';
+}
+
+function applyEnvToUi() {
+  const rulesPath = getActiveRulesPath();
+  document.querySelectorAll('.dock-path').forEach(el => { el.textContent = 'Target: ' + rulesPath; el.title = rulesPath; });
+}
+
+async function ensureEnvDetected(force) {
+  if (detectedEnv && !force) return detectedEnv;
+  try {
+    const res = await fetch('/env', { cache: 'no-store' });
+    if (res.ok) {
+      const env = await res.json();
+      if (env && env.ok) {
+        detectedEnv = env;
+        if (env.project_root) detectedProjectRoot = normalizeSlashes(env.project_root);
+        if (env.home_dir) detectedHomeDir = normalizeSlashes(env.home_dir);
+        applyEnvToUi();
+      }
+    }
+  } catch (e) {}
+  return detectedEnv;
+}
+
+function absorbVerifyData(vdata) {
+  if (!vdata) return;
+  if (vdata.project_root) detectedProjectRoot = normalizeSlashes(vdata.project_root);
+  if (vdata.home_dir) detectedHomeDir = normalizeSlashes(vdata.home_dir);
+  if (vdata.skills && typeof vdata.skills === 'object') verifiedSkillsMap = vdata.skills;
+}
+
+// Make sure paths + on-disk skill locations are known before writing rules.
+async function ensureServerContext() {
+  await ensureEnvDetected();
+  if (!verifiedSkillsMap || Object.keys(verifiedSkillsMap).length === 0) {
+    try {
+      const res = await fetch('/verify-skills', { cache: 'no-store' });
+      if (res.ok) absorbVerifyData(await res.json());
+    } catch (e) {}
+  }
+}
+
 async function initServerSync() {
+  await ensureEnvDetected();
+
   try {
     const resStatus = await fetch('/status');
     if (resStatus.ok) {
@@ -19,9 +75,7 @@ async function initServerSync() {
     const resVerify = await fetch('/verify-skills');
     if (resVerify.ok) {
       const vdata = await resVerify.json();
-      if (vdata.project_root) {
-        detectedProjectRoot = vdata.project_root.replace(/\\/g, '/');
-      }
+      absorbVerifyData(vdata);
       const diskBadge = document.getElementById('disk-badge');
       if (diskBadge) {
         diskBadge.innerHTML = `<svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg> ${vdata.total_found || 87}<span> Verified</span>`;
@@ -47,7 +101,7 @@ function updateDiskStatusBadge(data) {
   } else {
     text.textContent = 'Disk: Clean (0 Active)';
     if (dot) dot.className = 'status-indicator-dot';
-    badge.title = 'No skills currently active in ~/.gemini/config/rules/active-skills.md.';
+    badge.title = `No skills currently active in ${data.path ? normalizeSlashes(data.path) : getActiveRulesPath()}.`;
   }
 }
 
@@ -145,7 +199,7 @@ function loadCustomPreset() {
 function switchModalTab(tab) {
   const tabSpec = document.getElementById('mtab-spec');
   const tabManual = document.getElementById('mtab-manual');
-  const panelSpec = document.getElementById('modal-panel-spec');
+  const panelSpec = document.ge6+tElementById('modal-panel-spec');
   const panelManual = document.getElementById('modal-panel-manual');
 
   if (tab === 'manual') {
@@ -383,4 +437,4 @@ let selectedTelemetrySessionId = '';
 let telemetryPollTimer = null;
 let activeTelemetryCurrency = 'INR'; // INR is primary per user requirement
 let isTelemetryModalOpen = false;
-
+

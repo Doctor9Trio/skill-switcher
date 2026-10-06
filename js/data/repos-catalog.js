@@ -1,7 +1,31 @@
 /* Skill Switcher — Repository Catalog & Global Vars */
 /* Contains: global var declarations + REPOS array (62+ skill repos) */
 
-var detectedProjectRoot = 'c:/Users/1000859/Desktop/Skills-Switcher';
+/* ---------------------------------------------------------------
+ * Runtime path detection — NEVER hardcode a user-specific path here.
+ *  1) When served by skill-gui-server.ps1, /env and /verify-skills
+ *     overwrite these with the real project root & home directory.
+ *  2) When opened directly as file://, derive them from this page's
+ *     own location so links still point at THIS machine.
+ * --------------------------------------------------------------- */
+var detectedProjectRoot = (function () {
+  try {
+    if (window.location.protocol === 'file:') {
+      var p = decodeURIComponent(window.location.pathname).replace(/\\/g, '/');
+      p = p.replace(/\/[^\/]*$/, '');          // strip the html file name
+      p = p.replace(/\/pages$/, '');           // sub-pages live one level down
+      if (/^\/[A-Za-z]:\//.test(p)) p = p.slice(1); // "/C:/..." -> "C:/..."
+      return p;
+    }
+  } catch (e) {}
+  return '';
+})();
+var detectedHomeDir = (function () {
+  var m = (detectedProjectRoot || '').match(/^([A-Za-z]:\/Users\/[^\/]+|\/Users\/[^\/]+|\/home\/[^\/]+)/i);
+  return m ? m[1] : '';
+})();
+var detectedEnv = null;        // full /env payload from the server
+var verifiedSkillsMap = {};    // skillId -> { location, full_path, ... } from /verify-skills
 var diskActiveSkills = [];
 var currentSkillManualText = '';
 

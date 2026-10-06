@@ -74,16 +74,16 @@ Skill file: `.agents/skills/laya/SKILL.md`
 
 ### 3. FRONTEND & DESIGN
 - `.agents/skills/motion-dev-animations-skill/SKILL.md` (Motion.dev v11+ hardware-accelerated animations)
-- `~/.gemini/config/skills/gsap-skills-gsap-core/SKILL.md` (GSAP timeline, ScrollTrigger, useGSAP)
-- `~/.gemini/config/skills/impeccable/SKILL.md` (Aesthetic polish, spatial hierarchy, typography)
-- `~/.gemini/config/skills/emilkowalski-skills-apple-design/SKILL.md` (Apple HIG 8 design foundations)
-- `~/.gemini/config/skills/emilkowalski-skills-emil-design-eng/SKILL.md` (Design engineering heuristics)
+- `.agents/skills/gsap-skills-gsap-core/SKILL.md` (GSAP timeline, ScrollTrigger, useGSAP)
+- `.agents/skills/impeccable/SKILL.md` (Aesthetic polish, spatial hierarchy, typography)
+- `.agents/skills/emilkowalski-skills-apple-design/SKILL.md` (Apple HIG 8 design foundations)
+- `.agents/skills/emilkowalski-skills-emil-design-eng/SKILL.md` (Design engineering heuristics)
 
 ### 4. DATA & MEDIA
 - `.agents/skills/json-render/SKILL.md` (Streaming Generative UI React component renderer)
 - `.agents/skills/neo4jev/SKILL.md` (Graph-based knowledge extraction)
-- `~/.gemini/config/skills/seedance2-skill/SKILL.md` (Generative video prompts & consistency)
-- `~/.gemini/config/skills/claudedesignskills-threejs-webgl/SKILL.md` (3D interactive canvases)
+- `.agents/skills/seedance2-skill/SKILL.md` (Generative video prompts & consistency)
+- `.agents/skills/claudedesignskills-threejs-webgl/SKILL.md` (3D interactive canvases)
 
 ### 5. CODE REVIEW & AUDITING
 - `.agents/skills/jev-review/SKILL.md` (Automated diff review & quality gates)
@@ -99,7 +99,7 @@ Reads all files across categories 1 through 5.
 
 When the user says `"Load [CATEGORY] skills"` or asks to apply rules from `load-skills.md`:
 
-1. **Locate and Read** every `SKILL.md` file listed under that category in `.agents/skills/`.
+1. **Locate and Read** every `SKILL.md` file listed under that category. Paths starting with `.agents/skills/` are relative to the folder containing this `load-skills.md` (the cloned Skill Switcher repo) — resolve them against that folder, never against a hardcoded user directory.
 2. **Apply Directives**: Adopt the guidelines, constraints, and trigger syntax specified in those files.
 3. **Confirm Activation** to the user with a concise confirmation summary:
 

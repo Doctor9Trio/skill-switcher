@@ -442,7 +442,7 @@ function runIntentRouter() {
       </div>
 
       <div class="ir-footer-note">
-        ${activatedCount} of ${ALL_SKILLS.length} skills active &middot; Target: <code>~/.gemini/config/rules/active-skills.md</code>
+        ${activatedCount} of ${ALL_SKILLS.length} skills active &middot; Target: <code>${typeof getActiveRulesPath === 'function' ? getActiveRulesPath() : '~/.gemini/config/rules/active-skills.md'}</code>
       </div>
     `;
 
