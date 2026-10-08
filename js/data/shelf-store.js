@@ -26,6 +26,7 @@
       whySaved: 'Pinterest-style masonry layout where cards let the content & visual screenshots supply the color. Zero UI noise.',
       potentialUse: 'EKA Connect & Skills Switcher design gallery redesign and visual reference feed.',
       project: 'FrontEnd',
+      collection: 'Design & Visual Identity',
       tags: ['gallery', 'masonry', 'inspiration', 'branding'],
       starred: true,
       githubMeta: null,
@@ -44,6 +45,7 @@
       whySaved: 'Industry-standard declarative physics and layout transition engine for React and web apps.',
       potentialUse: 'Micro-animations, drag-to-dismiss sheets, and fluid accordion transitions in EKA Connect.',
       project: 'EKA Connect',
+      collection: 'React & Animation Engines',
       tags: ['animation', 'react', 'gestures', 'physics'],
       starred: true,
       githubMeta: {
@@ -67,6 +69,7 @@
       whySaved: 'Extreme monospace constraint experiments by Grant Custer. High-contrast typography and pure utility.',
       potentialUse: 'Inspector modals and code preview cards in developer tooling and IDE extensions.',
       project: 'Skills-Switcher',
+      collection: 'Typography & Monospace Lab',
       tags: ['typography', 'creative-tools', 'minimalist', 'monospace'],
       starred: false,
       githubMeta: null,
@@ -85,6 +88,7 @@
       whySaved: 'Teardowns of user onboarding and cognitive friction in comic-strip format.',
       potentialUse: 'Audit onboarding funnel and notification fatigue for vehicle fleet manager dashboard.',
       project: 'EKA Connect',
+      collection: 'CRO & Growth Psychology',
       tags: ['ux-psychology', 'onboarding', 'retention', 'cognitive-load'],
       starred: true,
       githubMeta: null,
@@ -103,6 +107,7 @@
       whySaved: 'Clean multi-tag filtering with brand logos and case-study links.',
       potentialUse: 'Design token showcase and brand asset management UI.',
       project: 'FrontEnd',
+      collection: 'Design & Visual Identity',
       tags: ['branding', 'visual-identity', 'case-studies'],
       starred: false,
       githubMeta: null,
@@ -121,6 +126,7 @@
       whySaved: 'High-contrast stark typography laboratory. Bold Dutch design aesthetic.',
       potentialUse: 'Poster design generator or hero typography for technical marketing pages.',
       project: 'PosterIQ',
+      collection: 'Typography & Monospace Lab',
       tags: ['typography', 'editorial', 'high-contrast'],
       starred: false,
       githubMeta: null,
@@ -139,6 +145,7 @@
       whySaved: 'Real-world CRO experiments showing exact control vs variation metrics.',
       potentialUse: 'Conversion rate optimization for checkout and landing page signups.',
       project: 'EKA Connect',
+      collection: 'CRO & Growth Psychology',
       tags: ['cro', 'experimentation', 'metrics', 'conversion'],
       starred: false,
       githubMeta: null,
@@ -157,6 +164,7 @@
       whySaved: 'Curated library of mobile UX flows and micro-interactions from top consumer apps.',
       potentialUse: 'Benchmark mobile vehicle booking and telematics flows.',
       project: 'Mobile App',
+      collection: 'Design & Visual Identity',
       tags: ['mobile-ui', 'ux-teardowns', 'flows'],
       starred: false,
       githubMeta: null,
@@ -251,7 +259,19 @@
         return [...DEFAULT_SEED_DISCOVERIES];
       }
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed)) {
+        // Backfill collection from seed mapping if missing
+        const seedMap = {};
+        DEFAULT_SEED_DISCOVERIES.forEach(s => {
+          if (s.collection) seedMap[s.id] = s.collection;
+        });
+        parsed.forEach(item => {
+          if (!item.collection && seedMap[item.id]) {
+            item.collection = seedMap[item.id];
+          }
+        });
+        return parsed;
+      }
     } catch (e) {
       console.warn('[DiscoveryStore] Failed to parse localStorage items:', e);
     }
@@ -280,7 +300,7 @@
     },
 
     // Zero-friction instant capture (Save to Inbox in 5 seconds)
-    addQuick: function (url, whySaved = '', project = '') {
+    addQuick: function (url, whySaved = '', project = '', collection = '') {
       if (!url) throw new Error('URL is required');
       const cleanUrl = url.trim();
       const domain = extractDomain(cleanUrl);
@@ -295,6 +315,7 @@
         whySaved: whySaved.trim(),
         potentialUse: '',
         project: project.trim(),
+        collection: collection.trim(),
         tags: [],
         starred: false
       });
@@ -319,6 +340,7 @@
         whySaved: (data.whySaved || data.note || '').trim(),
         potentialUse: (data.potentialUse || '').trim(),
         project: (data.project || '').trim(),
+        collection: (data.collection || '').trim(),
         tags: Array.isArray(data.tags)
           ? data.tags.map(t => t.trim().toLowerCase()).filter(Boolean)
           : (typeof data.tags === 'string' ? data.tags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : []),
@@ -357,6 +379,7 @@
       const updated = {
         ...current,
         ...updates,
+        collection: updates.collection !== undefined ? updates.collection.trim() : (current.collection || ''),
         tags: updates.tags !== undefined
           ? (Array.isArray(updates.tags)
               ? updates.tags.map(t => t.trim().toLowerCase()).filter(Boolean)
@@ -414,6 +437,22 @@
       return candidates[randomIndex];
     },
 
+    getCollections: function () {
+      const items = loadDiscoveries();
+      const map = {};
+      items.forEach(i => {
+        const col = i.collection || 'Uncategorized';
+        if (!map[col]) {
+          map[col] = { name: col, count: 0, sampleItems: [] };
+        }
+        map[col].count++;
+        if (map[col].sampleItems.length < 3) {
+          map[col].sampleItems.push(i);
+        }
+      });
+      return Object.values(map).sort((a, b) => b.count - a.count);
+    },
+
     getStats: function () {
       const items = loadDiscoveries();
       const stats = {
@@ -450,14 +489,53 @@
       });
       stats.projects = projectMap;
 
-      // Unique tags
-      const tagSet = new Set();
+      // Unique collections
+      const collectionMap = {};
       items.forEach(i => {
-        if (Array.isArray(i.tags)) i.tags.forEach(t => tagSet.add(t));
+        if (i.collection) {
+          collectionMap[i.collection] = (collectionMap[i.collection] || 0) + 1;
+        }
       });
-      stats.tags = Array.from(tagSet).sort();
+      stats.collections = collectionMap;
+
+      // Unique tags with frequencies
+      const tagCountMap = {};
+      items.forEach(i => {
+        if (Array.isArray(i.tags)) {
+          i.tags.forEach(t => {
+            const clean = t.trim().toLowerCase();
+            if (clean) tagCountMap[clean] = (tagCountMap[clean] || 0) + 1;
+          });
+        }
+      });
+      stats.tags = Object.keys(tagCountMap).sort();
+      stats.tagsWithCounts = Object.entries(tagCountMap)
+        .map(([tag, count]) => ({ tag, count }))
+        .sort((a, b) => b.count - a.count);
 
       return stats;
+    },
+
+    formatMarkdownSnippet: function (id) {
+      const item = this.getById(id);
+      if (!item) return '';
+      const parts = [`[${item.title}](${item.url})`];
+      if (item.project) parts.push(`*(Project: ${item.project})*`);
+      if (item.whySaved) parts.push(`— *Why: ${item.whySaved}*`);
+      if (item.potentialUse) parts.push(`*(Potential use: ${item.potentialUse})*`);
+      if (item.tags && item.tags.length) parts.push(item.tags.map(t => '#' + t).join(' '));
+      return parts.join(' ');
+    },
+
+    formatAllFilteredMarkdown: function (items) {
+      if (!Array.isArray(items) || !items.length) return '';
+      return items.map(item => {
+        const parts = [`- [${item.title}](${item.url})`];
+        if (item.project) parts.push(`*(Project: ${item.project})*`);
+        if (item.whySaved) parts.push(`— *Why: ${item.whySaved}*`);
+        if (item.potentialUse) parts.push(`*(Use: ${item.potentialUse})*`);
+        return parts.join(' ');
+      }).join('\n');
     },
 
     exportJSON: function () {
@@ -495,6 +573,7 @@
             whySaved: item.whySaved || item.note || '',
             potentialUse: item.potentialUse || '',
             project: item.project || '',
+            collection: item.collection || '',
             tags: Array.isArray(item.tags) ? item.tags : [],
             starred: Boolean(item.starred),
             githubMeta: item.githubMeta || null,

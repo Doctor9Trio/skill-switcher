@@ -6,14 +6,17 @@
   'use strict';
 
   // Navigation & View state
-  let currentTab = 'all'; // 'all' | 'inbox' | 'projects' | 'intentions' | 'starred'
+  let currentTab = 'all'; // 'all' | 'inbox' | 'collections' | 'projects' | 'intentions' | 'starred'
   let currentProject = null;
+  let currentCollection = null;
+  let currentTag = null;
   let currentIntent = 'all';
   let currentType = 'all';
   let currentSearch = '';
   let currentSort = 'newest';
   let currentViewMode = 'grid'; // 'grid' | 'list'
   let isLibraryActive = false;
+  let isTagCloudOpen = false;
   let editingDiscoveryId = null;
   let currentRediscoverId = null;
 
@@ -43,6 +46,15 @@
     active: { label: 'Active', badgeClass: 'status-active', icon: '📌' },
     in_use: { label: 'In Use', badgeClass: 'status-in-use', icon: '🔨' },
     archived: { label: 'Archived', badgeClass: 'status-archived', icon: '📦' }
+  };
+
+  const COLLECTION_THEMES = {
+    'Design & Visual Identity': { icon: '🎨', emoji: '🎨', color: 'rgba(163, 113, 247, 0.15)', border: 'rgba(163, 113, 247, 0.4)' },
+    'React & Animation Engines': { icon: '⚡', emoji: '⚡', color: 'rgba(88, 166, 255, 0.15)', border: 'rgba(88, 166, 255, 0.4)' },
+    'Typography & Monospace Lab': { icon: '🧪', emoji: '🧪', color: 'rgba(57, 211, 83, 0.15)', border: 'rgba(57, 211, 83, 0.4)' },
+    'CRO & Growth Psychology': { icon: '📈', emoji: '📈', color: 'rgba(240, 136, 62, 0.15)', border: 'rgba(240, 136, 62, 0.4)' },
+    'AI Tools & Architectures': { icon: '🧠', emoji: '🧠', color: 'rgba(187, 128, 179, 0.15)', border: 'rgba(187, 128, 179, 0.4)' },
+    'Developer Tools': { icon: '🛠️', emoji: '🛠️', color: 'rgba(139, 148, 158, 0.15)', border: 'rgba(139, 148, 158, 0.4)' }
   };
 
   // Open the Discovery Library View
@@ -132,10 +144,22 @@
       list = list.filter(i => i.status === 'inbox');
     } else if (currentTab === 'starred') {
       list = list.filter(i => i.starred);
+    } else if (currentTab === 'collections' && currentCollection) {
+      list = list.filter(i => i.collection && i.collection.toLowerCase() === currentCollection.toLowerCase());
     } else if (currentTab === 'projects' && currentProject) {
       list = list.filter(i => i.project && i.project.toLowerCase() === currentProject.toLowerCase());
     } else if (currentTab === 'intentions' && currentIntent !== 'all') {
       list = list.filter(i => i.intent === currentIntent);
+    }
+
+    // Secondary Collection filtering
+    if (currentCollection && currentTab !== 'collections') {
+      list = list.filter(i => i.collection && i.collection.toLowerCase() === currentCollection.toLowerCase());
+    }
+
+    // Secondary Tag filtering
+    if (currentTag) {
+      list = list.filter(i => Array.isArray(i.tags) && i.tags.some(t => t.toLowerCase() === currentTag.toLowerCase()));
     }
 
     // Secondary Type filtering
@@ -153,6 +177,7 @@
           (i.whySaved && i.whySaved.toLowerCase().includes(q)) ||
           (i.potentialUse && i.potentialUse.toLowerCase().includes(q)) ||
           (i.project && i.project.toLowerCase().includes(q)) ||
+          (i.collection && i.collection.toLowerCase().includes(q)) ||
           (Array.isArray(i.tags) && i.tags.some(t => t.toLowerCase().includes(q))) ||
           (i.githubMeta && (
             (i.githubMeta.description && i.githubMeta.description.toLowerCase().includes(q)) ||
@@ -175,6 +200,202 @@
     });
 
     return list;
+  }
+
+  // Render Collections / Topic Folders Grid
+  function renderCollectionsOverview(stats) {
+    if (!window.ShelfStore) return '';
+    const collections = window.ShelfStore.getCollections();
+
+    const collectionInfo = {
+      'Design & Visual Identity': {
+        desc: 'Curated design archives, brutalist typography labs, visual craft and creative web references.',
+        icon: '🎨'
+      },
+      'React & Animation Engines': {
+        desc: 'Fluid springs, motion primitives, interactive physics, gesture libraries, and modern React components.',
+        icon: '⚡'
+      },
+      'Typography & Monospace Lab': {
+        desc: 'Variable fonts, experimental monospace typefaces, typographic specimens, and font pairing tools.',
+        icon: '🧪'
+      },
+      'CRO & Growth Psychology': {
+        desc: 'Behavioral economics, onboarding tear-downs, growth psychology loops, and high-converting UX experiments.',
+        icon: '📈'
+      },
+      'AI Tools & Architectures': {
+        desc: 'Autonomous agent frameworks, LLM memory systems, embeddings, and generative media models.',
+        icon: '🧠'
+      },
+      'Developer Tools': {
+        desc: 'Terminal CLIs, performance monitors, debugging suites, build systems, and local automation scripts.',
+        icon: '🛠️'
+      }
+    };
+
+    if (!collections.length) {
+      return `
+        <div class="shelf-empty-state">
+          <div class="shelf-empty-icon">🏷️</div>
+          <h3 class="shelf-empty-title">No Collections Yet</h3>
+          <p class="shelf-empty-text">Organize your discoveries by adding a Collection name when saving or editing resources.</p>
+          <button class="btn-gh btn-gh-primary" onclick="openShelfModal()">+ Create Discovery</button>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="collections-overview-wrap">
+        <div class="collections-head-bar">
+          <div>
+            <h2 class="collections-title">Curated Topic Collections</h2>
+            <p class="collections-sub">Thematic knowledge silos connected to your active engineering domains.</p>
+          </div>
+          <button class="btn-gh btn-gh-sm" onclick="openShelfModal()">+ New Discovery</button>
+        </div>
+        <div class="collections-grid">
+          ${collections.map(col => {
+            const theme = COLLECTION_THEMES[col.name] || { icon: '🏷️', color: 'rgba(88, 166, 255, 0.1)', border: 'rgba(88, 166, 255, 0.3)' };
+            const info = collectionInfo[col.name] || { desc: 'Thematic resource bucket and design inspiration.', icon: theme.icon };
+            return `
+              <div class="collection-folder-card" onclick="selectCollectionFilter('${escapeHtml(col.name)}', event)">
+                <div class="col-card-head">
+                  <div class="col-card-icon-wrap" style="background:${theme.color}; border-color:${theme.border};">
+                    <span class="col-card-icon">${theme.icon}</span>
+                  </div>
+                  <div class="col-card-badge">${col.count} ${col.count === 1 ? 'item' : 'items'}</div>
+                </div>
+                <h3 class="col-card-title">${escapeHtml(col.name)}</h3>
+                <p class="col-card-desc">${escapeHtml(info.desc)}</p>
+                
+                ${col.sampleItems && col.sampleItems.length ? `
+                  <div class="col-card-samples">
+                    <span class="col-card-samples-label">RECENT IN THIS TOPIC:</span>
+                    ${col.sampleItems.slice(0, 3).map(s => `
+                      <div class="col-sample-row">
+                        <span class="col-sample-bullet">•</span>
+                        <span class="col-sample-title">${escapeHtml(s.title)}</span>
+                        <span class="col-sample-domain">${escapeHtml(window.ShelfStore.extractDomain(s.url))}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                ` : ''}
+
+                <div class="col-card-footer">
+                  <span class="col-card-explore-btn">Explore Collection &rarr;</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // Collection filter handlers
+  function selectCollectionFilter(colName, event) {
+    if (event) event.stopPropagation();
+    currentCollection = colName;
+    currentTab = 'collections';
+    renderDiscoveryUI();
+  }
+
+  function clearCollectionFilter() {
+    currentCollection = null;
+    renderDiscoveryUI();
+  }
+
+  // Tag filter handlers
+  function selectTagFilter(tag, event) {
+    if (event) event.stopPropagation();
+    currentTag = (currentTag === tag) ? null : tag;
+    if (currentTag && currentTab === 'collections') {
+      currentTab = 'all';
+    }
+    renderDiscoveryUI();
+  }
+
+  function clearTagFilter() {
+    currentTag = null;
+    renderDiscoveryUI();
+  }
+
+  function toggleTagCloud() {
+    isTagCloudOpen = !isTagCloudOpen;
+    renderDiscoveryUI();
+  }
+
+  // Markdown copy handlers
+  function copyShelfMarkdown(id, event) {
+    if (event) event.stopPropagation();
+    if (!window.ShelfStore) return;
+    const snippet = window.ShelfStore.formatMarkdownSnippet(id);
+    if (!snippet) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(snippet).then(() => {
+        if (typeof showToast === 'function') showToast('Copied Markdown snippet! 📋');
+      });
+    } else if (typeof copySnippetText === 'function') {
+      copySnippetText(snippet, 'Copied Markdown snippet! 📋');
+    }
+  }
+
+  function copyAllFilteredMarkdown() {
+    if (!window.ShelfStore) return;
+    const items = getFilteredDiscoveries();
+    if (!items.length) {
+      if (typeof showToast === 'function') showToast('No discoveries to copy.');
+      return;
+    }
+    const md = window.ShelfStore.formatAllFilteredMarkdown(items);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(md).then(() => {
+        if (typeof showToast === 'function') showToast(`Copied ${items.length} discoveries as Markdown! 📋`);
+      });
+    } else if (typeof copySnippetText === 'function') {
+      copySnippetText(md, `Copied ${items.length} discoveries as Markdown! 📋`);
+    }
+  }
+
+  // Bookmarklet modal handlers
+  function openBookmarkletModal() {
+    const modal = document.getElementById('shelf-bookmarklet-modal');
+    if (!modal) return;
+    const origin = window.location.origin || 'http://localhost:7891';
+    const code = `javascript:(function(){var u=encodeURIComponent(window.location.href);var t=encodeURIComponent(document.title||'');window.open('${origin}/index.html?quickSaveUrl='+u+'&title='+t,'_blank');})();`;
+    
+    const codeInput = document.getElementById('bookmarklet-code-input');
+    if (codeInput) codeInput.value = code;
+
+    const dragBtn = modal.querySelector('a[href^="javascript:"]');
+    if (dragBtn) dragBtn.setAttribute('href', code);
+
+    modal.classList.add('open');
+  }
+
+  function closeBookmarkletModal(event) {
+    if (event && event.target && event.target.id !== 'shelf-bookmarklet-modal') return;
+    closeBookmarkletModalDirect();
+  }
+
+  function closeBookmarkletModalDirect() {
+    const modal = document.getElementById('shelf-bookmarklet-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function copyBookmarkletCode() {
+    const codeInput = document.getElementById('bookmarklet-code-input');
+    if (!codeInput) return;
+    codeInput.select();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(codeInput.value).then(() => {
+        if (typeof showToast === 'function') showToast('Bookmarklet code copied to clipboard! 📋');
+      });
+    } else {
+      document.execCommand('copy');
+      if (typeof showToast === 'function') showToast('Bookmarklet code copied to clipboard! 📋');
+    }
   }
 
   // Render main Discovery Library UI
@@ -226,6 +447,13 @@
                 <span>+ Add Resource</span>
               </button>
 
+              <button class="btn-gh" onclick="openBookmarkletModal()" title="1-Click Browser Bookmarklet to save links from any tab">
+                <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="m3.5 1.75.006-.016a2.001 2.001 0 0 1 1.744-1.234H10.75a2 2 0 0 1 2 2v12.25a.75.75 0 0 1-1.22.586L8 12.336l-3.53 2.95A.75.75 0 0 1 3.25 14.7V1.75h.25Zm1.25.25a.5.5 0 0 0-.5.5v11.196l3.28-2.74a.75.75 0 0 1 .94 0l3.28 2.74V2.5a.5.5 0 0 0-.5-.5H4.75Z"></path>
+                </svg>
+                <span>Bookmarklet</span>
+              </button>
+
               <button class="btn-gh" onclick="exportShelfMD()" title="Download as clean Markdown reference graph">
                 <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M0 1.75C0 .784.784 0 1.75 0h7.5C9.716 0 10.5.784 10.5 1.75v3.5a.75.75 0 0 1-1.5 0V1.75a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V9.75a.75.75 0 0 1 1.5 0v4.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Zm12.03 3.47a.75.75 0 0 1 1.06 0l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L13.19 9H7.75a.75.75 0 0 1 0-1.5h5.44l-1.16-1.16a.75.75 0 0 1 0-1.06Z"></path>
@@ -252,7 +480,7 @@
         <div class="discovery-quick-strip">
           <div class="discovery-quick-input-wrap">
             <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="color:var(--fg-subtle);">
-              <path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"></path>
+              <path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"></path>
             </svg>
             <input
               type="url"
@@ -270,7 +498,7 @@
         <!-- Rediscover System Banner (Keeping saved things alive) -->
         ${rediscoverItem ? renderRediscoverBanner(rediscoverItem) : ''}
 
-        <!-- Sub-Navigation Strip (Inbox, Explore, Projects, Intentions, Starred) -->
+        <!-- Sub-Navigation Strip (Inbox, Explore, Collections, Projects, Intentions, Starred) -->
         <div class="discovery-subnav-strip">
           <div class="discovery-subnav-tabs">
             <button class="disc-subnav-btn ${currentTab === 'all' ? 'active' : ''}" onclick="switchDiscoveryTab('all')">
@@ -279,8 +507,13 @@
             </button>
 
             <button class="disc-subnav-btn ${currentTab === 'inbox' ? 'active' : ''}" onclick="switchDiscoveryTab('inbox')">
-              <span>📥 Inbox (Unprocessed)</span>
+              <span>📥 Inbox</span>
               <span class="disc-pill-bubble ${stats.inbox > 0 ? 'highlight' : ''}">${stats.inbox}</span>
+            </button>
+
+            <button class="disc-subnav-btn ${currentTab === 'collections' ? 'active' : ''}" onclick="switchDiscoveryTab('collections')">
+              <span>🏷️ Collections</span>
+              <span class="disc-pill-bubble">${Object.keys(stats.collections || {}).length}</span>
             </button>
 
             <button class="disc-subnav-btn ${currentTab === 'projects' ? 'active' : ''}" onclick="switchDiscoveryTab('projects')">
@@ -324,7 +557,7 @@
           </div>
         </div>
 
-        <!-- Dynamic Context Bar (Project Filter Chips or Intention Filter Chips) -->
+        <!-- Dynamic Context Bar (Collections, Projects, or Intentions) -->
         ${renderDynamicContextBar(stats)}
 
         <!-- Search & Filter Bar -->
@@ -337,7 +570,7 @@
               type="text"
               id="shelf-search-input"
               class="shelf-search-input"
-              placeholder="Search title, URL, Why I saved, Potential use, tags or project..."
+              placeholder="Search title, URL, Why I saved, Potential use, tags, collection or project..."
               value="${escapeHtml(currentSearch)}"
               oninput="handleShelfSearch(this.value)"
             />
@@ -345,6 +578,21 @@
           </div>
 
           <div class="shelf-filter-group">
+            <button class="shelf-star-toggle ${isTagCloudOpen ? 'active' : ''}" onclick="toggleTagCloud()" title="Toggle interactive tag cloud">
+              <svg class="octicon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M1 7.775V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.753 1.753 0 0 1 1 7.775Zm1.5 0c0 .066.026.13.073.177l6.25 6.25a.25.25 0 0 0 .354 0l5.025-5.025a.25.25 0 0 0 0-.354l-6.25-6.25a.25.25 0 0 0-.177-.073H2.75a.25.25 0 0 0-.25.25v5.025ZM6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"></path>
+              </svg>
+              <span>Tags (${stats.tags ? stats.tags.length : 0})</span>
+            </button>
+
+            <button class="shelf-star-toggle" onclick="copyAllFilteredMarkdown()" title="Copy all matching discoveries as Markdown list">
+              <svg class="octicon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
+                <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+              </svg>
+              <span>Copy List</span>
+            </button>
+
             <select class="shelf-sort-select" onchange="handleShelfSortChange(this.value)">
               <option value="newest" ${currentSort === 'newest' ? 'selected' : ''}>Newest Added</option>
               <option value="oldest" ${currentSort === 'oldest' ? 'selected' : ''}>Oldest Added</option>
@@ -354,6 +602,23 @@
           </div>
         </div>
 
+        <!-- Tag Cloud Drawer (Expandable) -->
+        ${isTagCloudOpen ? `
+          <div class="shelf-tag-cloud-drawer">
+            <div class="shelf-tag-cloud-head">
+              <span class="shelf-tag-cloud-title">TOP TOPIC TAGS (${(stats.tagsWithCounts || []).length})</span>
+              ${currentTag ? `<button class="shelf-tag-clear-btn" onclick="clearTagFilter()">Clear Tag Filter &times;</button>` : ''}
+            </div>
+            <div class="shelf-tag-chips-wrap">
+              ${(stats.tagsWithCounts || []).map(tc => `
+                <button class="shelf-tag-chip ${currentTag === tc.tag ? 'active' : ''}" onclick="selectTagFilter('${escapeHtml(tc.tag)}')">
+                  #${escapeHtml(tc.tag)} <span class="tag-chip-count">${tc.count}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
         <!-- Content Type Pills Strip -->
         <div class="shelf-type-pills-strip">
           <div class="shelf-pills-scroll">
@@ -361,23 +626,27 @@
           </div>
         </div>
 
-        <!-- Active Filter Indicator -->
-        ${(currentProject || currentIntent !== 'all' || currentSearch) ? `
+        <!-- Active Filter Indicator Banner -->
+        ${(currentCollection || currentTag || currentProject || currentIntent !== 'all' || currentSearch) ? `
           <div class="shelf-active-tag-banner">
-            <div>
-              ${currentProject ? `<span>Project: <strong>${escapeHtml(currentProject)}</strong></span> ` : ''}
-              ${currentIntent !== 'all' ? `<span>Intent: <strong>${escapeHtml(currentIntent)}</strong></span> ` : ''}
-              ${currentSearch ? `<span>Search: <strong>"${escapeHtml(currentSearch)}"</strong></span> ` : ''}
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              ${currentCollection ? `<span class="shelf-filter-chip">Collection: <strong>${escapeHtml(currentCollection)}</strong> <button onclick="clearCollectionFilter()">&times;</button></span>` : ''}
+              ${currentTag ? `<span class="shelf-filter-chip">Tag: <strong>#${escapeHtml(currentTag)}</strong> <button onclick="clearTagFilter()">&times;</button></span>` : ''}
+              ${currentProject ? `<span class="shelf-filter-chip">Project: <strong>${escapeHtml(currentProject)}</strong> <button onclick="selectProjectFilter(null)">&times;</button></span>` : ''}
+              ${currentIntent !== 'all' ? `<span class="shelf-filter-chip">Intent: <strong>${escapeHtml(currentIntent)}</strong> <button onclick="selectIntentFilter('all')">&times;</button></span>` : ''}
+              ${currentSearch ? `<span class="shelf-filter-chip">Search: <strong>"${escapeHtml(currentSearch)}"</strong> <button onclick="clearShelfSearch()">&times;</button></span>` : ''}
             </div>
-            <button class="shelf-tag-clear-btn" onclick="resetAllShelfFilters()">Reset Filters &times;</button>
+            <button class="shelf-tag-clear-btn" onclick="resetAllShelfFilters()">Reset All Filters &times;</button>
           </div>
         ` : ''}
 
-        <!-- Main Discoveries Display (Grid or List View) -->
+        <!-- Main Discoveries Display (Grid, List or Collections Overview) -->
         <div class="shelf-grid-container">
-          ${items.length > 0
-            ? (currentViewMode === 'grid' ? renderDiscoveryGrid(items) : renderDiscoveryList(items))
-            : renderEmptyState()}
+          ${currentTab === 'collections' && !currentCollection
+            ? renderCollectionsOverview(stats)
+            : (items.length > 0
+                ? (currentViewMode === 'grid' ? renderDiscoveryGrid(items) : renderDiscoveryList(items))
+                : renderEmptyState())}
         </div>
       </div>
     `;
@@ -597,9 +866,16 @@
                 ${escapeHtml(item.title)}
               </a>
             </h3>
-            <span class="disc-intent-tag" title="Intention: ${intent.label}">
-              ${intent.emoji} ${intent.label}
-            </span>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              ${item.collection ? `
+                <button class="disc-collection-tag" onclick="selectCollectionFilter('${escapeHtml(item.collection)}', event)" title="Filter collection: ${escapeHtml(item.collection)}">
+                  🏷️ ${escapeHtml(item.collection)}
+                </button>
+              ` : ''}
+              <span class="disc-intent-tag" title="Intention: ${intent.label}">
+                ${intent.emoji} ${intent.label}
+              </span>
+            </div>
           </div>
 
           <div class="shelf-card-url-mono" title="${escapeHtml(item.url)}">
@@ -661,6 +937,13 @@
           <span class="shelf-card-date">${dateFormatted}</span>
 
           <div class="shelf-card-actions">
+            <button class="shelf-action-btn" onclick="copyShelfMarkdown('${item.id}', event)" title="Copy Markdown reference snippet">
+              <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M0 1.75C0 .784.784 0 1.75 0h7.5C9.716 0 10.5.784 10.5 1.75v3.5a.75.75 0 0 1-1.5 0V1.75a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V9.75a.75.75 0 0 1 1.5 0v4.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Zm12.03 3.47a.75.75 0 0 1 1.06 0l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L13.19 9H7.75a.75.75 0 0 1 0-1.5h5.44l-1.16-1.16a.75.75 0 0 1 0-1.06Z"></path>
+              </svg>
+              <span>📋 MD</span>
+            </button>
+
             <button class="shelf-action-btn" onclick="copyShelfUrl('${escapeHtml(item.url)}', event)" title="Copy URL">
               <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
@@ -878,6 +1161,7 @@
     const selectIntent = document.getElementById('shelf-select-intent');
     const selectStatus = document.getElementById('shelf-select-status');
     const inputProject = document.getElementById('shelf-input-project');
+    const inputCollection = document.getElementById('shelf-input-collection');
     const inputWhy = document.getElementById('shelf-input-why');
     const inputUse = document.getElementById('shelf-input-use');
     const inputTags = document.getElementById('shelf-input-tags');
@@ -893,6 +1177,7 @@
         if (selectIntent) selectIntent.value = item.intent || 'might_use';
         if (selectStatus) selectStatus.value = item.status || 'active';
         if (inputProject) inputProject.value = item.project || '';
+        if (inputCollection) inputCollection.value = item.collection || '';
         if (inputWhy) inputWhy.value = item.whySaved || '';
         if (inputUse) inputUse.value = item.potentialUse || '';
         if (inputTags) inputTags.value = Array.isArray(item.tags) ? item.tags.join(', ') : '';
@@ -906,9 +1191,10 @@
       if (selectIntent) selectIntent.value = 'might_use';
       if (selectStatus) selectStatus.value = 'active';
       if (inputProject) inputProject.value = currentProject || '';
+      if (inputCollection) inputCollection.value = currentCollection || '';
       if (inputWhy) inputWhy.value = '';
       if (inputUse) inputUse.value = '';
-      if (inputTags) inputTags.value = '';
+      if (inputTags) inputTags.value = currentTag ? currentTag : '';
       if (saveBtn) saveBtn.textContent = 'Add to Shelf';
     }
 
@@ -964,6 +1250,7 @@
     const selectIntent = document.getElementById('shelf-select-intent');
     const selectStatus = document.getElementById('shelf-select-status');
     const inputProject = document.getElementById('shelf-input-project');
+    const inputCollection = document.getElementById('shelf-input-collection');
     const inputWhy = document.getElementById('shelf-input-why');
     const inputUse = document.getElementById('shelf-input-use');
     const inputTags = document.getElementById('shelf-input-tags');
@@ -982,6 +1269,7 @@
       intent: selectIntent ? selectIntent.value : 'might_use',
       status: selectStatus ? selectStatus.value : 'active',
       project: inputProject ? inputProject.value.trim() : '',
+      collection: inputCollection ? inputCollection.value.trim() : '',
       whySaved: inputWhy ? inputWhy.value.trim() : '',
       potentialUse: inputUse ? inputUse.value.trim() : '',
       tags: inputTags ? inputTags.value : ''
@@ -1059,6 +1347,9 @@
     const modal = document.getElementById('shelf-modal-overlay');
     const isModalOpen = modal && modal.classList.contains('open');
 
+    const bookmarkletModal = document.getElementById('shelf-bookmarklet-modal');
+    const isBookmarkletOpen = bookmarkletModal && bookmarkletModal.classList.contains('open');
+
     if (isModalOpen) {
       if (e.key === 'Escape') {
         closeShelfModalDirect();
@@ -1069,11 +1360,39 @@
       return;
     }
 
+    if (isBookmarkletOpen) {
+      if (e.key === 'Escape') {
+        closeBookmarkletModalDirect();
+      }
+      return;
+    }
+
     if (isLibraryActive) {
-      if (e.key === '/' && document.activeElement && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
-        e.preventDefault();
-        const searchInput = document.getElementById('shelf-search-input');
-        if (searchInput) searchInput.focus();
+      const activeTag = document.activeElement ? document.activeElement.tagName : '';
+      if (!['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag)) {
+        if (e.key === '/') {
+          e.preventDefault();
+          const searchInput = document.getElementById('shelf-search-input');
+          if (searchInput) searchInput.focus();
+        } else if (e.key === 'n' || e.key === '+') {
+          e.preventDefault();
+          openShelfModal();
+        } else if (e.key === 'm') {
+          e.preventDefault();
+          exportShelfMD();
+        } else if (e.key === 'b') {
+          e.preventDefault();
+          exportShelfJSON();
+        } else if (e.key === '1') {
+          setViewMode('grid');
+        } else if (e.key === '2') {
+          setViewMode('list');
+        } else if (e.key === 'Escape') {
+          if (currentTag) clearTagFilter();
+          else if (currentCollection) clearCollectionFilter();
+          else if (currentSearch) clearShelfSearch();
+          else if (isTagCloudOpen) toggleTagCloud();
+        }
       }
     }
   });
@@ -1083,6 +1402,18 @@
   root.closeShelfView = closeShelfView;
   root.renderShelfUI = renderDiscoveryUI;
   root.renderDiscoveryUI = renderDiscoveryUI;
+  root.renderCollectionsOverview = renderCollectionsOverview;
+  root.selectCollectionFilter = selectCollectionFilter;
+  root.clearCollectionFilter = clearCollectionFilter;
+  root.selectTagFilter = selectTagFilter;
+  root.clearTagFilter = clearTagFilter;
+  root.toggleTagCloud = toggleTagCloud;
+  root.copyShelfMarkdown = copyShelfMarkdown;
+  root.copyAllFilteredMarkdown = copyAllFilteredMarkdown;
+  root.openBookmarkletModal = openBookmarkletModal;
+  root.closeBookmarkletModal = closeBookmarkletModal;
+  root.closeBookmarkletModalDirect = closeBookmarkletModalDirect;
+  root.copyBookmarkletCode = copyBookmarkletCode;
   root.openShelfModal = openShelfModal;
   root.closeShelfModal = closeShelfModal;
   root.closeShelfModalDirect = closeShelfModalDirect;

@@ -1613,6 +1613,25 @@
 
           <div class="shelf-form-row">
             <div>
+              <label style="display:block;font-size:11px;font-weight:600;margin-bottom:5px;color:var(--fg-muted);">COLLECTION / TOPIC BUCKET</label>
+              <input type="text" id="shelf-input-collection" class="repo-filter-input" list="shelf-collections-list" placeholder="e.g. Design & Visual Identity">
+              <datalist id="shelf-collections-list">
+                <option value="Design & Visual Identity">
+                <option value="React & Animation Engines">
+                <option value="Typography & Monospace Lab">
+                <option value="CRO & Growth Psychology">
+                <option value="AI Tools & Architectures">
+                <option value="Developer Tools">
+              </datalist>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:600;margin-bottom:5px;color:var(--fg-muted);">TAGS (comma-separated)</label>
+              <input type="text" id="shelf-input-tags" class="repo-filter-input" placeholder="e.g. animation, react, maps">
+            </div>
+          </div>
+
+          <div class="shelf-form-row">
+            <div>
               <label style="display:block;font-size:11px;font-weight:600;margin-bottom:5px;color:var(--fg-muted);">CONTENT TYPE</label>
               <select id="shelf-select-type" class="repo-filter-input" style="cursor:pointer;">
                 <option value="repo">GitHub Repository / Package</option>
@@ -1647,8 +1666,8 @@
               </select>
             </div>
             <div>
-              <label style="display:block;font-size:11px;font-weight:600;margin-bottom:5px;color:var(--fg-muted);">TAGS (comma-separated)</label>
-              <input type="text" id="shelf-input-tags" class="repo-filter-input" placeholder="e.g. animation, react, maps">
+              <label style="display:block;font-size:11px;font-weight:600;margin-bottom:5px;color:var(--fg-subtle);">KEYBOARD SHORTCUT</label>
+              <div style="font-size:11px;color:var(--fg-muted);padding-top:6px;">Press <kbd style="font-size:10px;background:var(--bg-subtle);padding:2px 5px;border-radius:3px;border:1px solid var(--border-default);">Ctrl</kbd> + <kbd style="font-size:10px;background:var(--bg-subtle);padding:2px 5px;border-radius:3px;border:1px solid var(--border-default);">Enter</kbd> to save</div>
             </div>
           </div>
 
@@ -1665,6 +1684,46 @@
           <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
             <button class="btn-gh" onclick="closeShelfModalDirect()">Cancel</button>
             <button class="btn-gh btn-gh-primary" id="shelf-modal-submit-btn" onclick="submitShelfModal()">Add to Shelf</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookmarklet Helper Modal -->
+    <div class="modal-overlay" id="shelf-bookmarklet-modal" onclick="closeBookmarkletModal(event)">
+      <div class="modal-window" style="max-width:540px;" onclick="event.stopPropagation()">
+        <div class="modal-head">
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;">
+            <svg class="octicon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="m3.5 1.75.006-.016a2.001 2.001 0 0 1 1.744-1.234H10.75a2 2 0 0 1 2 2v12.25a.75.75 0 0 1-1.22.586L8 12.336l-3.53 2.95A.75.75 0 0 1 3.25 14.7V1.75h.25Zm1.25.25a.5.5 0 0 0-.5.5v11.196l3.28-2.74a.75.75 0 0 1 .94 0l3.28 2.74V2.5a.5.5 0 0 0-.5-.5H4.75Z"></path>
+            </svg>
+            <span>1-Click Browser Bookmarklet</span>
+          </div>
+          <button class="btn-gh btn-gh-ghost btn-gh-sm" onclick="closeBookmarkletModalDirect()">&times;</button>
+        </div>
+        <div class="modal-body" style="gap:14px;">
+          <p style="font-size:13px;color:var(--fg-muted);margin:0;line-height:1.5;">
+            Save any GitHub repo, design site, or tech article directly to your Shelf Inbox in 1 click without leaving the page.
+          </p>
+          <div style="background:var(--bg-subtle);border:1px solid var(--border-default);border-radius:8px;padding:16px;text-align:center;">
+            <div style="font-size:11px;font-weight:600;color:var(--fg-subtle);text-transform:uppercase;margin-bottom:8px;">Drag this button to your Bookmarks Bar:</div>
+            <a href="javascript:(function(){var u=encodeURIComponent(window.location.href);var t=encodeURIComponent(document.title||'');window.open('http://localhost:7891/index.html?quickSaveUrl='+u+'&title='+t,'_blank');})();"
+               class="btn-gh btn-gh-primary"
+               style="display:inline-flex;cursor:grab;font-weight:600;padding:8px 18px;text-decoration:none;"
+               onclick="event.preventDefault();alert('Drag this button up to your browser bookmarks bar!');"
+               title="Drag me to your bookmarks bar">
+              📥 + Add to Shelf
+            </a>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:11px;font-weight:600;color:var(--fg-muted);">OR COPY JAVASCRIPT CODE:</span>
+              <button class="btn-gh btn-gh-sm" onclick="copyBookmarkletCode()">Copy Code</button>
+            </div>
+            <textarea id="bookmarklet-code-input" class="repo-filter-input" style="height:60px;font-family:'JetBrains Mono',monospace;font-size:11px;resize:none;" readonly>javascript:(function(){var u=encodeURIComponent(window.location.href);var t=encodeURIComponent(document.title||'');window.open('http://localhost:7891/index.html?quickSaveUrl='+u+'&title='+t,'_blank');})();</textarea>
+          </div>
+          <div style="font-size:11px;color:var(--fg-subtle);line-height:1.4;">
+            💡 <strong>How it works:</strong> Clicking the bookmarklet grabs the current page's URL and title, opens Skill Switcher, saves it to your Inbox, and enriches it automatically.
           </div>
         </div>
       </div>

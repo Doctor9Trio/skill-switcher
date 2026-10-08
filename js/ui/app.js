@@ -44,6 +44,22 @@ function handleDeepLinking() {
       }, 120);
     }
 
+    const quickSaveUrl = params.get('quickSaveUrl') || params.get('addUrl');
+    const quickSaveTitle = params.get('quickSaveTitle') || params.get('title');
+
+    if (quickSaveUrl) {
+      setTimeout(() => {
+        if (typeof openShelfView === 'function') openShelfView();
+        if (window.ShelfStore) {
+          window.ShelfStore.addQuick(quickSaveUrl, '', '', '');
+          if (typeof renderDiscoveryUI === 'function') renderDiscoveryUI();
+          if (typeof showToast === 'function') {
+            showToast('Saved resource to Shelf Inbox! 📥');
+          }
+        }
+      }, 150);
+    }
+
     if (categoryTarget && typeof filterMainCategory === 'function') {
       setTimeout(() => filterMainCategory(categoryTarget), 250);
     }
@@ -63,7 +79,7 @@ function handleDeepLinking() {
     }
 
     // Clean query parameters from URL bar without reloading
-    if (openTarget || categoryTarget || presetTarget || filterTarget) {
+    if (openTarget || categoryTarget || presetTarget || filterTarget || quickSaveUrl) {
       const cleanUrl = window.location.pathname;
       window.history.replaceState({}, document.title, cleanUrl);
     }
