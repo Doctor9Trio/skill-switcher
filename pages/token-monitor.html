@@ -650,6 +650,8 @@
           </svg>
           main
         </span>
+        <span class="gh-pill" id="badge-user-node" title="Active Machine Node & User">Host: detecting...</span>
+        <span class="gh-pill" id="badge-brain-status" title="Active Trajectory Brain Location">Brain: detecting...</span>
       </div>
     </div>
 
@@ -884,12 +886,41 @@
           </select>
         </div>
 
+        <!-- Session Selector (Dropdown) -->
+        <select class="gh-select" id="ctrl-session-selector" onchange="changeSessionFilter(this.value)"
+          style="font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--border-default);background:var(--bg-card);color:var(--fg-default);max-width:210px;text-overflow:ellipsis;"
+          title="Filter by Antigravity Agent Session Trajectory">
+          <option value="">All Sessions (Aggregated)</option>
+        </select>
+
         <!-- Currency Toggle -->
         <div class="tm-segmented">
           <button class="tm-segmented-btn active" id="btn-curr-inr" onclick="setCurrency('INR')">₹ INR</button>
           <button class="tm-segmented-btn" id="btn-curr-usd" onclick="setCurrency('USD')">$ USD</button>
           <button class="tm-segmented-btn" id="btn-curr-eur" onclick="setCurrency('EUR')">€ EUR</button>
           <button class="tm-segmented-btn" id="btn-curr-gbp" onclick="setCurrency('GBP')">£ GBP</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Machine Context & Empty Brain Banner -->
+    <div id="no-sessions-alert" style="display:none;background:var(--bg-subtle);border:1px solid var(--border-default);border-left:4px solid var(--accent-blue);border-radius:6px;padding:14px 18px;margin-bottom:20px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <svg class="octicon" width="20" height="20" viewBox="0 0 16 16" style="color:var(--accent-blue);flex-shrink:0;margin-top:2px;">
+          <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path>
+        </svg>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;color:var(--fg-default);margin-bottom:4px;" id="no-sessions-title">
+            Dynamic Machine Connected · Awaiting First Trajectory Session
+          </div>
+          <div style="font-size:12px;color:var(--fg-muted);line-height:1.5;" id="no-sessions-desc">
+            Token Monitor is dynamically mapped to this PC (<span id="alert-machine-user" style="font-family:'JetBrains Mono',monospace;color:var(--fg-default);">active user</span>).
+            No IDE chat trajectories have been logged to the brain directory yet (<code id="alert-brain-path" style="font-size:11px;">~/.gemini/antigravity-ide/brain</code>). Once you start a session in Antigravity on this PC, token telemetry will stream here automatically.
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px;align-items:center;">
+            <button class="btn-gh btn-gh-sm" onclick="openSettingsModal()">Configure Brain Directory</button>
+            <button class="btn-gh btn-gh-sm" onclick="manualRefresh()">Refresh Trajectories</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1250,6 +1281,21 @@
         <button class="modal-close-btn" onclick="closeSettingsModal()">&times;</button>
       </div>
       <div class="modal-body">
+        <!-- Dynamic Machine & Brain Directory Configuration -->
+        <div class="tm-form-group" style="background:var(--bg-subtle);border:1px solid var(--border-default);border-radius:6px;padding:12px;margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <label class="tm-form-label" style="margin:0;font-weight:600;">Active Machine & Brain Directory</label>
+            <span class="gh-pill" id="s-machine-pill" style="font-size:11px;">Local PC</span>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <input class="tm-form-control" type="text" id="s-brain-dir" placeholder="Auto-detecting dynamically..." style="font-family:'JetBrains Mono',monospace;font-size:11px;">
+            <button class="btn-gh btn-gh-sm" type="button" onclick="saveCustomBrainPath()" title="Update brain path on server">Set</button>
+          </div>
+          <span style="font-size:10px;color:var(--fg-muted);display:block;margin-top:4px;">
+            Path to Antigravity IDE brain directory containing session conversation trajectories. Leave blank to auto-detect dynamically.
+          </span>
+        </div>
+
         <!-- Currency & Exchange Rate -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div class="tm-form-group">
@@ -1503,7 +1549,12 @@
     initTheme();
 
     // ─── State ──────────────────────────────────────────────────────────────────
-    const BASE_URL = window.location.origin || 'http://localhost:7891';
+    let apiBaseUrl = (window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null')
+      ? window.location.origin
+      : (localStorage.getItem('tm_custom_api_base') || 'http://localhost:7891');
+    let selectedSessionId = '';
+    let machineEnv = null;
+
     let currentPeriod = 'day';
     let currentModel = 'gemini-flash';
     let currentRange = 30;
@@ -1792,20 +1843,149 @@
     }
 
     // ─── API Telemetry Fetching ─────────────────────────────────────────────────
+    // ─── Machine & Dynamic Environment Auto-Detection ──────────────────────────
+    async function resolveLiveApiBase() {
+      if (window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null') {
+        try {
+          const res = await fetch(`${window.location.origin}/env`, { cache: 'no-store' });
+          if (res.ok) {
+            apiBaseUrl = window.location.origin;
+            return apiBaseUrl;
+          }
+        } catch (e) {}
+      }
+      const candidatePorts = [7891, 7892, 7893, 7894, 7895];
+      for (const port of candidatePorts) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 600);
+          const res = await fetch(`http://localhost:${port}/env`, { signal: controller.signal, cache: 'no-store' });
+          clearTimeout(timeoutId);
+          if (res.ok) {
+            apiBaseUrl = `http://localhost:${port}`;
+            localStorage.setItem('tm_custom_api_base', apiBaseUrl);
+            return apiBaseUrl;
+          }
+        } catch (e) {}
+      }
+      return apiBaseUrl;
+    }
+
+    async function fetchMachineEnv() {
+      try {
+        const res = await fetch(`${apiBaseUrl}/env`, { cache: 'no-store' });
+        if (res.ok) {
+          const env = await res.json();
+          if (env && env.ok) {
+            machineEnv = env;
+            updateMachineBadges(env);
+          }
+        }
+      } catch (e) {
+        console.warn('[TokenMonitor] Could not fetch machine env:', e);
+      }
+    }
+
+    function updateMachineBadges(env) {
+      const hostPill = document.getElementById('badge-user-node');
+      if (hostPill) {
+        hostPill.textContent = `${env.user || 'user'}@${env.hostname || 'local'}`;
+        hostPill.title = `Active PC User: ${env.user || 'Unknown'} | Host: ${env.hostname || 'Unknown'} (${env.platform || 'OS'})`;
+      }
+      const brainPill = document.getElementById('badge-brain-status');
+      if (brainPill) {
+        if (env.brain_path_exists) {
+          brainPill.textContent = `Brain: ${env.sessions_count || 0} sessions`;
+          brainPill.className = 'gh-pill green';
+        } else {
+          brainPill.textContent = 'Brain: Not found';
+          brainPill.className = 'gh-pill yellow';
+        }
+        brainPill.title = env.brain_path || 'No brain path detected';
+      }
+      const smPill = document.getElementById('s-machine-pill');
+      if (smPill) smPill.textContent = `${env.user || 'user'}@${env.hostname || 'local'}`;
+      const sBrain = document.getElementById('s-brain-dir');
+      if (sBrain && !sBrain.value) sBrain.placeholder = env.brain_path || 'Auto-detecting...';
+    }
+
+    function syncSessionSelector(sessionsList, activeId) {
+      const sel = document.getElementById('ctrl-session-selector');
+      if (!sel) return;
+      const currentVal = activeId !== undefined ? activeId : (selectedSessionId || '');
+      sel.innerHTML = '<option value="">All Sessions (Aggregated)</option>';
+      if (Array.isArray(sessionsList)) {
+        sessionsList.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          const displayLabel = s.id.length > 12 ? (s.id.slice(0, 8) + '...' + s.id.slice(-4)) : s.id;
+          opt.textContent = `Session: ${displayLabel} (${s.size_kb || 0} KB)`;
+          if (s.id === currentVal) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      }
+    }
+
+    function changeSessionFilter(sId) {
+      selectedSessionId = sId;
+      fetchStats();
+      fetchTrends();
+      showToast(sId ? `Filtered to session ${sId.slice(0, 8)}...` : 'Viewing all sessions aggregated.');
+    }
+
+    function handleEmptySessionsState(data) {
+      const alertEl = document.getElementById('no-sessions-alert');
+      if (!alertEl) return;
+      if (data.has_sessions === false || (data.session_count === 0 && !selectedSessionId)) {
+        alertEl.style.display = 'block';
+        const alertUser = document.getElementById('alert-machine-user');
+        const alertBrain = document.getElementById('alert-brain-path');
+        if (alertUser && machineEnv) alertUser.textContent = `${machineEnv.user || 'active user'} (${machineEnv.hostname || 'PC'})`;
+        if (alertBrain && machineEnv) alertBrain.textContent = machineEnv.brain_path || '~/.gemini/antigravity-ide/brain';
+      } else {
+        alertEl.style.display = 'none';
+      }
+    }
+
+    async function saveCustomBrainPath() {
+      const dir = document.getElementById('s-brain-dir').value.trim();
+      try {
+        const res = await fetch(`${apiBaseUrl}/set-brain-path`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: dir })
+        });
+        const d = await res.json();
+        if (d.ok) {
+          showToast('Brain path updated successfully.');
+          await fetchMachineEnv();
+          await fetchStats();
+          await fetchTrends();
+        } else {
+          showToast('Failed to set brain path: ' + (d.error || 'Unknown error'));
+        }
+      } catch (e) {
+        showToast('Failed to connect to server');
+      }
+    }
+
     let isFetchingStats = false;
     let isFetchingTrends = false;
 
     async function fetchStats() {
       if (isFetchingStats) return;
       isFetchingStats = true;
-      const cacheKey = `${currentPeriod}_${currentModel}`;
+      const cacheKey = `${currentPeriod}_${currentModel}_${selectedSessionId || 'all'}`;
       try {
-        const res = await fetch(`${BASE_URL}/token-stats?period=${currentPeriod}&model=${currentModel}`);
+        const sParam = selectedSessionId ? `&sessionId=${encodeURIComponent(selectedSessionId)}` : '';
+        const res = await fetch(`${apiBaseUrl}/token-stats?period=${currentPeriod}&model=${currentModel}${sParam}`);
         const data = await res.json();
         if (data.ok) {
           statsClientCache[cacheKey] = data;
           lastData = data;
           renderStats(data);
+          if (data.sessions_list) syncSessionSelector(data.sessions_list, data.current_session_id || selectedSessionId);
+          handleEmptySessionsState(data);
         }
       } catch (err) {
         console.warn('[TokenMonitor] Telemetry fetch error:', err);
@@ -1818,7 +1998,8 @@
       if (isFetchingTrends) return;
       isFetchingTrends = true;
       try {
-        const res = await fetch(`${BASE_URL}/token-trends?days=${currentRange}`);
+        const sParam = selectedSessionId ? `&sessionId=${encodeURIComponent(selectedSessionId)}` : '';
+        const res = await fetch(`${apiBaseUrl}/token-trends?days=${currentRange}${sParam}`);
         const data = await res.json();
         if (data.ok) {
           trendsClientCache[currentRange] = data;
@@ -2365,6 +2546,7 @@
     function manualRefresh() {
       const icon = document.getElementById('sync-icon');
       if (icon) icon.style.transform = 'rotate(180deg)';
+      fetchMachineEnv();
       fetchStats();
       fetchTrends();
       setTimeout(() => { if (icon) icon.style.transform = ''; }, 400);
@@ -2561,6 +2743,13 @@
       document.getElementById('s-custom-in').value = customInRate;
       document.getElementById('s-custom-out').value = customOutRate;
 
+      if (machineEnv) {
+        const sBrain = document.getElementById('s-brain-dir');
+        if (sBrain && !sBrain.value) sBrain.placeholder = machineEnv.brain_path || 'Auto-detecting...';
+        const smPill = document.getElementById('s-machine-pill');
+        if (smPill) smPill.textContent = `${machineEnv.user || 'user'}@${machineEnv.hostname || 'local'}`;
+      }
+
       toggleCustomPriceInputs(currentModel);
       document.getElementById('settings-modal').classList.add('active');
     }
@@ -2644,6 +2833,8 @@
     handleIncomingDeepLinks();
 
     (async function init() {
+      await resolveLiveApiBase();
+      await fetchMachineEnv();
       await Promise.all([fetchStats(), fetchTrends()]);
       startRefreshTimer();
     })();

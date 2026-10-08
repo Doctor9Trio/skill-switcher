@@ -49,25 +49,72 @@ if (-not (Test-Path $GUI_FILE)) {
 $rulesDir = Split-Path $GLOBAL_RULES
 if (!(Test-Path $rulesDir)) { New-Item -ItemType Directory -Force $rulesDir | Out-Null }
 
+$global:CUSTOM_BRAIN_PATH = $null
+
 function Get-AntigravityBrainPath() {
+    # 1. Manually specified custom brain directory (if set via UI or API)
+    if ($global:CUSTOM_BRAIN_PATH -and (Test-Path $global:CUSTOM_BRAIN_PATH)) {
+        return $global:CUSTOM_BRAIN_PATH
+    }
+
+    # 2. Environment variable override
+    if ($env:SKILL_SWITCHER_BRAIN_DIR -and (Test-Path $env:SKILL_SWITCHER_BRAIN_DIR)) {
+        return $env:SKILL_SWITCHER_BRAIN_DIR
+    }
+
+    # 3. Dynamic candidate discovery across all OS profiles & installs
     $candidates = @()
-    if ($env:SKILL_SWITCHER_BRAIN_DIR) { $candidates += $env:SKILL_SWITCHER_BRAIN_DIR }
+    # Windows & Universal ~/.gemini locations
     $candidates += (Join-PathParts @($GEMINI_HOME, "antigravity-ide", "brain"))
     $candidates += (Join-PathParts @($GEMINI_HOME, "antigravity", "brain"))
-    if ($env:LOCALAPPDATA) { $candidates += (Join-PathParts @($env:LOCALAPPDATA, "antigravity-ide", "brain")) }
-    if ($env:APPDATA)      { $candidates += (Join-PathParts @($env:APPDATA, "antigravity-ide", "brain")) }
+    $candidates += (Join-PathParts @($GEMINI_HOME, "brain"))
+    $candidates += (Join-PathParts @($USER_HOME, ".gemini", "antigravity-ide", "brain"))
+    $candidates += (Join-PathParts @($USER_HOME, ".gemini", "antigravity", "brain"))
+    $candidates += (Join-PathParts @($USER_HOME, ".gemini", "brain"))
+    $candidates += (Join-PathParts @($USER_HOME, ".antigravity", "brain"))
+    $candidates += (Join-PathParts @($USER_HOME, ".antigravity-ide", "brain"))
+    $candidates += (Join-PathParts @($USER_HOME, ".config", "antigravity-ide", "brain"))
+    $candidates += (Join-PathParts @($USER_HOME, ".config", "antigravity", "brain"))
+
+    # macOS application support paths
+    $candidates += (Join-PathParts @($USER_HOME, "Library", "Application Support", "antigravity-ide", "brain"))
+    $candidates += (Join-PathParts @($USER_HOME, "Library", "Application Support", "antigravity", "brain"))
+    $candidates += (Join-PathParts @($USER_HOME, "Library", "Application Support", "Google", "Antigravity", "brain"))
+
+    # Windows AppData / LocalAppData paths
+    if ($env:LOCALAPPDATA) {
+        $candidates += (Join-PathParts @($env:LOCALAPPDATA, "antigravity-ide", "brain"))
+        $candidates += (Join-PathParts @($env:LOCALAPPDATA, "antigravity", "brain"))
+        $candidates += (Join-PathParts @($env:LOCALAPPDATA, "Google", "Antigravity", "brain"))
+        $candidates += (Join-PathParts @($env:LOCALAPPDATA, "Programs", "antigravity", "brain"))
+    }
+    if ($env:APPDATA) {
+        $candidates += (Join-PathParts @($env:APPDATA, "antigravity-ide", "brain"))
+        $candidates += (Join-PathParts @($env:APPDATA, "antigravity", "brain"))
+        $candidates += (Join-PathParts @($env:APPDATA, "Google", "Antigravity", "brain"))
+    }
+
+    # Project / Workspace fallback
+    $candidates += (Join-PathParts @($PROJECT_ROOT, ".agents", "brain"))
+    $candidates += (Join-PathParts @($PROJECT_ROOT, ".gemini", "brain"))
+    $candidates += (Join-PathParts @($PROJECT_ROOT, ".brain"))
+
     foreach ($c in $candidates) {
         if ($c -and (Test-Path $c)) { return $c }
     }
-    return $null
+
+    # Default expected location on this machine even if no sessions created yet
+    return (Join-PathParts @($GEMINI_HOME, "antigravity-ide", "brain"))
 }
 
 function Get-EnvInfo() {
     $brain = Get-AntigravityBrainPath
+    $sessions = Get-ActiveSessionsList
     return @{
         ok                   = $true
         user                 = $USER_NAME
         home_dir             = $USER_HOME
+        hostname             = [System.Net.Dns]::GetHostName()
         gemini_home          = $GEMINI_HOME
         global_config        = $GLOBAL_CONFIG
         global_rules         = $GLOBAL_RULES
@@ -75,6 +122,8 @@ function Get-EnvInfo() {
         global_skills        = $GLOBAL_SKILLS
         global_skills_exists = (Test-Path $GLOBAL_SKILLS)
         brain_path           = $brain
+        brain_path_exists    = if ($brain) { Test-Path $brain } else { $false }
+        sessions_count       = $sessions.Count
         project_root         = $PROJECT_ROOT
         tool_dir             = $TOOL_DIR
         workspace_skills     = (Join-PathParts @($PROJECT_ROOT, ".agents", "skills"))
@@ -155,15 +204,27 @@ function Send-Json($res, $data, [int]$status = 200) {
     $res.OutputStream.Write($bytes, 0, $bytes.Length)
 }
 
-function Get-ActiveSessionsList() {
-    $brainPath = Get-AntigravityBrainPath
+function Get-ActiveSessionsList($customPath = $null) {
+    $brainPath = if ($customPath) { $customPath } else { Get-AntigravityBrainPath }
     if (-not $brainPath -or -not (Test-Path $brainPath)) {
         return @()
     }
     $sessions = @()
     Get-ChildItem -Path $brainPath -Directory -ErrorAction SilentlyContinue | ForEach-Object {
-        $transcript = Join-Path $_.FullName ".system_generated\logs\transcript.jsonl"
-        if (Test-Path $transcript) {
+        $candPaths = @(
+            (Join-PathParts @($_.FullName, ".system_generated", "logs", "transcript.jsonl")),
+            (Join-PathParts @($_.FullName, ".system_generated", "logs", "transcript_full.jsonl")),
+            (Join-PathParts @($_.FullName, "logs", "transcript.jsonl")),
+            (Join-PathParts @($_.FullName, "transcript.jsonl"))
+        )
+        $transcript = $null
+        foreach ($cp in $candPaths) {
+            if ($cp -and (Test-Path $cp)) {
+                $transcript = $cp
+                break
+            }
+        }
+        if ($transcript) {
             $item = Get-Item $transcript -ErrorAction SilentlyContinue
             if ($item) {
                 $sessions += [PSCustomObject]@{
@@ -354,12 +415,10 @@ $global:TokenTrendsCacheTime = @{}
 # TOKEN STATS: Aggregate tokens across ALL sessions by period
 # period = "day" (today) | "week" (7D) | "month" (30D)
 # =============================================================
-function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
+function Get-TokenStats($period = "day", $selectedModel = "gemini-flash", $targetSessionId = $null) {
     $brainPath = Get-AntigravityBrainPath
-    if (-not $brainPath -or -not (Test-Path $brainPath)) {
-        return @{ ok = $false; error = "Antigravity brain path not found"; total_tokens = 0; cost_inr = 0; cost_usd = 0 }
-    }
-
+    $sessions = Get-ActiveSessionsList
+    
     $INR_PER_USD = 86.50
     $pricing = @{
         "all-combined"  = @{ id = "all-combined";  name = "All Models Combined (Blended Portfolio)"; input_per_m = 1.29;  output_per_m = 5.76 }
@@ -376,13 +435,53 @@ function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
     $now = Get-Date
     $periodLower = $period.ToLower()
 
-    # Fast in-memory cache check (20s TTL)
-    $cacheKey = "$periodLower-$modelKey"
+    # Fast in-memory cache check (10s TTL) - key includes target session if specified
+    $cacheKey = "$periodLower-$modelKey-$targetSessionId"
     if ($global:TokenStatsCache.ContainsKey($cacheKey)) {
         $cachedTime = $global:TokenStatsCacheTime[$cacheKey]
-        if ($cachedTime -and ($now - $cachedTime).TotalSeconds -lt 20) {
+        if ($cachedTime -and ($now - $cachedTime).TotalSeconds -lt 10) {
             return $global:TokenStatsCache[$cacheKey]
         }
+    }
+
+    # Graceful zero-state handling if no sessions exist on this PC
+    if ($sessions.Count -eq 0 -or -not $brainPath -or -not (Test-Path $brainPath)) {
+        $emptyResult = @{
+            ok               = $true
+            has_sessions     = $false
+            period           = $periodLower
+            session_count    = 0
+            total_tokens     = 0
+            input_tokens     = 0
+            output_tokens    = 0
+            cache_hit_tokens = 0
+            cache_miss_tokens= 0
+            cache_hit_pct    = 0
+            cost_usd         = 0.00
+            cost_inr         = 0.00
+            cost_inr_fmt     = "₹0.00"
+            cost_usd_fmt     = "$0.00"
+            model_key        = $modelKey
+            model_name       = $rates.name
+            exchange_rate    = $INR_PER_USD
+            tool_breakdown   = @{}
+            available_models = $pricing
+            rolling_5h       = 0
+            weekly_total     = 0
+            monthly_total    = 0
+            brain_path       = if ($brainPath) { $brainPath } else { "Not found" }
+            brain_exists     = if ($brainPath) { Test-Path $brainPath } else { $false }
+            user             = $USER_NAME
+            home_dir         = $USER_HOME
+            hostname         = [System.Net.Dns]::GetHostName()
+            sessions_list    = @()
+            selected_session = $null
+            timestamp        = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+            message          = "No agent sessions found yet on this PC ($USER_NAME). Run Antigravity IDE to start streaming live telemetry."
+        }
+        $global:TokenStatsCache[$cacheKey] = $emptyResult
+        $global:TokenStatsCacheTime[$cacheKey] = $now
+        return $emptyResult
     }
 
     $cutoff = switch ($periodLower) {
@@ -407,24 +506,34 @@ function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
     $rolling7dTokens = 0
     $rolling30dTokens= 0
 
-    $sessions = Get-ActiveSessionsList
-    foreach ($sess in $sessions) {
+    $targetSessions = if ($targetSessionId) {
+        @($sessions | Where-Object { $_.id -eq $targetSessionId })
+    } else {
+        $sessions
+    }
+
+    foreach ($sess in $targetSessions) {
         $path = $sess.path
         if (-not (Test-Path $path)) { continue }
 
-        # Optimization: skip session if older than 30 days
+        # Skip sessions older than 30 days
         if ($sess.last_time_raw -lt $time30dAgo) { continue }
 
         $isPeriodSession = ($sess.last_time_raw -ge $cutoff)
         if ($isPeriodSession) { $sessionCount++ }
 
+        $fs = $null
+        $sr = $null
         try {
-            $sr = [System.IO.File]::OpenText($path)
+            # Concurrency-safe file open with ReadWrite sharing
+            $fs = New-Object System.IO.FileStream($path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+            $sr = New-Object System.IO.StreamReader($fs, [System.Text.Encoding]::UTF8)
+
             while (-not $sr.EndOfStream) {
                 $rawLine = $sr.ReadLine()
                 if ($null -eq $rawLine -or $rawLine.Length -lt 25) { continue }
 
-                # Fast date extraction without JSON parsing overhead
+                # Fast date extraction without full JSON parsing overhead
                 $lineDate = $null
                 $lineDt = $null
                 if ($rawLine -match '"created_at":"([^"]+)"') {
@@ -463,7 +572,7 @@ function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
                     $totalInput += $tokens
                 }
 
-                # Tool breakdown fast extraction
+                # Tool breakdown extraction
                 if ($rawLine.IndexOf('"name":"') -ge 0) {
                     if ($rawLine -match '"name":"([^"]+)"') {
                         $n = $Matches[1]
@@ -487,8 +596,11 @@ function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
                     $toolBreakdown["code_action"]++
                 }
             }
-            $sr.Close()
-        } catch {}
+        } catch {
+        } finally {
+            if ($sr) { $sr.Close(); $sr.Dispose() }
+            if ($fs) { $fs.Close(); $fs.Dispose() }
+        }
     }
 
     $totalTokens = $totalInput + $totalOutput
@@ -501,6 +613,7 @@ function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
 
     $result = @{
         ok               = $true
+        has_sessions     = ($sessions.Count -gt 0)
         period           = $periodLower
         session_count    = $sessionCount
         total_tokens     = $totalTokens
@@ -521,7 +634,15 @@ function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
         rolling_5h       = $rolling5hTokens
         weekly_total     = $rolling7dTokens
         monthly_total    = $rolling30dTokens
+        brain_path       = if ($brainPath) { $brainPath } else { "Not found" }
+        brain_exists     = if ($brainPath) { Test-Path $brainPath } else { $false }
+        user             = $USER_NAME
+        home_dir         = $USER_HOME
+        hostname         = [System.Net.Dns]::GetHostName()
+        sessions_list    = @($sessions | Select-Object -First 30 | ForEach-Object { @{ id = $_.id; last_active = $_.last_active; size_kb = [math]::Round($_.size_bytes / 1024, 1) } })
+        selected_session = $targetSessionId
         timestamp        = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        message          = if ($sessions.Count -eq 0) { "No agent sessions found on this PC ($USER_NAME)." } else { "Telemetry computed for $sessionCount sessions." }
     }
 
     # Store in fast cache
@@ -535,23 +656,27 @@ function Get-TokenStats($period = "day", $selectedModel = "gemini-flash") {
 # TOKEN TRENDS: Hourly (Today/24h) or Day-by-Day (7D / 30D)
 # days = 1 (Today: 24h format 00:00-23:00) | 7 (Weekly) | 30 (30 Days)
 # =============================================================
-function Get-TokenTrends($days = 30) {
+function Get-TokenTrends($days = 30, $targetSessionId = $null) {
     $brainPath = Get-AntigravityBrainPath
-    if (-not $brainPath -or -not (Test-Path $brainPath)) {
-        return @{ ok = $false; error = "Brain path not found"; data = @() }
-    }
+    $sessions = Get-ActiveSessionsList
 
     # Constrain to 1, 7, or 30 days
     $cleanDays = if ($days -le 1) { 1 } elseif ($days -le 7) { 7 } else { 30 }
 
     $now = Get-Date
-    # Fast in-memory cache check (20s TTL)
-    $cacheKey = "$cleanDays"
+    # Fast in-memory cache check (10s TTL)
+    $cacheKey = "$cleanDays-$targetSessionId"
     if ($global:TokenTrendsCache.ContainsKey($cacheKey)) {
         $cachedTime = $global:TokenTrendsCacheTime[$cacheKey]
-        if ($cachedTime -and ($now - $cachedTime).TotalSeconds -lt 20) {
+        if ($cachedTime -and ($now - $cachedTime).TotalSeconds -lt 10) {
             return $global:TokenTrendsCache[$cacheKey]
         }
+    }
+
+    $targetSessions = if ($targetSessionId) {
+        @($sessions | Where-Object { $_.id -eq $targetSessionId })
+    } else {
+        $sessions
     }
 
     # CASE A: Today -> 24-Hour Hourly Timeline (00:00 - 23:00 in 24h format)
@@ -563,49 +688,56 @@ function Get-TokenTrends($days = 30) {
             $buckets[$hKey] = @{ input = 0; output = 0; total = 0; label = $hKey }
         }
 
-        $sessions = Get-ActiveSessionsList
-        foreach ($sess in $sessions) {
-            $path = $sess.path
-            if (-not (Test-Path $path)) { continue }
-            if ($sess.last_time_raw.ToString("yyyy-MM-dd") -lt $todayStr) { continue }
+        if ($targetSessions.Count -gt 0 -and $brainPath -and (Test-Path $brainPath)) {
+            foreach ($sess in $targetSessions) {
+                $path = $sess.path
+                if (-not (Test-Path $path)) { continue }
+                if ($sess.last_time_raw.ToString("yyyy-MM-dd") -lt $todayStr) { continue }
 
-            try {
-                $sr = [System.IO.File]::OpenText($path)
-                while (-not $sr.EndOfStream) {
-                    $rawLine = $sr.ReadLine()
-                    if ($null -eq $rawLine -or $rawLine.Length -lt 25) { continue }
+                $fs = $null
+                $sr = $null
+                try {
+                    $fs = New-Object System.IO.FileStream($path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+                    $sr = New-Object System.IO.StreamReader($fs, [System.Text.Encoding]::UTF8)
+                    while (-not $sr.EndOfStream) {
+                        $rawLine = $sr.ReadLine()
+                        if ($null -eq $rawLine -or $rawLine.Length -lt 25) { continue }
 
-                    if ($rawLine -match '"created_at":"([^"]+)"') {
-                        try {
-                            $dt = [DateTime]::Parse($Matches[1]).ToLocalTime()
-                            if ($dt.ToString("yyyy-MM-dd") -eq $todayStr) {
-                                $hKey = "{0:D2}:00" -f $dt.Hour
-                                if ($buckets.Contains($hKey)) {
-                                    $cIdx = $rawLine.IndexOf('"content":"')
-                                    $tokens = 0
-                                    if ($cIdx -ge 0) {
-                                        $cStart = $cIdx + 11
-                                        $cEnd = $rawLine.LastIndexOf('","')
-                                        $contentLen = if ($cEnd -gt $cStart) { $cEnd - $cStart } else { $rawLine.Length - $cStart }
-                                        $tokens = [math]::Round($contentLen / 3.8)
-                                    } else {
-                                        $tokens = [math]::Round($rawLine.Length / 4.0)
+                        if ($rawLine -match '"created_at":"([^"]+)"') {
+                            try {
+                                $dt = [DateTime]::Parse($Matches[1]).ToLocalTime()
+                                if ($dt.ToString("yyyy-MM-dd") -eq $todayStr) {
+                                    $hKey = "{0:D2}:00" -f $dt.Hour
+                                    if ($buckets.Contains($hKey)) {
+                                        $cIdx = $rawLine.IndexOf('"content":"')
+                                        $tokens = 0
+                                        if ($cIdx -ge 0) {
+                                            $cStart = $cIdx + 11
+                                            $cEnd = $rawLine.LastIndexOf('","')
+                                            $contentLen = if ($cEnd -gt $cStart) { $cEnd - $cStart } else { $rawLine.Length - $cStart }
+                                            $tokens = [math]::Round($contentLen / 3.8)
+                                        } else {
+                                            $tokens = [math]::Round($rawLine.Length / 4.0)
+                                        }
+
+                                        $isOutput = ($rawLine.IndexOf('"source":"MODEL"') -ge 0 -or $rawLine.IndexOf('"type":"PLANNER_RESPONSE"') -ge 0)
+                                        if ($isOutput) {
+                                            $buckets[$hKey].output += $tokens
+                                        } else {
+                                            $buckets[$hKey].input += $tokens
+                                        }
+                                        $buckets[$hKey].total += $tokens
                                     }
-
-                                    $isOutput = ($rawLine.IndexOf('"source":"MODEL"') -ge 0 -or $rawLine.IndexOf('"type":"PLANNER_RESPONSE"') -ge 0)
-                                    if ($isOutput) {
-                                        $buckets[$hKey].output += $tokens
-                                    } else {
-                                        $buckets[$hKey].input += $tokens
-                                    }
-                                    $buckets[$hKey].total += $tokens
                                 }
-                            }
-                        } catch {}
+                            } catch {}
+                        }
                     }
+                } catch {
+                } finally {
+                    if ($sr) { $sr.Close(); $sr.Dispose() }
+                    if ($fs) { $fs.Close(); $fs.Dispose() }
                 }
-                $sr.Close()
-            } catch {}
+            }
         }
 
         $data = @()
@@ -622,10 +754,13 @@ function Get-TokenTrends($days = 30) {
         }
 
         $result = @{
-            ok   = $true
-            days = 1
-            mode = "hourly"
-            data = $data
+            ok           = $true
+            has_sessions = ($targetSessions.Count -gt 0)
+            days         = 1
+            mode         = "hourly"
+            data         = $data
+            user         = $USER_NAME
+            brain_path   = if ($brainPath) { $brainPath } else { "Not found" }
         }
         $global:TokenTrendsCache[$cacheKey] = $result
         $global:TokenTrendsCacheTime[$cacheKey] = $now
@@ -643,45 +778,52 @@ function Get-TokenTrends($days = 30) {
         $buckets[$dateKey] = @{ input = 0; output = 0; total = 0; label = $start.AddDays($d).ToString("M/d") }
     }
 
-    $sessions = Get-ActiveSessionsList
-    foreach ($sess in $sessions) {
-        $path = $sess.path
-        if (-not (Test-Path $path)) { continue }
-        if ($sess.last_time_raw -lt $start) { continue }
+    if ($targetSessions.Count -gt 0 -and $brainPath -and (Test-Path $brainPath)) {
+        foreach ($sess in $targetSessions) {
+            $path = $sess.path
+            if (-not (Test-Path $path)) { continue }
+            if ($sess.last_time_raw -lt $start) { continue }
 
-        try {
-            $sr = [System.IO.File]::OpenText($path)
-            while (-not $sr.EndOfStream) {
-                $rawLine = $sr.ReadLine()
-                if ($null -eq $rawLine -or $rawLine.Length -lt 25) { continue }
+            $fs = $null
+            $sr = $null
+            try {
+                $fs = New-Object System.IO.FileStream($path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+                $sr = New-Object System.IO.StreamReader($fs, [System.Text.Encoding]::UTF8)
+                while (-not $sr.EndOfStream) {
+                    $rawLine = $sr.ReadLine()
+                    if ($null -eq $rawLine -or $rawLine.Length -lt 25) { continue }
 
-                # Fast date extraction
-                if (-not ($rawLine -match '"created_at":"(\d{4}-\d{2}-\d{2})')) { continue }
-                $dateKey = $Matches[1]
-                if (-not $buckets.Contains($dateKey)) { continue }
+                    # Fast date extraction
+                    if (-not ($rawLine -match '"created_at":"(\d{4}-\d{2}-\d{2})')) { continue }
+                    $dateKey = $Matches[1]
+                    if (-not $buckets.Contains($dateKey)) { continue }
 
-                # Fast token count
-                $cIdx = $rawLine.IndexOf('"content":"')
-                $tokens = 0
-                if ($cIdx -ge 0) {
-                    $cStart = $cIdx + 11
-                    $cEnd = $rawLine.LastIndexOf('","')
-                    $contentLen = if ($cEnd -gt $cStart) { $cEnd - $cStart } else { $rawLine.Length - $cStart }
-                    $tokens = [math]::Round($contentLen / 3.8)
-                } else {
-                    $tokens = [math]::Round($rawLine.Length / 4.0)
+                    # Fast token count
+                    $cIdx = $rawLine.IndexOf('"content":"')
+                    $tokens = 0
+                    if ($cIdx -ge 0) {
+                        $cStart = $cIdx + 11
+                        $cEnd = $rawLine.LastIndexOf('","')
+                        $contentLen = if ($cEnd -gt $cStart) { $cEnd - $cStart } else { $rawLine.Length - $cStart }
+                        $tokens = [math]::Round($contentLen / 3.8)
+                    } else {
+                        $tokens = [math]::Round($rawLine.Length / 4.0)
+                    }
+
+                    $isOutput = ($rawLine.IndexOf('"source":"MODEL"') -ge 0 -or $rawLine.IndexOf('"type":"PLANNER_RESPONSE"') -ge 0)
+                    if ($isOutput) {
+                        $buckets[$dateKey].output += $tokens
+                    } else {
+                        $buckets[$dateKey].input += $tokens
+                    }
+                    $buckets[$dateKey].total += $tokens
                 }
-
-                $isOutput = ($rawLine.IndexOf('"source":"MODEL"') -ge 0 -or $rawLine.IndexOf('"type":"PLANNER_RESPONSE"') -ge 0)
-                if ($isOutput) {
-                    $buckets[$dateKey].output += $tokens
-                } else {
-                    $buckets[$dateKey].input += $tokens
-                }
-                $buckets[$dateKey].total += $tokens
+            } catch {
+            } finally {
+                if ($sr) { $sr.Close(); $sr.Dispose() }
+                if ($fs) { $fs.Close(); $fs.Dispose() }
             }
-            $sr.Close()
-        } catch {}
+        }
     }
 
     $data = @()
@@ -698,10 +840,13 @@ function Get-TokenTrends($days = 30) {
     }
 
     $result = @{
-        ok   = $true
-        days = $cleanDays
-        mode = "daily"
-        data = $data
+        ok           = $true
+        has_sessions = ($targetSessions.Count -gt 0)
+        days         = $cleanDays
+        mode         = "daily"
+        data         = $data
+        user         = $USER_NAME
+        brain_path   = if ($brainPath) { $brainPath } else { "Not found" }
     }
 
     # Store in fast cache
@@ -1014,19 +1159,74 @@ while ($listener.IsListening) {
             $query = $req.Url.Query
             $period = "day"
             $model  = "gemini-flash"
+            $sessionId = $null
             if ($query -match "period=([^&]+)") { $period = [System.Net.WebUtility]::UrlDecode($Matches[1]) }
             if ($query -match "model=([^&]+)")  { $model  = [System.Net.WebUtility]::UrlDecode($Matches[1]) }
-            $stats = Get-TokenStats $period $model
+            if ($query -match "sessionId=([^&]+)") { $sessionId = [System.Net.WebUtility]::UrlDecode($Matches[1]) }
+            $stats = Get-TokenStats $period $model $sessionId
             Send-Json $res $stats
         }
         elseif ($method -eq "GET" -and $path -eq "/token-trends") {
             $query = $req.Url.Query
             $days  = 30
+            $sessionId = $null
             if ($query -match "days=([^&]+)") { 
                 try { $days = [int][System.Net.WebUtility]::UrlDecode($Matches[1]) } catch {}
             }
-            $trends = Get-TokenTrends $days
+            if ($query -match "sessionId=([^&]+)") { $sessionId = [System.Net.WebUtility]::UrlDecode($Matches[1]) }
+            $trends = Get-TokenTrends $days $sessionId
             Send-Json $res $trends
+        }
+        elseif ($method -eq "POST" -and $path -eq "/set-brain-path") {
+            try {
+                $reader = New-Object System.IO.StreamReader($req.InputStream, [System.Text.Encoding]::UTF8)
+                $body   = $reader.ReadToEnd()
+                $reader.Close()
+                $data   = $body | ConvertFrom-Json
+                if ([string]::IsNullOrWhiteSpace($data.path)) {
+                    $global:CUSTOM_BRAIN_PATH = $null
+                    $global:TokenStatsCache.Clear()
+                    $global:TokenTrendsCache.Clear()
+                    $autoPath = Get-AntigravityBrainPath
+                    $ts = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+                    Write-Host "  [$ts] Reset brain path to dynamic auto-detection -> $autoPath"
+                    Send-Json $res @{ 
+                        ok         = $true
+                        brain_path = $autoPath
+                        sessions   = (Get-ActiveSessionsList).Count
+                        message    = "Brain path reset to auto-detection"
+                    }
+                }
+                elseif (Test-Path $data.path) {
+                    $global:CUSTOM_BRAIN_PATH = $data.path
+                    $global:TokenStatsCache.Clear()
+                    $global:TokenTrendsCache.Clear()
+                    $ts = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+                    Write-Host "  [$ts] Custom brain path configured -> $($data.path)"
+                    Send-Json $res @{ 
+                        ok         = $true
+                        brain_path = $global:CUSTOM_BRAIN_PATH
+                        sessions   = (Get-ActiveSessionsList).Count
+                        message    = "Brain path updated successfully"
+                    }
+                } else {
+                    Send-Json $res @{ ok = $false; error = "Path does not exist on this machine: $($data.path)" } 400
+                }
+            } catch {
+                Send-Json $res @{ ok = $false; error = $_.Exception.Message } 500
+            }
+        }
+        elseif ($method -eq "POST" -and $path -eq "/test-report") {
+            try {
+                $reader = New-Object System.IO.StreamReader($req.InputStream, [System.Text.Encoding]::UTF8)
+                $body   = $reader.ReadToEnd()
+                $reader.Close()
+                Set-Content -Path (Join-Path $TOOL_DIR "shelf-test-results.json") -Value $body -Encoding utf8
+                Write-Host "  [Test] Automated E2E test report saved!"
+                Send-Json $res @{ ok = $true; message = "Report saved" }
+            } catch {
+                Send-Json $res @{ ok = $false; error = $_.Exception.Message } 500
+            }
         }
         else {
             # Try serving static file if path matches

@@ -178,6 +178,13 @@ function changeTelemetrySession(sessionId) {
   fetchSessionTelemetry(false);
 }
 
+function getTelemetryApiBase() {
+  if (window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null') {
+    return window.location.origin;
+  }
+  return localStorage.getItem('tm_custom_api_base') || 'http://localhost:7891';
+}
+
 async function fetchSessionTelemetry(isSilent = false) {
   const refreshBtn = document.getElementById('tel-refresh-btn');
   if (refreshBtn && !isSilent) {
@@ -190,7 +197,8 @@ async function fetchSessionTelemetry(isSilent = false) {
     if (selectedTelemetryModel) params.append('model', selectedTelemetryModel);
     if (selectedTelemetrySessionId) params.append('sessionId', selectedTelemetrySessionId);
 
-    const res = await fetch(`/session-telemetry?${params.toString()}`);
+    const apiBase = getTelemetryApiBase();
+    const res = await fetch(`${apiBase}/session-telemetry?${params.toString()}`);
     if (res.ok) {
       const data = await res.json();
       currentTelemetryData = data;

@@ -31,6 +31,11 @@ function handleDeepLinking() {
           case 'jev':
             if (typeof openJevGuide === 'function') openJevGuide();
             break;
+          case 'shelf':
+          case 'archive':
+          case 'library':
+            if (typeof openShelfView === 'function') openShelfView();
+            break;
           case 'token-monitor':
           case 'tokenmonitor':
             window.location.href = 'pages/token-monitor.html';
@@ -77,6 +82,7 @@ window.addEventListener('focus', () => {
 setTimeout(() => {
   if (typeof initServerSync === 'function') initServerSync();
   if (typeof fetchSessionTelemetry === 'function') fetchSessionTelemetry(true);
+  if (typeof updateShelfNavCounter === 'function') updateShelfNavCounter();
   handleDeepLinking();
   
   // Background interval poll (every 15s)
