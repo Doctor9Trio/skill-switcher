@@ -14,7 +14,10 @@
   let currentType = 'all';
   let currentSearch = '';
   let currentSort = 'newest';
-  let currentViewMode = 'grid'; // 'grid' | 'list'
+  let currentViewMode = 'focused'; // 'focused' | 'detailed' | 'list' | 'grid'
+  let expandedCardIds = new Set();
+  let focusItemIndex = 0;
+  let currentFocusItemId = null;
   let isLibraryActive = false;
   let isTagCloudOpen = false;
   let editingDiscoveryId = null;
@@ -22,14 +25,14 @@
 
   // Metadata mappings
   const TYPE_META = {
-    all: { label: 'All Types', icon: 'M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Z' },
-    design: { label: 'Design & Inspo', icon: 'M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25a1.75 1.75 0 0 1 .445-.758l8.61-8.61Z' },
-    repo: { label: 'GitHub Repos', icon: 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z' },
-    tool: { label: 'Tools & Modules', icon: 'M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H11v1.75a.75.75 0 0 1-1.5 0V4.5H7.75a.75.75 0 0 1 0-1.5H9.5V1.75a.75.75 0 0 1 1.5 0ZM4.5 6.5A2.5 2.5 0 0 0 2 9v4.5A2.5 2.5 0 0 0 4.5 16h7a2.5 2.5 0 0 0 2.5-2.5V9a2.5 2.5 0 0 0-2.5-2.5h-7Z' },
-    ai: { label: 'AI & Models', icon: 'M6 1.75a.75.75 0 0 1 .75.75v1h2.5v-1a.75.75 0 0 1 1.5 0v1h.5A2.75 2.75 0 0 1 14 6.25v.5h1a.75.75 0 0 1 0 1.5h-1v2.5h1a.75.75 0 0 1 0 1.5h-1v.5A2.75 2.75 0 0 1 11.25 14h-.5v1a.75.75 0 0 1-1.5 0v-1h-2.5v1a.75.75 0 0 1-1.5 0v-1h-.5A2.75 2.75 0 0 1 2 11.25v-.5H1a.75.75 0 0 1 0-1.5h1v-2.5H1a.75.75 0 0 1 0-1.5h1v-.5A2.75 2.75 0 0 1 4.75 3.5h.5v-1A.75.75 0 0 1 6 1.75Z' },
-    article: { label: 'Articles & Guides', icon: 'M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.003 1H15.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.247a3.75 3.75 0 0 0-3.003 1.501A3.75 3.75 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75Z' },
-    video: { label: 'Videos & Motion', icon: 'M0 3.75C0 2.784.784 2 1.75 2h9.5c.966 0 1.75.784 1.75 1.75v1.88l3.18-1.59A.75.75 0 0 1 17 4.71v6.58a.75.75 0 0 1-.82.67.747.747 0 0 1-.25-.06L13 10.37v1.88c0 .966-.784 1.75-1.75 1.75h-9.5A1.75 1.75 0 0 1 0 12.25v-8.5Z' },
-    other: { label: 'Other', icon: 'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Z' }
+    all: { label: 'All Types', emoji: '✨', icon: 'M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Z' },
+    design: { label: 'Design & Inspo', emoji: '🎨', icon: 'M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25a1.75 1.75 0 0 1 .445-.758l8.61-8.61Z' },
+    repo: { label: 'GitHub Repos', emoji: '⚡', icon: 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z' },
+    tool: { label: 'Tools & Modules', emoji: '🛠️', icon: 'M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H11v1.75a.75.75 0 0 1-1.5 0V4.5H7.75a.75.75 0 0 1 0-1.5H9.5V1.75a.75.75 0 0 1 1.5 0ZM4.5 6.5A2.5 2.5 0 0 0 2 9v4.5A2.5 2.5 0 0 0 4.5 16h7a2.5 2.5 0 0 0 2.5-2.5V9a2.5 2.5 0 0 0-2.5-2.5h-7Z' },
+    ai: { label: 'AI & Models', emoji: '🧠', icon: 'M6 1.75a.75.75 0 0 1 .75.75v1h2.5v-1a.75.75 0 0 1 1.5 0v1h.5A2.75 2.75 0 0 1 14 6.25v.5h1a.75.75 0 0 1 0 1.5h-1v2.5h1a.75.75 0 0 1 0 1.5h-1v.5A2.75 2.75 0 0 1 11.25 14h-.5v1a.75.75 0 0 1-1.5 0v-1h-2.5v1a.75.75 0 0 1-1.5 0v-1h-.5A2.75 2.75 0 0 1 2 11.25v-.5H1a.75.75 0 0 1 0-1.5h1v-2.5H1a.75.75 0 0 1 0-1.5h1v-.5A2.75 2.75 0 0 1 4.75 3.5h.5v-1A.75.75 0 0 1 6 1.75Z' },
+    article: { label: 'Articles & Guides', emoji: '📚', icon: 'M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.003 1H15.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.247a3.75 3.75 0 0 0-3.003 1.501A3.75 3.75 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75Z' },
+    video: { label: 'Videos & Motion', emoji: '🎬', icon: 'M0 3.75C0 2.784.784 2 1.75 2h9.5c.966 0 1.75.784 1.75 1.75v1.88l3.18-1.59A.75.75 0 0 1 17 4.71v6.58a.75.75 0 0 1-.82.67.747.747 0 0 1-.25-.06L13 10.37v1.88c0 .966-.784 1.75-1.75 1.75h-9.5A1.75 1.75 0 0 1 0 12.25v-8.5Z' },
+    other: { label: 'Other', emoji: '📦', icon: 'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Z' }
   };
 
   const INTENT_META = {
@@ -531,17 +534,28 @@
             </button>
           </div>
 
-          <!-- View Mode Switcher: Grid vs Dense List -->
+          <!-- View Mode Switcher: Focused Grid vs Detailed Grid vs List -->
           <div class="disc-view-switcher">
             <button
-              class="disc-view-btn ${currentViewMode === 'grid' ? 'active' : ''}"
-              onclick="setViewMode('grid')"
-              title="Masonry visual cards view"
+              class="disc-view-btn ${(currentViewMode === 'focused' || currentViewMode === 'grid') ? 'active' : ''}"
+              onclick="setViewMode('focused')"
+              title="Clean, breathable grid with on-demand insights (Default)"
             >
               <svg class="octicon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M1 2.75C1 1.784 1.784 1 2.75 1h3.5c.966 0 1.75.784 1.75 1.75v3.5A1.75 1.75 0 0 1 8 8H2.75A1.75 1.75 0 0 1 1 6.25v-3.5Zm1.75-.25a.25.25 0 0 0-.25.25v3.5c0 .138.112.25.25.25h3.5a.25.25 0 0 0 .25-.25v-3.5a.25.25 0 0 0-.25-.25h-3.5ZM9 2.75C9 1.784 9.784 1 10.75 1h3.5c.966 0 1.75.784 1.75 1.75v3.5A1.75 1.75 0 0 1 14.25 8h-3.5A1.75 1.75 0 0 1 9 6.25v-3.5Zm1.75-.25a.25.25 0 0 0-.25.25v3.5c0 .138.112.25.25.25h3.5a.25.25 0 0 0 .25-.25v-3.5a.25.25 0 0 0-.25-.25h-3.5ZM1 10.75C1 9.784 1.784 9 2.75 9h3.5c.966 0 1.75.784 1.75 1.75v3.5A1.75 1.75 0 0 1 8 16H2.75A1.75 1.75 0 0 1 1 14.25v-3.5Zm1.75-.25a.25.25 0 0 0-.25.25v3.5c0 .138.112.25.25.25h3.5a.25.25 0 0 0 .25-.25v-3.5a.25.25 0 0 0-.25-.25h-3.5ZM9 10.75c0-.966.784-1.75 1.75-1.75h3.5c.966 0 1.75.784 1.75 1.75v3.5A1.75 1.75 0 0 1 14.25 16h-3.5A1.75 1.75 0 0 1 9 14.25v-3.5Zm1.75-.25a.25.25 0 0 0-.25.25v3.5c0 .138.112.25.25.25h3.5a.25.25 0 0 0 .25-.25v-3.5a.25.25 0 0 0-.25-.25h-3.5Z"></path>
               </svg>
-              <span>Grid</span>
+              <span>🎯 Focused</span>
+            </button>
+
+            <button
+              class="disc-view-btn ${currentViewMode === 'detailed' ? 'active' : ''}"
+              onclick="setViewMode('detailed')"
+              title="Full notes expanded inline"
+            >
+              <svg class="octicon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.003 1H15.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.247a3.75 3.75 0 0 0-3.003 1.501A3.75 3.75 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75Z"></path>
+              </svg>
+              <span>📖 Detailed</span>
             </button>
 
             <button
@@ -552,7 +566,7 @@
               <svg class="octicon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M2 3.75A.75.75 0 0 1 2.75 3h10.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 3.75Zm0 4A.75.75 0 0 1 2.75 7h10.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 7.75Zm0 4a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z"></path>
               </svg>
-              <span>List</span>
+              <span>📋 List</span>
             </button>
           </div>
         </div>
@@ -645,7 +659,7 @@
           ${currentTab === 'collections' && !currentCollection
             ? renderCollectionsOverview(stats)
             : (items.length > 0
-                ? (currentViewMode === 'grid' ? renderDiscoveryGrid(items) : renderDiscoveryList(items))
+                ? (currentViewMode === 'list' ? renderDiscoveryList(items) : renderDiscoveryGrid(items))
                 : renderEmptyState())}
         </div>
       </div>
@@ -807,21 +821,28 @@
     `;
   }
 
-  // Individual Card Component
+  // Individual Card Component with Enhanced Hierarchy & Expandable Insights
   function renderDiscoveryCard(item) {
     const domain = window.ShelfStore ? window.ShelfStore.extractDomain(item.url) : item.url;
     const isStarred = Boolean(item.starred);
     const intent = INTENT_META[item.intent] || { label: item.intent, emoji: '📌' };
     const status = STATUS_META[item.status] || { label: item.status, badgeClass: '', icon: '📌' };
+    const typeMeta = TYPE_META[item.type] || { label: item.type || 'Resource', emoji: '📦' };
 
     const dateFormatted = new Date(item.createdAt || Date.now()).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric'
     });
 
+    const isExpanded = currentViewMode === 'detailed' || expandedCardIds.has(item.id);
+    const essenceText = item.whySaved || item.potentialUse || item.title;
+
     return `
-      <div class="shelf-card ${isStarred ? 'is-starred' : ''} ${item.status === 'inbox' ? 'is-inbox' : ''}" id="shelf-card-${item.id}">
-        <!-- Top bar: Source, Domain, Badges, Star -->
+      <div class="shelf-card ${isStarred ? 'is-starred' : ''} ${item.status === 'inbox' ? 'is-inbox' : ''}"
+           id="shelf-card-${item.id}"
+           data-type="${escapeHtml(item.type || 'other')}">
+        
+        <!-- Top bar: Favicon + Domain + Category Badge + Star -->
         <div class="shelf-card-top">
           <div class="shelf-card-source">
             <div class="shelf-card-favicon-wrap">
@@ -832,9 +853,10 @@
                   class="shelf-card-favicon"
                   onerror="this.style.display='none';"
                 />
-              ` : ''}
+              ` : `<span class="shelf-card-favicon-fallback">${typeMeta.emoji}</span>`}
             </div>
             <span class="shelf-card-domain" title="${escapeHtml(item.url)}">${escapeHtml(domain)}</span>
+            <span class="shelf-card-type-badge">${typeMeta.emoji} ${typeMeta.label}</span>
           </div>
 
           <div class="shelf-card-top-right">
@@ -858,32 +880,23 @@
           </div>
         </div>
 
-        <!-- Body: Title, Monospace URL, GitHub Metadata -->
+        <!-- Body: Title Row, Essence, GitHub Stats, Expandable Insights, Tags -->
         <div class="shelf-card-body">
-          <div class="shelf-card-header-row">
+          <div class="shelf-card-title-row">
             <h3 class="shelf-card-title">
               <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(item.title)}">
                 ${escapeHtml(item.title)}
               </a>
             </h3>
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-              ${item.collection ? `
-                <button class="disc-collection-tag" onclick="selectCollectionFilter('${escapeHtml(item.collection)}', event)" title="Filter collection: ${escapeHtml(item.collection)}">
-                  🏷️ ${escapeHtml(item.collection)}
-                </button>
-              ` : ''}
-              <span class="disc-intent-tag" title="Intention: ${intent.label}">
-                ${intent.emoji} ${intent.label}
-              </span>
-            </div>
+            <button class="shelf-card-quick-focus-btn" onclick="openFocusReader('${item.id}', event)" title="Open in distraction-free Focus Mode (Space / Click)">
+              🔍 Focus
+            </button>
           </div>
 
-          <div class="shelf-card-url-mono" title="${escapeHtml(item.url)}">
-            <span>${escapeHtml(item.url)}</span>
-            <svg class="octicon" width="11" height="11" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.5-.25a.75.75 0 0 1 .75-.75h4.25a.75.75 0 0 1 .75.75v4.25a.75.75 0 0 1-1.5 0V3.56l-5.72 5.72a.75.75 0 0 1-1.06-1.06l5.72-5.72H11a.75.75 0 0 1-.75-.75Z"></path>
-            </svg>
-          </div>
+          <!-- Crisp Single-Line Takeaway Essence -->
+          <p class="shelf-card-essence" title="${escapeHtml(essenceText)}">
+            ${escapeHtml(essenceText)}
+          </p>
 
           <!-- GitHub Intelligence Pill (if repo) -->
           ${item.githubMeta ? `
@@ -897,37 +910,66 @@
             </div>
           ` : ''}
 
-          <!-- The Two Magic Questions: "Why I saved this" & "Potential use" -->
-          ${item.whySaved ? `
-            <div class="disc-context-box why-box">
-              <span class="disc-context-heading">💭 Why I saved this:</span>
-              <p class="disc-context-content">${escapeHtml(item.whySaved)}</p>
+          <!-- Expandable Insight Drawer (No more forced repetitive boxes!) -->
+          ${(item.whySaved || item.potentialUse) ? `
+            <div class="shelf-insights-wrapper">
+              <button class="shelf-insights-toggle-btn ${isExpanded ? 'open' : ''}" onclick="toggleCardInsights('${item.id}', event)">
+                <span style="display:inline-flex;align-items:center;gap:5px;">
+                  <span>💡</span>
+                  <span class="insights-text">${isExpanded ? 'Collapse Insights' : 'Personal Context & Codebase Action'}</span>
+                </span>
+                <svg class="octicon insights-chevron ${isExpanded ? 'rotated' : ''}" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="m4.427 7.427 3.396 3.396a.25.25 0 0 0 .354 0l3.396-3.396A.25.25 0 0 0 11.396 7H4.604a.25.25 0 0 0-.177.427Z"/>
+                </svg>
+              </button>
+
+              <div class="shelf-card-insights-drawer ${isExpanded ? 'open' : ''}" style="${isExpanded ? 'display:flex;' : 'display:none;'}">
+                ${item.whySaved ? `
+                  <div class="shelf-insight-item why-insight">
+                    <div class="insight-label">
+                      <span>💭 Why I saved this:</span>
+                    </div>
+                    <div class="insight-body">${escapeHtml(item.whySaved)}</div>
+                  </div>
+                ` : ''}
+                ${item.potentialUse ? `
+                  <div class="shelf-insight-item use-insight">
+                    <div class="insight-label">
+                      <span>🚀 Codebase Application:</span>
+                    </div>
+                    <div class="insight-body">${escapeHtml(item.potentialUse)}</div>
+                  </div>
+                ` : ''}
+              </div>
             </div>
           ` : ''}
 
-          ${item.potentialUse ? `
-            <div class="disc-context-box use-box">
-              <span class="disc-context-heading">🚀 Potential use:</span>
-              <p class="disc-context-content">${escapeHtml(item.potentialUse)}</p>
-            </div>
-          ` : ''}
-
-          <!-- Project Context Badge -->
-          ${item.project ? `
-            <div class="shelf-card-project">
-              <span class="shelf-project-label">Project:</span>
-              <button class="shelf-project-value" onclick="selectProjectFilter('${escapeHtml(item.project)}', event)">
+          <!-- Project & Collection Pill Row -->
+          <div class="shelf-card-meta-row">
+            ${item.project ? `
+              <button class="shelf-project-chip" onclick="selectProjectFilter('${escapeHtml(item.project)}', event)" title="Filter project: ${escapeHtml(item.project)}">
                 📁 ${escapeHtml(item.project)}
               </button>
-            </div>
-          ` : ''}
+            ` : ''}
+            ${item.collection ? `
+              <button class="shelf-collection-chip" onclick="selectCollectionFilter('${escapeHtml(item.collection)}', event)" title="Filter collection: ${escapeHtml(item.collection)}">
+                🏷️ ${escapeHtml(item.collection)}
+              </button>
+            ` : ''}
+            <span class="disc-intent-tag" title="Intention: ${intent.label}">
+              ${intent.emoji} ${intent.label}
+            </span>
+          </div>
 
           <!-- Tags -->
           ${Array.isArray(item.tags) && item.tags.length > 0 ? `
             <div class="shelf-card-tags">
-              ${item.tags.map(t => `
-                <span class="shelf-tag-pill">#${escapeHtml(t)}</span>
+              ${item.tags.slice(0, 3).map(t => `
+                <span class="shelf-tag-pill" onclick="selectTagFilter('${escapeHtml(t)}', event)">#${escapeHtml(t)}</span>
               `).join('')}
+              ${item.tags.length > 3 ? `
+                <span class="shelf-tag-pill more" onclick="openFocusReader('${item.id}', event)" title="View all ${item.tags.length} tags in Focus Mode">+${item.tags.length - 3}</span>
+              ` : ''}
             </div>
           ` : ''}
         </div>
@@ -937,6 +979,10 @@
           <span class="shelf-card-date">${dateFormatted}</span>
 
           <div class="shelf-card-actions">
+            <button class="shelf-action-btn focus-btn" onclick="openFocusReader('${item.id}', event)" title="Open in distraction-free Focus Mode">
+              <span>🔍 Focus</span>
+            </button>
+
             <button class="shelf-action-btn" onclick="copyShelfMarkdown('${item.id}', event)" title="Copy Markdown reference snippet">
               <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M0 1.75C0 .784.784 0 1.75 0h7.5C9.716 0 10.5.784 10.5 1.75v3.5a.75.75 0 0 1-1.5 0V1.75a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V9.75a.75.75 0 0 1 1.5 0v4.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Zm12.03 3.47a.75.75 0 0 1 1.06 0l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L13.19 9H7.75a.75.75 0 0 1 0-1.5h5.44l-1.16-1.16a.75.75 0 0 1 0-1.06Z"></path>
@@ -956,12 +1002,11 @@
               <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25a1.75 1.75 0 0 1 .445-.758l8.61-8.61Zm1.414 1.06a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354l-1.086-1.086ZM9.75 4.81l-6.286 6.287a.25.25 0 0 0-.064.108l-.558 1.953 1.953-.558a.249.249 0 0 0 .108-.064L11.19 6.25 9.75 4.81Z"></path>
               </svg>
-              <span>Edit</span>
             </button>
 
             <button class="shelf-action-btn delete-btn" onclick="deleteShelfCard('${item.id}', event)" title="Remove discovery">
               <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75ZM4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 0 0 0 .249-.225l.66-6.6a.75.75 0 0 1 1.492.15l-.66 6.6A1.75 1.75 0 0 1 10.595 15H5.405a1.75 1.75 0 0 1-1.741-1.575l-.66-6.6a.75.75 0 1 1 1.492-.15ZM6.5 1.5h3a.25.25 0 0 0-.25-.25h-2.5a.25.25 0 0 0-.25.25Z"></path>
+                <path d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75ZM4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 0 0 0 .249-.225l.66-6.6a.75.75 0 0 1 1.492.15l-.66 6.6A1.75 1.75 0 0 1 10.595 15H5.405a1.75 1.75 0 0 1-1.741-1.575l-.66-6.6a.75.75 0 0 1 1.492-.15ZM6.5 1.5h3a.25.25 0 0 0-.25-.25h-2.5a.25.25 0 0 0-.25.25Z"></path>
               </svg>
             </button>
           </div>
@@ -1397,7 +1442,242 @@
     }
   });
 
+
+  // Insights toggle handler
+  function toggleCardInsights(id, event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    const cardEl = document.getElementById(`shelf-card-${id}`);
+    const isCurrentlyExpanded = expandedCardIds.has(id);
+    if (isCurrentlyExpanded) {
+      expandedCardIds.delete(id);
+    } else {
+      expandedCardIds.add(id);
+    }
+
+    if (cardEl) {
+      const drawer = cardEl.querySelector('.shelf-card-insights-drawer');
+      const btn = cardEl.querySelector('.shelf-insights-toggle-btn');
+      const chevron = cardEl.querySelector('.insights-chevron');
+      const btnText = cardEl.querySelector('.insights-text');
+      
+      const willBeOpen = !isCurrentlyExpanded;
+      if (drawer) drawer.style.display = willBeOpen ? 'flex' : 'none';
+      if (btn) btn.classList.toggle('open', willBeOpen);
+      if (chevron) chevron.classList.toggle('rotated', willBeOpen);
+      if (btnText) btnText.textContent = willBeOpen ? 'Collapse Insights' : 'Personal Context & Codebase Action';
+    } else {
+      renderDiscoveryUI();
+    }
+  }
+
+  // Focus Reader Mode
+  function openFocusReader(id, event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    const items = getFilteredDiscoveries();
+    if (!items.length) return;
+
+    let idx = items.findIndex(i => i.id === id);
+    if (idx === -1) idx = 0;
+    focusItemIndex = idx;
+    currentFocusItemId = items[idx].id;
+
+    renderFocusReaderContent();
+    const overlay = document.getElementById('shelf-focus-overlay');
+    if (overlay) overlay.classList.add('open');
+  }
+
+  function renderFocusReaderContent() {
+    const items = getFilteredDiscoveries();
+    if (!items.length || focusItemIndex < 0 || focusItemIndex >= items.length) return;
+    const item = items[focusItemIndex];
+    currentFocusItemId = item.id;
+
+    const overlay = document.getElementById('shelf-focus-overlay');
+    if (!overlay) return;
+
+    const domain = window.ShelfStore ? window.ShelfStore.extractDomain(item.url) : item.url;
+    const isStarred = Boolean(item.starred);
+    const typeMeta = TYPE_META[item.type] || { label: item.type || 'Resource', emoji: '📦' };
+
+    const counterEl = document.getElementById('shelf-focus-counter');
+    if (counterEl) counterEl.textContent = `${focusItemIndex + 1} of ${items.length}`;
+
+    const badgeEl = document.getElementById('shelf-focus-type-badge');
+    if (badgeEl) badgeEl.textContent = `${typeMeta.emoji} ${typeMeta.label}`;
+
+    const projectPill = document.getElementById('shelf-focus-project-pill');
+    if (projectPill) {
+      if (item.project) {
+        projectPill.style.display = 'inline-flex';
+        projectPill.textContent = `📁 ${item.project}`;
+      } else {
+        projectPill.style.display = 'none';
+      }
+    }
+
+    const starBtn = document.getElementById('shelf-focus-star-btn');
+    if (starBtn) {
+      starBtn.classList.toggle('starred', isStarred);
+      starBtn.title = isStarred ? 'Unstar discovery' : 'Star discovery';
+    }
+
+    const faviconEl = document.getElementById('shelf-focus-favicon');
+    if (faviconEl) {
+      if (item.favicon) {
+        faviconEl.src = item.favicon;
+        faviconEl.style.display = 'inline-block';
+      } else {
+        faviconEl.style.display = 'none';
+      }
+    }
+
+    const domainEl = document.getElementById('shelf-focus-domain');
+    if (domainEl) domainEl.textContent = domain;
+
+    const dateEl = document.getElementById('shelf-focus-date');
+    if (dateEl) {
+      dateEl.textContent = '• Saved ' + new Date(item.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    const titleEl = document.getElementById('shelf-focus-title');
+    if (titleEl) titleEl.textContent = item.title;
+
+    const urlLink = document.getElementById('shelf-focus-url-link');
+    if (urlLink) {
+      urlLink.href = item.url;
+      urlLink.textContent = item.url;
+    }
+
+    const openBtn = document.getElementById('shelf-focus-open-btn');
+    if (openBtn) openBtn.href = item.url;
+
+    const whySec = document.getElementById('shelf-focus-why-section');
+    const whyText = document.getElementById('shelf-focus-why-text');
+    if (whySec && whyText) {
+      if (item.whySaved) {
+        whySec.style.display = 'flex';
+        whyText.textContent = item.whySaved;
+      } else {
+        whySec.style.display = 'none';
+      }
+    }
+
+    const useSec = document.getElementById('shelf-focus-use-section');
+    const useText = document.getElementById('shelf-focus-use-text');
+    if (useSec && useText) {
+      if (item.potentialUse) {
+        useSec.style.display = 'flex';
+        useText.textContent = item.potentialUse;
+      } else {
+        useSec.style.display = 'none';
+      }
+    }
+
+    const tagsSec = document.getElementById('shelf-focus-tags-section');
+    const tagsWrap = document.getElementById('shelf-focus-tags-wrap');
+    if (tagsSec && tagsWrap) {
+      if (Array.isArray(item.tags) && item.tags.length > 0) {
+        tagsSec.style.display = 'flex';
+        tagsWrap.innerHTML = item.tags.map(t => `<span class="shelf-tag-pill" onclick="selectTagFilter('${escapeHtml(t)}'); closeFocusReaderDirect();">#${escapeHtml(t)}</span>`).join('');
+      } else {
+        tagsSec.style.display = 'none';
+      }
+    }
+  }
+
+  function closeFocusReader(event) {
+    if (event && event.target && event.target.id !== 'shelf-focus-overlay') return;
+    closeFocusReaderDirect();
+  }
+
+  function closeFocusReaderDirect() {
+    const overlay = document.getElementById('shelf-focus-overlay');
+    if (overlay) overlay.classList.remove('open');
+    currentFocusItemId = null;
+  }
+
+  function prevFocusItem() {
+    const items = getFilteredDiscoveries();
+    if (!items.length) return;
+    focusItemIndex = (focusItemIndex - 1 + items.length) % items.length;
+    renderFocusReaderContent();
+  }
+
+  function nextFocusItem() {
+    const items = getFilteredDiscoveries();
+    if (!items.length) return;
+    focusItemIndex = (focusItemIndex + 1) % items.length;
+    renderFocusReaderContent();
+  }
+
+  function toggleFocusStar() {
+    const items = getFilteredDiscoveries();
+    if (!items.length || focusItemIndex < 0 || focusItemIndex >= items.length) return;
+    const item = items[focusItemIndex];
+    toggleShelfCardStar(item.id);
+    renderFocusReaderContent();
+  }
+
+  function copyFocusMarkdown() {
+    const items = getFilteredDiscoveries();
+    if (!items.length || focusItemIndex < 0 || focusItemIndex >= items.length) return;
+    copyShelfMarkdown(items[focusItemIndex].id);
+  }
+
+  function copyFocusUrl() {
+    const items = getFilteredDiscoveries();
+    if (!items.length || focusItemIndex < 0 || focusItemIndex >= items.length) return;
+    copyShelfUrl(items[focusItemIndex].url);
+  }
+
+  function editFocusItem() {
+    const items = getFilteredDiscoveries();
+    if (!items.length || focusItemIndex < 0 || focusItemIndex >= items.length) return;
+    const item = items[focusItemIndex];
+    closeFocusReaderDirect();
+    openShelfModal(item.id);
+  }
+
+  // Global Keyboard listener for Focus Reader
+  window.addEventListener('keydown', (e) => {
+    const overlay = document.getElementById('shelf-focus-overlay');
+    if (overlay && overlay.classList.contains('open')) {
+      if (e.key === 'Escape') {
+        closeFocusReaderDirect();
+      } else if (e.key === 'ArrowLeft') {
+        prevFocusItem();
+      } else if (e.key === 'ArrowRight') {
+        nextFocusItem();
+      } else if (e.key === 's' || e.key === 'S') {
+        if (!['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+          toggleFocusStar();
+        }
+      } else if (e.key === 'c' || e.key === 'C') {
+        if (!['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+          copyFocusMarkdown();
+        }
+      }
+    }
+  });
+
+
   // Expose to window
+  root.toggleCardInsights = toggleCardInsights;
+  root.openFocusReader = openFocusReader;
+  root.closeFocusReader = closeFocusReader;
+  root.closeFocusReaderDirect = closeFocusReaderDirect;
+  root.prevFocusItem = prevFocusItem;
+  root.nextFocusItem = nextFocusItem;
+  root.toggleFocusStar = toggleFocusStar;
+  root.copyFocusMarkdown = copyFocusMarkdown;
+  root.copyFocusUrl = copyFocusUrl;
+  root.editFocusItem = editFocusItem;
   root.openShelfView = openShelfView;
   root.closeShelfView = closeShelfView;
   root.renderShelfUI = renderDiscoveryUI;

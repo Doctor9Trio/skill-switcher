@@ -36,6 +36,13 @@ Modern AI coding agents (Antigravity IDE, Claude Code, Gemini CLI, Cursor, Winds
 - **📚 The Shelf (Technology Discovery Library & Inspiration Graph)**:
   - High-speed personal engineering repository and design library.
   - Zero-friction **5-second Quick Capture** directly into your Inbox.
+  - **🎯 3 View Density Modes**:
+    - **🎯 Focused Grid (Default)**: Breathable, high-hierarchy cards with category accents, bold titles, 1-line essences, and on-demand expandable insight drawers (`💡 Personal Context & Codebase Action`).
+    - **📖 Detailed Grid**: Full context notes expanded inline with modern structured quote styling.
+    - **📋 Dense List View**: High-density table layout for rapid scanning across 27+ saved resources.
+  - **🔍 Distraction-Free Focus Reader Mode**:
+    - Full-screen zen reading modal with keyboard navigation (`←`/`→` to cycle, `Esc` to close, `S` to star, `C` to copy markdown).
+    - Eliminates repetitive boilerplates with clean typographic hierarchy, direct URL actions, and category badges.
   - **Curated Topic Collections**: Visual topic folders for *Design & Visual Identity*, *React & Animation Engines*, *Typography & Monospace Lab*, *CRO & Growth Psychology*, *AI Tools & Architectures*, and *Developer Tools*.
   - **1-Click Browser Bookmarklet**: Draggable bookmarklet button that captures any webpage or repository URL and title from any browser tab into your Shelf without leaving the page.
   - **Dual-Context Capture**: Captures both *"💭 Why I saved this"* (personal context) and *"🚀 Potential use"* (future application in active codebases).

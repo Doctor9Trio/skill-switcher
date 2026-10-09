@@ -1744,6 +1744,87 @@
       </div>
     </div>
 
+    <!-- Distraction-Free Focus Reader Modal -->
+    <div class="shelf-focus-overlay" id="shelf-focus-overlay" onclick="closeFocusReader(event)">
+      <div class="shelf-focus-window" onclick="event.stopPropagation()">
+        <!-- Header: Category, Counter, Navigation, Close -->
+        <div class="shelf-focus-header">
+          <div class="shelf-focus-header-left">
+            <span class="shelf-focus-badge" id="shelf-focus-type-badge">📦 Resource</span>
+            <span class="shelf-focus-project-pill" id="shelf-focus-project-pill" style="display:none;"></span>
+          </div>
+          <div class="shelf-focus-header-center" id="shelf-focus-counter">1 of 1</div>
+          <div class="shelf-focus-header-right">
+            <button class="shelf-focus-nav-btn" onclick="prevFocusItem()" title="Previous (←)">
+              <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M7.78 12.53a.75.75 0 0 1-1.06 0L2.47 8.28a.75.75 0 0 1 0-1.06l4.25-4.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L4.81 7h7.44a.75.75 0 0 1 0 1.5H4.81l2.97 2.97a.75.75 0 0 1 0 1.06Z"></path>
+              </svg>
+              <span>Prev</span>
+            </button>
+            <button class="shelf-focus-nav-btn" onclick="nextFocusItem()" title="Next (→)">
+              <span>Next</span>
+              <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8.22 3.47a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L11.19 9H3.75a.75.75 0 0 1 0-1.5h7.44L8.22 4.53a.75.75 0 0 1 0-1.06Z"></path>
+              </svg>
+            </button>
+            <button class="shelf-card-star-btn" id="shelf-focus-star-btn" onclick="toggleFocusStar()" title="Star / Favorite" style="margin-left:4px;">
+              <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"></path>
+              </svg>
+            </button>
+            <button class="btn-gh btn-gh-ghost btn-gh-sm" onclick="closeFocusReaderDirect()" title="Close (Esc)" style="margin-left:4px;">&times;</button>
+          </div>
+        </div>
+
+        <!-- Body: Hero Meta, Title, URL Bar, Insight Sections -->
+        <div class="shelf-focus-body">
+          <div>
+            <div class="shelf-focus-hero-meta">
+              <img id="shelf-focus-favicon" class="shelf-focus-favicon" src="" alt="" style="display:none;" />
+              <span id="shelf-focus-domain" class="shelf-focus-domain"></span>
+              <span id="shelf-focus-date"></span>
+            </div>
+            <h2 class="shelf-focus-title" id="shelf-focus-title"></h2>
+            <div class="shelf-focus-url-bar">
+              <a id="shelf-focus-url-link" class="shelf-focus-url-text" href="#" target="_blank" rel="noopener noreferrer"></a>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <button class="btn-gh btn-gh-sm" onclick="copyFocusUrl()" title="Copy link URL">Copy URL</button>
+                <a id="shelf-focus-open-btn" class="btn-gh btn-gh-primary btn-gh-sm" href="#" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">Open ↗</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="shelf-focus-sections">
+            <div class="shelf-focus-card-section" id="shelf-focus-why-section">
+              <h4 class="shelf-focus-section-heading">💭 Why I Saved This</h4>
+              <p class="shelf-focus-section-text" id="shelf-focus-why-text"></p>
+            </div>
+
+            <div class="shelf-focus-card-section" id="shelf-focus-use-section">
+              <h4 class="shelf-focus-section-heading">🚀 Potential Use & Codebase Action</h4>
+              <p class="shelf-focus-section-text highlight" id="shelf-focus-use-text"></p>
+            </div>
+
+            <div class="shelf-focus-card-section" id="shelf-focus-tags-section" style="display:none;">
+              <h4 class="shelf-focus-section-heading">🏷️ Tags</h4>
+              <div class="shelf-focus-tags-wrap" id="shelf-focus-tags-wrap"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer: Shortcuts guide, Edit, Copy Markdown -->
+        <div class="shelf-focus-footer">
+          <div class="shelf-focus-shortcuts-hint">
+            Shortcuts: <kbd>←</kbd> <kbd>→</kbd> Navigate • <kbd>Esc</kbd> Close • <kbd>S</kbd> Star • <kbd>C</kbd> Copy MD
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-gh btn-gh-sm" onclick="copyFocusMarkdown()">📄 Copy Markdown</button>
+            <button class="btn-gh btn-gh-sm" onclick="editFocusItem()">✏️ Edit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Skill Switcher JavaScript (load order: data → state → services → ui) -->
     <!-- 1. Data: static catalog, presets, categories, shelf store -->
     <script src="js/data/repos-catalog.js"></script>
