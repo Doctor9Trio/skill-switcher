@@ -88,20 +88,7 @@
   padding: 8px 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.skills-toolbar-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.skills-toolbar-row.categories-row {
-  border-bottom: 1px solid var(--border-muted);
-  padding-bottom: 8px;
+  gap: 6px;
 }
 
 .skills-context-toolbar .category-filter-strip,
@@ -114,6 +101,7 @@
 .skills-context-toolbar .preset-strip {
   max-width: 100% !important;
   margin: 0 !important;
+  padding: 4px 0 !important;
 }
 
 
@@ -589,7 +577,7 @@ html:not(.dark) .theme-icon-moon { display: inline-block; color: var(--fg-muted)
 .subnav-tab.active {
   color: var(--fg-default);
   font-weight: 600;
-  border-bottom-color: var(--accent-orange, #fd8c73);
+  border-bottom-color: var(--accent-blue, #0969da);
 }
 .subnav-tab svg.octicon {
   color: var(--fg-muted);

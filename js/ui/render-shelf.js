@@ -256,8 +256,7 @@
         <div class="shelf-empty-state">
           <div class="shelf-empty-icon">🏷️</div>
           <h3 class="shelf-empty-title">No Collections Yet</h3>
-          <p class="shelf-empty-text">Organize your discoveries by adding a Collection name when saving or editing resources.</p>
-          <button class="btn-gh btn-gh-primary" onclick="openShelfModal()">+ Create Discovery</button>
+          <p class="shelf-empty-text">Organize your discoveries by adding a Collection name in the curated library data.</p>
         </div>
       `;
     }
@@ -269,7 +268,6 @@
             <h2 class="collections-title">Curated Topic Collections</h2>
             <p class="collections-sub">Thematic knowledge silos connected to your active engineering domains.</p>
           </div>
-          <button class="btn-gh btn-gh-sm" onclick="openShelfModal()">+ New Discovery</button>
         </div>
         <div class="collections-grid">
           ${collections.map(col => {
@@ -442,74 +440,36 @@
                   <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M7.53 1.282a.5.5 0 0 1 .94 0l.732 2.253a4.5 4.5 0 0 0 2.893 2.893l2.253.732a.5.5 0 0 1 0 .94l-2.253.732a4.5 4.5 0 0 0-2.893 2.893l-.732 2.253a.5.5 0 0 1-.94 0l-.732-2.253a4.5 4.5 0 0 0-2.893-2.893L.655 8.16a.5.5 0 0 1 0-.94l2.253-.732a4.5 4.5 0 0 0 2.893-2.893L7.53 1.282Z"></path>
                   </svg>
-                  Discovery Graph
+                  Curated Tech Library
                 </span>
-                <span class="shelf-stat-pill">${stats.total} Total</span>
-                <span class="shelf-stat-pill ${stats.inbox > 0 ? 'amber' : ''}">📥 ${stats.inbox} Inbox</span>
-                <span class="shelf-stat-pill">📌 ${stats.active} Active</span>
+                <span class="shelf-stat-pill">${stats.total} Resources</span>
                 <span class="shelf-stat-pill">★ ${stats.starred} Starred</span>
+                <span class="shelf-stat-pill">🏷️ ${Object.keys(stats.collections || {}).length} Collections</span>
               </div>
-              <h1 class="shelf-title">Technology Discovery Library</h1>
+              <h1 class="shelf-title">Technology & Discovery Shelf</h1>
               <p class="shelf-desc">
-                Capture repos, designs, and tools in 5 seconds. Connect what you discover directly to your active engineering projects.
+                Curated directory of high-impact repositories, tools, UI systems, and engineering patterns.
               </p>
             </div>
 
             <!-- Global Action Buttons -->
             <div class="shelf-header-actions">
-              <button class="btn-gh btn-gh-primary shelf-add-btn" id="shelf-add-resource-btn" onclick="openShelfModal()" title="+ Add Resource">
-                <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"></path>
-                </svg>
-                <span>+ Add Resource</span>
-              </button>
-
-              <button class="btn-gh" onclick="openBookmarkletModal()" title="1-Click Browser Bookmarklet to save links from any tab">
-                <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="m3.5 1.75.006-.016a2.001 2.001 0 0 1 1.744-1.234H10.75a2 2 0 0 1 2 2v12.25a.75.75 0 0 1-1.22.586L8 12.336l-3.53 2.95A.75.75 0 0 1 3.25 14.7V1.75h.25Zm1.25.25a.5.5 0 0 0-.5.5v11.196l3.28-2.74a.75.75 0 0 1 .94 0l3.28 2.74V2.5a.5.5 0 0 0-.5-.5H4.75Z"></path>
-                </svg>
-                <span>Bookmarklet</span>
-              </button>
-
               <button class="btn-gh" onclick="exportShelfMD()" title="Download as clean Markdown reference graph">
                 <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M0 1.75C0 .784.784 0 1.75 0h7.5C9.716 0 10.5.784 10.5 1.75v3.5a.75.75 0 0 1-1.5 0V1.75a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V9.75a.75.75 0 0 1 1.5 0v4.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Zm12.03 3.47a.75.75 0 0 1 1.06 0l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L13.19 9H7.75a.75.75 0 0 1 0-1.5h5.44l-1.16-1.16a.75.75 0 0 1 0-1.06Z"></path>
+                  <path d="M0 1.75C0 .784.784 0 1.75 0h7.5C9.716 0 10.5.784 10.5 1.75v3.5a.75.75 0 0 1-1.5 0V1.75a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V9.75a.75.75 0 0 1 1.5 0v4.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Zm12.03 3.47a.75.75 0 0 1 1.06 0l2.5 2.5a.751.751 0 0 1 0 1.06l-2.5 2.5a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L13.19 9H7.75a.75.75 0 0 1 0-1.5h5.44l-1.16-1.16a.75.75 0 0 1 0-1.06Z"></path>
                 </svg>
                 <span>Export MD</span>
               </button>
 
-              <button class="btn-gh" onclick="exportShelfJSON()" title="Export JSON backup">
-                <span>Backup JSON</span>
-              </button>
-
-              <button class="btn-gh" onclick="triggerImportJSON()" title="Import discoveries">
-                <span>Import</span>
+              <button class="btn-gh" onclick="exportShelfJSON()" title="Export curated library as JSON">
+                <span>Export JSON</span>
               </button>
 
               <button class="btn-gh btn-gh-ghost" onclick="closeShelfView()" title="Back to Skills Switcher catalog">
-                <span>&larr; Skills</span>
+                <span>&larr; Back to Skills</span>
               </button>
             </div>
           </div>
-        </div>
-
-        <!-- 5-Second Zero-Friction Quick-Capture Strip -->
-        <div class="discovery-quick-strip">
-          <div class="discovery-quick-input-wrap">
-            <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="color:var(--fg-subtle);">
-              <path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"></path>
-            </svg>
-            <input
-              type="url"
-              id="quick-capture-url"
-              class="discovery-quick-input"
-              placeholder="Instant Capture: Paste any URL to save to Inbox in 5 seconds (Press Enter)..."
-              onkeydown="if(event.key==='Enter'){handleQuickCapture();}"
-            />
-          </div>
-          <button class="btn-gh btn-gh-primary" onclick="handleQuickCapture()" title="Quick save directly to Inbox">
-            <span>+ Save to Inbox</span>
-          </button>
         </div>
 
         <!-- Rediscover System Banner (Keeping saved things alive) -->
@@ -827,7 +787,7 @@
         <div class="discovery-list-head">
           <div>Discovery / URL</div>
           <div>Project / Context</div>
-          <div>Why Saved / Potential Use</div>
+          <div>Why Saved / Application</div>
           <div style="text-align:right;">Actions</div>
         </div>
         ${items.map(item => renderDiscoveryListRow(item)).join('')}
@@ -835,12 +795,11 @@
     `;
   }
 
-  // Individual Card Component with Enhanced Hierarchy & Expandable Insights
+  // Individual Card Component with Enhanced Hierarchy & Prominent External Links
   function renderDiscoveryCard(item) {
     const domain = window.ShelfStore ? window.ShelfStore.extractDomain(item.url) : item.url;
     const isStarred = Boolean(item.starred);
     const intent = INTENT_META[item.intent] || { label: item.intent, emoji: '📌' };
-    const status = STATUS_META[item.status] || { label: item.status, badgeClass: '', icon: '📌' };
     const typeMeta = TYPE_META[item.type] || { label: item.type || 'Resource', emoji: '📦' };
 
     const dateFormatted = new Date(item.createdAt || Date.now()).toLocaleDateString('en-US', {
@@ -848,15 +807,17 @@
       day: 'numeric'
     });
 
-    const isExpanded = currentViewMode === 'detailed' || expandedCardIds.has(item.id);
-    const essenceText = item.whySaved || item.potentialUse || item.title;
+    const descriptionText = item.description || 
+      (item.githubMeta && item.githubMeta.description) || 
+      item.whySaved || 
+      'Curated technical resource.';
 
     return `
       <div class="shelf-card ${isStarred ? 'is-starred' : ''} ${item.status === 'inbox' ? 'is-inbox' : ''}"
            id="shelf-card-${item.id}"
            data-type="${escapeHtml(item.type || 'other')}">
         
-        <!-- Top bar: Favicon + Domain + Category Badge + Star -->
+        <!-- Top bar: Favicon + Clickable Domain Link + Type Badge + Star -->
         <div class="shelf-card-top">
           <div class="shelf-card-source">
             <div class="shelf-card-favicon-wrap">
@@ -869,20 +830,16 @@
                 />
               ` : `<span class="shelf-card-favicon-fallback">${typeMeta.emoji}</span>`}
             </div>
-            <span class="shelf-card-domain" title="${escapeHtml(item.url)}">${escapeHtml(domain)}</span>
+            <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="shelf-card-domain-link" title="Visit original link: ${escapeHtml(item.url)}">
+              <span>${escapeHtml(domain)}</span>
+              <svg class="octicon" width="11" height="11" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.75.75a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0V3.81L9.53 8.28a.75.75 0 0 1-1.06-1.06l4.47-4.47H11.25a.75.75 0 0 1-.75-.75Z"></path>
+              </svg>
+            </a>
             <span class="shelf-card-type-badge">${typeMeta.emoji} ${typeMeta.label}</span>
           </div>
 
           <div class="shelf-card-top-right">
-            <!-- Status Badge -->
-            <button
-              class="disc-status-tag ${status.badgeClass}"
-              onclick="cycleDiscoveryStatus('${item.id}', event)"
-              title="Click to cycle status: Inbox -> Active -> In Use -> Archived"
-            >
-              ${status.icon} ${status.label}
-            </button>
-
             <!-- Star button -->
             <button
               class="shelf-card-star-btn ${isStarred ? 'starred' : ''}"
@@ -894,7 +851,7 @@
           </div>
         </div>
 
-        <!-- Body: Title Row, Essence, GitHub Stats, Expandable Insights, Tags -->
+        <!-- Body: Title Row, Description, GitHub Stats, Application Notes, Tags -->
         <div class="shelf-card-body">
           <div class="shelf-card-title-row">
             <h3 class="shelf-card-title">
@@ -902,59 +859,32 @@
                 ${escapeHtml(item.title)}
               </a>
             </h3>
-            <button class="shelf-card-quick-focus-btn" onclick="openFocusReader('${item.id}', event)" title="Open in distraction-free Focus Mode (Space / Click)">
-              🔍 Focus
-            </button>
+            <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="shelf-card-direct-link-btn" title="Open original website in new tab">
+              <span>Visit ↗</span>
+            </a>
           </div>
 
-          <!-- Crisp Single-Line Takeaway Essence -->
-          <p class="shelf-card-essence" title="${escapeHtml(essenceText)}">
-            ${escapeHtml(essenceText)}
+          <!-- Prominent Full Description -->
+          <p class="shelf-card-description">
+            ${escapeHtml(descriptionText)}
           </p>
 
-          <!-- GitHub Intelligence Pill (if repo) -->
+          <!-- GitHub Intelligence Bar (if repo) -->
           ${item.githubMeta ? `
             <div class="disc-github-bar">
               <div class="disc-gh-stat">
                 <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"></path></svg>
-                <span>${item.githubMeta.stars}</span>
+                <span>${item.githubMeta.stars} stars</span>
               </div>
               ${item.githubMeta.language ? `<span class="disc-gh-lang">${escapeHtml(item.githubMeta.language)}</span>` : ''}
-              ${item.githubMeta.description ? `<span class="disc-gh-desc" title="${escapeHtml(item.githubMeta.description)}">${escapeHtml(item.githubMeta.description)}</span>` : ''}
             </div>
           ` : ''}
 
-          <!-- Expandable Insight Drawer (No more forced repetitive boxes!) -->
-          ${(item.whySaved || item.potentialUse) ? `
-            <div class="shelf-insights-wrapper">
-              <button class="shelf-insights-toggle-btn ${isExpanded ? 'open' : ''}" onclick="toggleCardInsights('${item.id}', event)">
-                <span style="display:inline-flex;align-items:center;gap:5px;">
-                  <span>💡</span>
-                  <span class="insights-text">${isExpanded ? 'Collapse Insights' : 'Personal Context & Codebase Action'}</span>
-                </span>
-                <svg class="octicon insights-chevron ${isExpanded ? 'rotated' : ''}" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="m4.427 7.427 3.396 3.396a.25.25 0 0 0 .354 0l3.396-3.396A.25.25 0 0 0 11.396 7H4.604a.25.25 0 0 0-.177.427Z"/>
-                </svg>
-              </button>
-
-              <div class="shelf-card-insights-drawer ${isExpanded ? 'open' : ''}" style="${isExpanded ? 'display:flex;' : 'display:none;'}">
-                ${item.whySaved ? `
-                  <div class="shelf-insight-item why-insight">
-                    <div class="insight-label">
-                      <span>💭 Why I saved this:</span>
-                    </div>
-                    <div class="insight-body">${escapeHtml(item.whySaved)}</div>
-                  </div>
-                ` : ''}
-                ${item.potentialUse ? `
-                  <div class="shelf-insight-item use-insight">
-                    <div class="insight-label">
-                      <span>🚀 Codebase Application:</span>
-                    </div>
-                    <div class="insight-body">${escapeHtml(item.potentialUse)}</div>
-                  </div>
-                ` : ''}
-              </div>
+          <!-- Codebase Application Note -->
+          ${item.potentialUse ? `
+            <div class="shelf-card-note">
+              <span class="note-label">Use in Project:</span>
+              <span class="note-body">${escapeHtml(item.potentialUse)}</span>
             </div>
           ` : ''}
 
@@ -978,11 +908,11 @@
           <!-- Tags -->
           ${Array.isArray(item.tags) && item.tags.length > 0 ? `
             <div class="shelf-card-tags">
-              ${item.tags.slice(0, 3).map(t => `
+              ${item.tags.slice(0, 4).map(t => `
                 <span class="shelf-tag-pill" onclick="selectTagFilter('${escapeHtml(t)}', event)">#${escapeHtml(t)}</span>
               `).join('')}
-              ${item.tags.length > 3 ? `
-                <span class="shelf-tag-pill more" onclick="openFocusReader('${item.id}', event)" title="View all ${item.tags.length} tags in Focus Mode">+${item.tags.length - 3}</span>
+              ${item.tags.length > 4 ? `
+                <span class="shelf-tag-pill more" onclick="openFocusReader('${item.id}', event)" title="View all ${item.tags.length} tags in Focus Mode">+${item.tags.length - 4}</span>
               ` : ''}
             </div>
           ` : ''}
@@ -993,15 +923,20 @@
           <span class="shelf-card-date">${dateFormatted}</span>
 
           <div class="shelf-card-actions">
+            <!-- Dedicated Prominent External Link Button -->
+            <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="shelf-action-btn primary-visit-btn" title="Open original link: ${escapeHtml(item.url)}">
+              <span>Open Link ↗</span>
+            </a>
+
             <button class="shelf-action-btn focus-btn" onclick="openFocusReader('${item.id}', event)" title="Open in distraction-free Focus Mode">
               <span>🔍 Focus</span>
             </button>
 
             <button class="shelf-action-btn" onclick="copyShelfMarkdown('${item.id}', event)" title="Copy Markdown reference snippet">
               <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M0 1.75C0 .784.784 0 1.75 0h7.5C9.716 0 10.5.784 10.5 1.75v3.5a.75.75 0 0 1-1.5 0V1.75a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V9.75a.75.75 0 0 1 1.5 0v4.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Zm12.03 3.47a.75.75 0 0 1 1.06 0l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L13.19 9H7.75a.75.75 0 0 1 0-1.5h5.44l-1.16-1.16a.75.75 0 0 1 0-1.06Z"></path>
+                <path d="M0 1.75C0 .784.784 0 1.75 0h7.5C9.716 0 10.5.784 10.5 1.75v3.5a.75.75 0 0 1-1.5 0V1.75a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V9.75a.75.75 0 0 1 1.5 0v4.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Zm12.03 3.47a.75.75 0 0 1 1.06 0l2.5 2.5a.751.751 0 0 1 0 1.06l-2.5 2.5a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L13.19 9H7.75a.75.75 0 0 1 0-1.5h5.44l-1.16-1.16a.75.75 0 0 1 0-1.06Z"></path>
               </svg>
-              <span>📋 MD</span>
+              <span>MD</span>
             </button>
 
             <button class="shelf-action-btn" onclick="copyShelfUrl('${escapeHtml(item.url)}', event)" title="Copy URL">
@@ -1010,18 +945,6 @@
                 <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
               </svg>
               <span>Copy</span>
-            </button>
-
-            <button class="shelf-action-btn" onclick="openShelfModal('${item.id}', event)" title="Edit context & details">
-              <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25a1.75 1.75 0 0 1 .445-.758l8.61-8.61Zm1.414 1.06a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354l-1.086-1.086ZM9.75 4.81l-6.286 6.287a.25.25 0 0 0-.064.108l-.558 1.953 1.953-.558a.249.249 0 0 0 .108-.064L11.19 6.25 9.75 4.81Z"></path>
-              </svg>
-            </button>
-
-            <button class="shelf-action-btn delete-btn" onclick="deleteShelfCard('${item.id}', event)" title="Remove discovery">
-              <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75ZM4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 0 0 0 .249-.225l.66-6.6a.75.75 0 0 1 1.492.15l-.66 6.6A1.75 1.75 0 0 1 10.595 15H5.405a1.75 1.75 0 0 1-1.741-1.575l-.66-6.6a.75.75 0 0 1 1.492-.15ZM6.5 1.5h3a.25.25 0 0 0-.25-.25h-2.5a.25.25 0 0 0-.25.25Z"></path>
-              </svg>
             </button>
           </div>
         </div>
@@ -1057,8 +980,7 @@
         </div>
 
         <div class="disc-list-col-actions">
-          <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="btn-gh btn-gh-sm">Open ↗</a>
-          <button class="btn-gh btn-gh-sm" onclick="openShelfModal('${item.id}', event)">Edit</button>
+          <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="btn-gh btn-gh-sm btn-gh-primary" title="Open ${escapeHtml(item.url)}">Visit ↗</a>
         </div>
       </div>
     `;

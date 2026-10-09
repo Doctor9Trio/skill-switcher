@@ -1312,7 +1312,7 @@ html.dark .repo-key-indicator.configured {
 }
 .modal-tab-btn.active {
   color: var(--fg-default);
-  border-bottom-color: #fd8c73;
+  border-bottom-color: var(--accent-blue, #0969da);
   font-weight: 600;
 }
 .modal-tab-btn:hover:not(.active) {
@@ -2105,75 +2105,41 @@ html.dark .shelf-star-toggle.active {
 
 /* ========================================================
    THE SHELF — CARD COMPONENT & FOCUS SYSTEM
-   ======================================================== */
-
-.shelf-card {
-  --card-accent: #58a6ff;
-  --card-accent-bg: rgba(88, 166, 255, 0.1);
+   ======================================================== .shelf-card {
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-top: 3.5px solid var(--card-accent);
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
-              border-color 0.2s ease, 
-              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.18s ease, 
+              box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
 }
 
-/* Category Accent Theme Color Injections */
-.shelf-card[data-type="design"] {
-  --card-accent: #a855f7;
-  --card-accent-bg: rgba(168, 85, 247, 0.12);
-}
-.shelf-card[data-type="ai"] {
-  --card-accent: #06b6d4;
-  --card-accent-bg: rgba(6, 182, 212, 0.12);
-}
-.shelf-card[data-type="repo"] {
-  --card-accent: #3b82f6;
-  --card-accent-bg: rgba(59, 130, 246, 0.12);
-}
-.shelf-card[data-type="tool"] {
-  --card-accent: #f59e0b;
-  --card-accent-bg: rgba(245, 158, 11, 0.12);
-}
-.shelf-card[data-type="article"] {
-  --card-accent: #10b981;
-  --card-accent-bg: rgba(16, 185, 129, 0.12);
-}
-.shelf-card[data-type="video"] {
-  --card-accent: #ec4899;
-  --card-accent-bg: rgba(236, 72, 153, 0.12);
-}
-.shelf-card[data-type="other"] {
-  --card-accent: #64748b;
-  --card-accent-bg: rgba(100, 116, 139, 0.12);
-}
-
 .shelf-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--card-accent);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.12), 0 0 0 1px var(--card-accent);
+  transform: translateY(-2px);
+  border-color: var(--accent-blue, #0969da);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .shelf-card.is-starred {
-  box-shadow: 0 0 0 1px rgba(227, 179, 65, 0.4), 0 6px 16px rgba(227, 179, 65, 0.12);
+  border-color: rgba(227, 179, 65, 0.4);
+  box-shadow: 0 0 0 1px rgba(227, 179, 65, 0.25), 0 3px 8px rgba(0, 0, 0, 0.04);
 }
 
 .shelf-card.is-inbox {
   border-style: dashed;
 }
 
-/* Card Top bar: Favicon + Domain + Category Badge + Star */
+/* Card Top bar: Favicon + Domain Link + Type Badge + Star */
 .shelf-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px 8px;
+  padding: 8px 14px;
   gap: 8px;
   border-bottom: 1px solid var(--border-muted);
   background: var(--bg-subtle);
@@ -2182,7 +2148,7 @@ html.dark .shelf-star-toggle.active {
 .shelf-card-source {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   min-width: 0;
   flex: 1;
 }
@@ -2206,27 +2172,43 @@ html.dark .shelf-star-toggle.active {
   object-fit: contain;
 }
 
-.shelf-card-domain {
-  font-family: 'JetBrains Mono', monospace;
+.shelf-card-domain-link {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
   font-size: 11px;
+  font-weight: 500;
   color: var(--fg-muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.shelf-card-domain-link:hover {
+  color: var(--accent-blue, #0969da);
+  background: var(--bg-card);
+  border-color: var(--border-default);
+  text-decoration: none;
 }
 
 .shelf-card-type-badge {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 10.5px;
+  font-weight: 500;
   padding: 2px 7px;
-  border-radius: 9999px;
-  background: var(--card-accent-bg);
-  color: var(--card-accent);
+  border-radius: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-muted);
+  color: var(--fg-muted);
   white-space: nowrap;
-  letter-spacing: 0.2px;
 }
 
 .shelf-card-top-right {
@@ -2258,23 +2240,23 @@ html.dark .shelf-star-toggle.active {
 
 /* Card Body */
 .shelf-card-body {
-  padding: 14px 16px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   flex: 1;
 }
 
-/* Title Row with Quick Focus Button */
+/* Title Row with Direct Visit Link */
 .shelf-card-title-row {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 
 .shelf-card-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.35;
   color: var(--fg-default);
@@ -2290,44 +2272,66 @@ html.dark .shelf-star-toggle.active {
 }
 
 .shelf-card-title a:hover {
-  color: var(--card-accent);
+  color: var(--accent-blue, #0969da);
   text-decoration: underline;
 }
 
-.shelf-card-quick-focus-btn {
+.shelf-card-direct-link-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 5px;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 4px;
   font-size: 11px;
   font-weight: 500;
   background: var(--bg-subtle);
   border: 1px solid var(--border-default);
-  color: var(--fg-muted);
-  cursor: pointer;
+  color: var(--accent-blue, #0969da);
+  text-decoration: none;
   transition: all 0.12s ease;
   flex-shrink: 0;
 }
 
-.shelf-card-quick-focus-btn:hover {
-  background: var(--card-accent-bg);
-  border-color: var(--card-accent);
-  color: var(--card-accent);
-  transform: scale(1.02);
+.shelf-card-direct-link-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-blue, #0969da);
+  text-decoration: none;
 }
 
-/* Core Essence (Clean 1-2 lines takeaway) */
-.shelf-card-essence {
-  font-size: 13px;
-  line-height: 1.5;
+/* Full Clear Description */
+.shelf-card-description {
+  font-size: 12.5px;
+  line-height: 1.55;
   color: var(--fg-default);
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+/* Architecture Application Callout */
+.shelf-card-note {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-muted);
+  border-left: 3px solid var(--accent-blue, #0969da);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--fg-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.shelf-card-note .note-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--fg-default);
+}
+
+.shelf-card-note .note-body {
+  color: var(--fg-default);
 }
 
 /* GitHub Quick Stats Pill */
@@ -2335,105 +2339,25 @@ html.dark .shelf-star-toggle.active {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 9px;
+  padding: 4px 8px;
   background: var(--bg-subtle);
   border: 1px solid var(--border-muted);
-  border-radius: 5px;
+  border-radius: 4px;
   font-size: 11px;
   overflow: hidden;
 }
 
-/* Interactive Expandable Insight Drawer */
-.shelf-insights-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 2px;
-}
-
-.shelf-insights-toggle-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 500;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-muted);
-  color: var(--fg-muted);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.shelf-insights-toggle-btn:hover {
-  background: var(--bg-hover);
-  color: var(--fg-default);
-  border-color: var(--border-default);
-}
-
-.shelf-insights-toggle-btn.open {
-  background: var(--card-accent-bg);
-  border-color: var(--card-accent);
-  color: var(--card-accent);
-  font-weight: 600;
-}
-
-.insights-chevron {
-  transition: transform 0.2s ease;
-}
-.insights-chevron.rotated {
-  transform: rotate(180deg);
-}
-
-.shelf-card-insights-drawer {
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px 12px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-default);
-  border-radius: 8px;
-  animation: shelfFadeSlide 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes shelfFadeSlide {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.shelf-insight-item {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.insight-label {
+.disc-gh-stat {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: var(--fg-subtle);
-}
-
-.why-insight .insight-label {
   color: var(--fg-muted);
+  font-weight: 500;
 }
 
-.use-insight .insight-label {
-  color: #1a7f37;
-}
-html.dark .use-insight .insight-label {
-  color: #3fb950;
-}
-
-.insight-body {
-  color: var(--fg-default);
+.disc-gh-lang {
+  color: var(--fg-muted);
+  font-size: 11px;
 }
 
 /* Project & Collection Row */
@@ -2450,8 +2374,8 @@ html.dark .use-insight .insight-label {
   gap: 4px;
   font-size: 11px;
   font-weight: 500;
-  padding: 3px 8px;
-  border-radius: 5px;
+  padding: 2px 7px;
+  border-radius: 4px;
   background: var(--bg-subtle);
   border: 1px solid var(--border-muted);
   color: var(--fg-muted);
@@ -2469,14 +2393,14 @@ html.dark .use-insight .insight-label {
 .shelf-card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 4px;
 }
 
 .shelf-tag-pill {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
   font-size: 10px;
-  padding: 2px 7px;
-  border-radius: 4px;
+  padding: 2px 6px;
+  border-radius: 3px;
   background: var(--bg-subtle);
   border: 1px solid var(--border-muted);
   color: var(--fg-muted);
@@ -2500,7 +2424,7 @@ html.dark .use-insight .insight-label {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 14px;
+  padding: 7px 12px;
   border-top: 1px solid var(--border-muted);
   background: var(--bg-subtle);
   gap: 8px;
@@ -2520,8 +2444,8 @@ html.dark .use-insight .insight-label {
 .shelf-action-btn {
   background: var(--bg-card);
   border: 1px solid var(--border-default);
-  border-radius: 5px;
-  padding: 3px 7px;
+  border-radius: 4px;
+  padding: 3px 8px;
   font-size: 11px;
   color: var(--fg-muted);
   cursor: pointer;
@@ -2529,27 +2453,34 @@ html.dark .use-insight .insight-label {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  text-decoration: none;
 }
 
 .shelf-action-btn:hover {
   background: var(--bg-hover);
   color: var(--fg-default);
   border-color: var(--border-default);
+  text-decoration: none;
+}
+
+.shelf-action-btn.primary-visit-btn {
+  background: var(--accent-blue, #0969da);
+  border-color: var(--accent-blue, #0969da);
+  color: #ffffff !important;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.shelf-action-btn.primary-visit-btn:hover {
+  opacity: 0.92;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
 }
 
 .shelf-action-btn.focus-btn {
-  color: var(--accent-blue);
-  background: var(--accent-blue-bg);
-  border-color: var(--accent-blue-border);
+  color: var(--fg-default);
+  background: var(--bg-card);
   font-weight: 500;
-}
-.shelf-action-btn.focus-btn:hover {
-  transform: scale(1.05);
-}
-
-.shelf-action-btn.delete-btn:hover {
-  color: #cf222e;
-  border-color: #cf222e;
 }
 
 /* Empty State */
