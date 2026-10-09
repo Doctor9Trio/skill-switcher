@@ -69,7 +69,14 @@
     const navTab = document.getElementById('shelf-nav-tab');
     if (navTab) navTab.classList.add('active');
 
-    // Hide Skills-Switcher catalog elements
+    // Update Dynamic Breadcrumb
+    if (typeof window.setNavBreadcrumb === 'function') {
+      window.setNavBreadcrumb('discovery-library');
+    }
+
+    // Hide Skills-Switcher toolbar & catalog elements
+    const toolbar = document.getElementById('skills-context-toolbar');
+    if (toolbar) toolbar.style.display = 'none';
     const catStrip = document.querySelector('.category-filter-strip');
     const subnavSubstrip = document.getElementById('subnav-substrip');
     const presetStrip = document.querySelector('.preset-strip-container');
@@ -111,7 +118,14 @@
     const panel = document.getElementById('shelf-view-panel');
     if (panel) panel.style.display = 'none';
 
-    // Restore Skills-Switcher catalog
+    // Reset Dynamic Breadcrumb
+    if (typeof window.setNavBreadcrumb === 'function') {
+      window.setNavBreadcrumb('skills');
+    }
+
+    // Restore Skills-Switcher toolbar & catalog
+    const toolbar = document.getElementById('skills-context-toolbar');
+    if (toolbar) toolbar.style.display = '';
     const catStrip = document.querySelector('.category-filter-strip');
     const presetStrip = document.querySelector('.preset-strip-container');
     const appContainer = document.querySelector('.app-container');
@@ -122,7 +136,7 @@
     if (appContainer) appContainer.style.display = '';
     if (actionDock) actionDock.style.display = '';
 
-    const firstTab = document.querySelector('.subnav-tab:first-child');
+    const firstTab = document.getElementById('subnav-tab-catalog') || document.querySelector('.subnav-tab:first-child');
     if (firstTab) firstTab.classList.add('active');
 
     updateShelfNavCounter();

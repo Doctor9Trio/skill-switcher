@@ -56,6 +56,67 @@
   font-weight: 600;
 }
 
+.gh-crumb-section {
+  color: var(--fg-default);
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default);
+  font-size: 13px;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+.gh-crumb-section:hover {
+  background: var(--bg-hover);
+  border-color: var(--fg-subtle);
+}
+
+/* ========================================================
+   UNIFIED SKILLS CONTEXT & PRESETS COMMAND BAR
+   ======================================================== */
+.skills-context-toolbar {
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-default);
+  width: 100%;
+}
+
+.skills-toolbar-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 8px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skills-toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skills-toolbar-row.categories-row {
+  border-bottom: 1px solid var(--border-muted);
+  padding-bottom: 8px;
+}
+
+.skills-context-toolbar .category-filter-strip,
+.skills-context-toolbar .preset-strip-container {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.skills-context-toolbar .preset-strip {
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+
 .gh-pill {
   display: inline-flex;
   align-items: center;

@@ -108,3 +108,50 @@ setTimeout(() => {
     }, 15000);
   }
 }, 300);
+
+// --- Navigation Breadcrumb & Header Hierarchy Controller ---
+function setNavBreadcrumb(sectionId, customLabel) {
+  const crumbEl = document.getElementById('gh-crumb-current-section');
+  if (!crumbEl) return;
+
+  const SECTION_MAP = {
+    'skills': { id: 'skills', label: 'skills', title: 'Doctor9Trio / skill-switcher · Skills & Packs' },
+    'shelf': { id: 'discovery-library', label: 'discovery-library', title: 'Doctor9Trio / skill-switcher · Discovery Library' },
+    'discovery-library': { id: 'discovery-library', label: 'discovery-library', title: 'Doctor9Trio / skill-switcher · Discovery Library' },
+    'token-monitor': { id: 'token-monitor', label: 'token-monitor', title: 'Doctor9Trio / skill-switcher · Live Token Monitor' },
+    'laya': { id: 'laya-playground', label: 'laya-playground', title: 'Doctor9Trio / skill-switcher · Laya Playground' },
+    'laya-playground': { id: 'laya-playground', label: 'laya-playground', title: 'Doctor9Trio / skill-switcher · Laya Playground' },
+    'keys': { id: 'key-vault', label: 'key-vault', title: 'Doctor9Trio / skill-switcher · API Key Vault' },
+    'key-vault': { id: 'key-vault', label: 'key-vault', title: 'Doctor9Trio / skill-switcher · API Key Vault' },
+    'health': { id: 'verification-matrix', label: 'verification-matrix', title: 'Doctor9Trio / skill-switcher · Verification Matrix' },
+    'verification-matrix': { id: 'verification-matrix', label: 'verification-matrix', title: 'Doctor9Trio / skill-switcher · Verification Matrix' }
+  };
+
+  const info = SECTION_MAP[sectionId] || { id: sectionId, label: customLabel || sectionId, title: 'Doctor9Trio / skill-switcher · ' + (customLabel || sectionId) };
+  crumbEl.textContent = info.label;
+  crumbEl.setAttribute('data-section', info.id);
+  document.title = info.title;
+}
+
+function navigateHome() {
+  if (typeof closeShelfView === 'function') closeShelfView();
+  if (typeof filterMainCategory === 'function') filterMainCategory('all');
+  setNavBreadcrumb('skills');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function handleCrumbClick() {
+  const crumbEl = document.getElementById('gh-crumb-current-section');
+  const section = crumbEl ? crumbEl.getAttribute('data-section') : 'skills';
+  if (section === 'discovery-library' || section === 'shelf') {
+    if (typeof openShelfView === 'function') openShelfView();
+  } else if (section === 'token-monitor') {
+    window.location.href = 'pages/token-monitor.html';
+  } else {
+    navigateHome();
+  }
+}
+
+window.setNavBreadcrumb = setNavBreadcrumb;
+window.navigateHome = navigateHome;
+window.handleCrumbClick = handleCrumbClick;
