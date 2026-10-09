@@ -7,8 +7,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
   <img src="https://img.shields.io/badge/Interface-GitHub%20Primer-1f2328.svg" alt="Interface">
-  <img src="https://img.shields.io/badge/Verified%20Tools-87%20Subskills-success.svg" alt="87 Verified Tools">
-  <img src="https://img.shields.io/badge/The%20Shelf-Discovery%20Graph-blueviolet.svg" alt="The Shelf">
+  <img src="https://img.shields.io/badge/Verified%20Tools-105%20Subskills-success.svg" alt="87 Verified Tools">
+  <img src="https://img.shields.io/badge/The%20Shelf-27%20Discoveries-blueviolet.svg" alt="The Shelf">
   <img src="https://img.shields.io/badge/Offline-100%25%20Local-success.svg" alt="Local Offline">
   <img src="https://img.shields.io/badge/Author-Doctor9Trio-0969da.svg" alt="Author">
 </p>
@@ -43,12 +43,15 @@ Modern AI coding agents (Antigravity IDE, Claude Code, Gemini CLI, Cursor, Winds
   - **Interactive Tag Cloud**: Expandable drawer with live tag frequencies and instant cross-cutting filtering.
   - **1-Click Markdown Citation (`📋 MD`)**: Copies formatted markdown citations and filtered list exports for PRs, notes, and RFCs.
 - **Workflow Stacks (1-Click Presets)**:
-  - 🎨 **Frontend Motion** — GSAP Core, ScrollTrigger, React, Timeline, Motion Dev, Emil Kowalski Animate & Impeccable Design.
+  - 🎨 **Frontend Motion** — GSAP Core, ScrollTrigger, React, Timeline, Motion Dev, Animate, Impeccable, Make Interfaces Feel Better, Libraries.dev & Better Icons.
   - ⚡ **JEV DOM Loop** — Sub-second headless browser clicks & input verification loop, Drone spatial engine, Desktop agent, and Canny verifier.
   - 🧠 **System 1 Decision** — Laya non-autoregressive decision engine, Fast context compactor, Winnow noise filter, and Blink instant fixer.
   - 🛡️ **PR Review & Guard** — JEV multi-agent diff review, Canny verifier guardrails, and Semdecide semantic gates.
   - 📱 **Mobile App UX** — Appllama transit UX, Finch/Lungy pulse patterns, and Swift native styling.
-  - 🌐 **Full Suite** — Balanced, battle-tested full stack development context.
+  - ✍️ **Anti-Slop & Precision Writing** — Miqdad Badjuber's 38-rule corporate fluff elimination and ASD-STE100 Controlled English prompts.
+  - 🔁 **Ralph Loop Autonomous Loop** — Geoffrey Huntley's self-correcting agent loop with test-driven gates.
+  - 🏗️ **AI & ML Architect** — 8-stage production AI stack (Classical ML to MCP Agents & MLOps).
+  - 🌐 **Full Suite** — Balanced, battle-tested full stack development context across all 105 skills.
   - 💾 **Custom Presets** — Save and reload custom skill combinations from localStorage with one click.
 - **Interactive Full SKILL.md Reader**:
   - The Inspect modal features a dedicated **"Full SKILL.md Manual"** tab that reads the live markdown documentation directly from disk via local API and renders clean syntax-highlighted instructions, file line counts, and a copy button.
@@ -64,7 +67,7 @@ Modern AI coding agents (Antigravity IDE, Claude Code, Gemini CLI, Cursor, Winds
 - **Token Economy Calculator**:
   - Real-time token budget visualizer showing estimated context footprint and context savings percentage (e.g. `~2,940 tokens • 92% saved vs full catalog`).
 - **Local Verification Health Matrix**:
-  - Modal matrix listing all 87 subskills, file paths, file sizes, and verification status.
+  - Modal matrix listing all 105 subskills, file paths, file sizes, and verification status.
 - **100% Offline & Private**:
   - Zero telemetry, zero cloud lock-in. All credentials and configurations stay strictly on your local machine.
 
@@ -356,12 +359,33 @@ The agent will report all active skills and line references from `active-skills.
 Yes! Place any skill folder inside `.agents/skills/<your-skill-name>/` containing a `SKILL.md` file. Skill Switcher will automatically detect and verify it.
 </details>
 
+
+---
+
+## 🚀 Newly Added Skills & Community Curations
+
+Skill Switcher now bundles **9 additional production-ready skills** and **19 new discoveries in The Shelf** extracted from real-world engineering reels, Threads, and X developer deep-dives:
+
+| Skill | Category | Source / Creator | Core Value |
+|---|---|---|---|
+| **`logo-design-skill`** | Design / SVG | Kaan Kiziltug | 1,400+ SVG logos, optical overshoot, geometric grid alignment, and 16px favicon legibility test. |
+| **`antislop`** | Writing / Rules | Miqdad Badjuber | 38 mandatory rules eliminating synthetic AI jargon ("delve", "tapestry", "testament") and throat-clearing fluff. |
+| **`make-interfaces-feel-better`** | UI / UX | Jakub Krehel | Nested concentric border radius (R_outer = R_inner + padding), optical visual weight balance, and 120ms physics curves. |
+| **`better-icons`** | DevTools / CLI | Better Icons | 200,000+ icons from 150+ icon packs (Lucide, Heroicons, Phosphor, Tabler) accessible via CLI and MCP. |
+| **`libraries-dev`** | Frontend / FX | Libraries.dev | Shimmering border beams, thinking orbs, voice pulse glows, gooey blobs, and metal shader effects. |
+| **`ralph-loop`** | AI / Agentic | Geoffrey Huntley | Autonomous state machine agent loop: Plan -> Execute -> Test/Lint -> Diff Check -> Auto-Remediate -> Commit. |
+| **`controlled-english-ste`** | Prompting / Spec | Andrej Karpathy / STE | ASD-STE100 aerospace specification: <=20 word sentences, single-meaning vocabulary roots to eliminate LLM hallucinations. |
+| **`tour-onboarding-engine`** | Frontend / Tours | Intro.js / Reactour / Onborda | Multi-framework onboarding guide with spotlight SVG masks, step persistence, and accessible keyboard navigation. |
+| **`ai-engineer-roadmap`** | AI / MLOps | AI Engineering Community | 8-stage complete curriculum from Classical ML & Deep Learning to RAG, Autonomous MCP Agents, Fine-Tuning, and MLOps. |
+
+---
+
 ## 📁 Repository Structure
 
 ```
 Skills-Switcher/
 ├── .agents/
-│   └── skills/                  # 85+ Bundled, production-ready JEV, Laya, GSAP & MCP skills
+│   └── skills/                  # 105+ Bundled, production-ready JEV, Laya, GSAP & MCP skills
 │       ├── laya/                # Multilingual non-autoregressive System 1 decision engine
 │       ├── jev-ultrafast/       # High-speed DOM automation loop
 │       ├── fast-jev-compaction/ # Context-window token compactor
@@ -375,7 +399,7 @@ Skills-Switcher/
 │
 ├── js/                          # Modular JavaScript
 │   ├── data/
-│   │   ├── repos-catalog.js     # All 62+ skill repository definitions + REPOS array
+│   │   ├── repos-catalog.js     # All 50 skill repository definitions (105 subskills) + REPOS array
 │   │   ├── presets.js           # WORKFLOW_PRESETS & category definitions
 │   │   └── shelf-store.js       # The Shelf: Discovery Store, Collections & Markdown Engine
 │   ├── state/

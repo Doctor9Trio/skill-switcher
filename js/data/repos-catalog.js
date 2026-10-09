@@ -2092,6 +2092,528 @@ const REPOS = [
       }
     ],
     "hasApiKey": true
+  },
+  {
+    "id": "repo-logo-design",
+    "name": "Logo Design Skill",
+    "desc": "Production-grade logo design agent by Kaan Kiziltug with 1,400+ categorized SVG logos, optical overshoot, and 16px favicon legibility checks.",
+    "stars": "3,150",
+    "cat": "design",
+    "subskills": [
+      {
+        "id": "logo-design-skill",
+        "name": "Logo Design Skill (1,400+ SVG Logos)",
+        "cat": "design",
+        "desc": "Precision vector logo designer following Paul Rand & Dieter Rams design criteria, optical overshoot compensation, and SVG export.",
+        "purpose": "Generate distinctive, geometrically balanced vector brand identities and icon marks that scale flawlessly down to 16px.",
+        "trigger": "design a logo, brand identity vector, create SVG logo mark",
+        "example_prompt": "Design a minimalist logo for an autonomous developer tool named 'Antigravity' following the 16px favicon test.",
+        "files": [
+          ".agents/skills/logo-design-skill/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/kaankiziltug/logo-design-skill.git",
+        "act": "LOGO DESIGN: Enforce optical overshoot, geometric grid alignment, and verify crispness at 16x16, 32x32, and 512x512 SVG viewboxes.",
+        "repoName": "kaankiziltug/logo-design-skill",
+        "repoUrl": "https://github.com/kaankiziltug/logo-design-skill",
+        "lang": "SVG / Design",
+        "langColor": "#ff9900",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-antislop",
+    "name": "Anti-Slop AI Quality Gatekeeper",
+    "desc": "Miqdad Badjuber's 38-rule system eliminating AI slop, synthetic jargon, throat-clearing intros, and hallucinated features.",
+    "stars": "4,820",
+    "cat": "writing",
+    "subskills": [
+      {
+        "id": "antislop",
+        "name": "Anti-Slop AI Writing & Code Gatekeeper",
+        "cat": "writing",
+        "desc": "Strict 38-rule audit pipeline banning corporate AI buzzwords ('delve', 'tapestry', 'testament') and enforcing concrete facts.",
+        "purpose": "Ensure all generated content, documentation, copy, and code commit notes are authentic, sharp, and free of AI filler.",
+        "trigger": "review for slop, remove AI fluff, audit writing tone, antislop audit",
+        "example_prompt": "Audit this landing page hero section and feature list using antislop rules. Replace all synthetic buzzwords with concrete figures.",
+        "files": [
+          ".agents/skills/antislop/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/miqdad/antislop.git",
+        "act": "ANTISLOP: Strike out throat-clearing fluff, ban banned vocabulary ('delve', 'testament', 'seamlessly'), and demand verifiable claims.",
+        "repoName": "miqdad/antislop",
+        "repoUrl": "https://github.com/miqdad/antislop",
+        "lang": "Markdown / Rules",
+        "langColor": "#e11d48",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-interface-polish",
+    "name": "Make Interfaces Feel Better",
+    "desc": "Jakub Krehel's micro-interaction design guide: concentric radii (R_outer = R_inner + padding), optical alignment, and dynamic transitions.",
+    "stars": "3,670",
+    "cat": "design",
+    "subskills": [
+      {
+        "id": "make-interfaces-feel-better",
+        "name": "Make Interfaces Feel Better (Micro-Polish)",
+        "cat": "design",
+        "desc": "Calculates nested border radii, prevents awkward border stacking, fixes optical visual weight, and implements snappy physics curves.",
+        "purpose": "Turn standard, clunky UI components into boutique-grade, Apple/Stripe-level tactile digital surfaces.",
+        "trigger": "polish UI micro-interactions, fix nested border radius, optical alignment CSS",
+        "example_prompt": "Audit this card modal component with nested buttons and tags. Apply concentric radius formulas and active scale states.",
+        "files": [
+          ".agents/skills/make-interfaces-feel-better/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/jakubkrehel/make-interfaces-feel-better.git",
+        "act": "INTERFACE POLISH: Calculate nested radii R_in = max(0, R_out - p), add text-wrap: balance, and apply 120ms cubic-bezier active states.",
+        "repoName": "jakubkrehel/make-interfaces-feel-better",
+        "repoUrl": "https://github.com/jakubkrehel/make-interfaces-feel-better",
+        "lang": "CSS / Design",
+        "langColor": "#8b5cf6",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-better-icons",
+    "name": "Better Icons MCP & CLI",
+    "desc": "Access 200,000+ curated icons across 150+ popular open-source icon packs (Lucide, Heroicons, Phosphor, Tabler, Radix) via CLI & MCP.",
+    "stars": "2,980",
+    "cat": "devtools",
+    "subskills": [
+      {
+        "id": "better-icons",
+        "name": "Better Icons MCP & Search",
+        "cat": "devtools",
+        "desc": "Zero-friction icon search and inline SVG insertion across Lucide, Heroicons, Phosphor, Simple Icons, and 150+ library sets.",
+        "purpose": "Instantly fetch consistent, vector-perfect icons by semantic keyword without opening an external browser or npm pack.",
+        "trigger": "search icons, get icon SVG, better-icons Lucide Heroicons",
+        "example_prompt": "Find and insert Lucide icons for 'cloud-rain', 'shield-check', and 'terminal' formatted as inline accessible SVG.",
+        "files": [
+          ".agents/skills/better-icons/SKILL.md"
+        ],
+        "clone_cmd": "npm i -g @better-icons/cli",
+        "act": "BETTER ICONS: Search icon sets matching intent, return clean optimized SVG with stroke-width: 1.5, viewBox, and aria-hidden.",
+        "repoName": "better-icons/better-icons",
+        "repoUrl": "https://github.com/better-icons/better-icons",
+        "lang": "TypeScript",
+        "langColor": "#3178c6",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-libraries-dev",
+    "name": "Libraries.dev Reactive UI Effects",
+    "desc": "Curated showcase of cutting-edge interactive effects: Border Beams, Thinking Orbs, Voice Pulse Glows, Gooey Blobs, and Metal textures.",
+    "stars": "2,540",
+    "cat": "frontend",
+    "subskills": [
+      {
+        "id": "libraries-dev",
+        "name": "Libraries.dev Modern Web Effects",
+        "cat": "frontend",
+        "desc": "Hardware-accelerated CSS and Canvas visual effects: dynamic border beams, audio reactive waveforms, and liquid fluid blobs.",
+        "purpose": "Give AI tools, dashboard cards, and interactive applications stunning, high-tier visual energy without bulky dependencies.",
+        "trigger": "add border beam effect, thinking orb animation, voice glow audio waves",
+        "example_prompt": "Add a shimmering border beam animation and a glowing voice avatar to the assistant response container.",
+        "files": [
+          ".agents/skills/libraries-dev/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/libraries-dev/ui-effects.git",
+        "act": "LIBRARIES.DEV EFFECTS: Inject hardware-accelerated CSS keyframes and CSS custom properties for vibrant, fluid interactive states.",
+        "repoName": "libraries-dev/ui-effects",
+        "repoUrl": "https://github.com/libraries-dev/ui-effects",
+        "lang": "CSS / JS",
+        "langColor": "#f59e0b",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-ralph-loop",
+    "name": "Ralph Loop Autonomous Agentic Loop",
+    "desc": "Geoffrey Huntley's deterministic loop pattern for self-correcting agent execution with test-driven gates and non-interactive autonomy.",
+    "stars": "5,310",
+    "cat": "ai",
+    "subskills": [
+      {
+        "id": "ralph-loop",
+        "name": "Ralph Loop Self-Correcting Execution",
+        "cat": "ai",
+        "desc": "State machine agent protocol: Plan -> Execute -> Test/Lint -> Diff Check -> Auto-Remediate -> Commit, terminating only on 100% green tests.",
+        "purpose": "Run complex multi-file engineering migrations autonomously without human intervention or premature exits.",
+        "trigger": "ralph loop, autonomous self-correction, run until tests pass",
+        "example_prompt": "Execute refactoring of the authentication module using Ralph Loop. Do not stop until all test suites pass with 0 lint errors.",
+        "files": [
+          ".agents/skills/ralph-loop/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/ghuntley/ralph.git",
+        "act": "RALPH LOOP: Enforce strict gatekeeping (RED -> GREEN -> REFACTOR), capture stdout/stderr, diagnose failures, and repeat iteratively.",
+        "repoName": "ghuntley/ralph",
+        "repoUrl": "https://github.com/ghuntley/ralph",
+        "lang": "Shell / Agent",
+        "langColor": "#10b981",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-controlled-ste",
+    "name": "Controlled Simplified Technical English (ASD-STE100)",
+    "desc": "Andrej Karpathy-inspired precision communication framework based on ASD-STE100 aerospace specification to stop LLM drift.",
+    "stars": "3,890",
+    "cat": "ai",
+    "subskills": [
+      {
+        "id": "controlled-english-ste",
+        "name": "Controlled English ASD-STE100 Specification",
+        "cat": "ai",
+        "desc": "Limits vocabulary to approved unambiguous roots, enforces <=20 word imperative sentences, and bans passive voice for bulletproof prompts.",
+        "purpose": "Eliminate semantic ambiguity in mission-critical prompts, system instructions, and agent reasoning chains.",
+        "trigger": "rewrite in controlled english, ASD-STE100 prompt, unambiguous instructions",
+        "example_prompt": "Rewrite our system deployment instructions into ASD-STE100 Controlled English so the autonomous agent makes zero misinterpretations.",
+        "files": [
+          ".agents/skills/controlled-english-ste/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/karpathy/ste-prompting.git",
+        "act": "CONTROLLED ENGLISH: One word = one meaning. Sentences <= 20 words. Active voice only. Action verbs in imperative mood.",
+        "repoName": "karpathy/ste-prompting",
+        "repoUrl": "https://github.com/karpathy/ste-prompting",
+        "lang": "Prompting / Spec",
+        "langColor": "#6366f1",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-tour-onboarding",
+    "name": "Product Onboarding Tour Engine",
+    "desc": "Triad onboarding guide comparing Intro.js, Reactour, and Next.js Onborda with framer-motion positioning, backdrop masking, and storage persistence.",
+    "stars": "4,120",
+    "cat": "frontend",
+    "subskills": [
+      {
+        "id": "tour-onboarding-engine",
+        "name": "Tour Onboarding Engine (Intro.js / Reactour / Onborda)",
+        "cat": "frontend",
+        "desc": "Architect interactive walkthroughs, spotlight overlays, SVG mask cutouts, and step progression with zero layout shift.",
+        "purpose": "Drive first-time user activation with delightful, accessible, keyboard-controllable product tours across React and vanilla apps.",
+        "trigger": "add onboarding tour, product walkthrough, highlight tour steps",
+        "example_prompt": "Scaffold a 4-step onboarding tour introducing new users to The Shelf, the Skill Switcher, and the Custom Presets.",
+        "files": [
+          ".agents/skills/tour-onboarding-engine/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/usablica/intro.js.git",
+        "act": "TOUR ENGINE: Attach high-contrast spotlight overlay, handle resize dynamically, bind Escape/Arrow keys, and save completion to localStorage.",
+        "repoName": "usablica/intro.js",
+        "repoUrl": "https://github.com/usablica/intro.js",
+        "lang": "JavaScript",
+        "langColor": "#f7df1e",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-ai-engineer-roadmap",
+    "name": "8-Stage AI & ML Engineering Roadmap",
+    "desc": "Comprehensive curriculum from Classical ML & Deep Learning through LLMs, RAG, Autonomous Agents (MCP), Fine-Tuning, High-Throughput APIs, and MLOps.",
+    "stars": "8,950",
+    "cat": "ai",
+    "subskills": [
+      {
+        "id": "ai-engineer-roadmap",
+        "name": "AI & ML Engineering Roadmap (Stages 1-8)",
+        "cat": "ai",
+        "desc": "Full architectural guides, tech stacks, and implementation blueprints spanning PyTorch, LangChain, vLLM, Vector DBs, MCP, and Triton.",
+        "purpose": "Provide systematic, production-ready engineering patterns across every layer of the modern AI/LLM stack.",
+        "trigger": "AI engineer roadmap, RAG architecture, agent orchestration blueprint, MLOps stack",
+        "example_prompt": "Show the Stage 4 (Advanced RAG) and Stage 5 (Autonomous Agents & MCP) reference architectures with recommended libraries.",
+        "files": [
+          ".agents/skills/ai-engineer-roadmap/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/ai-engineer/roadmap.git",
+        "act": "AI ROADMAP: Reference concrete production libraries (FastAPI, vLLM, Qdrant, LangGraph, vLLM, DeepSpeed) and multi-turn evaluation metrics.",
+        "repoName": "ai-engineer/roadmap",
+        "repoUrl": "https://github.com/ai-engineer/roadmap",
+        "lang": "Python / AI",
+        "langColor": "#3572A5",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-logo-design",
+    "name": "Logo Design Skill",
+    "desc": "Production-grade logo design agent by Kaan Kiziltug with 1,400+ categorized SVG logos, optical overshoot, and 16px favicon legibility checks.",
+    "stars": "3,150",
+    "cat": "design",
+    "subskills": [
+      {
+        "id": "logo-design-skill",
+        "name": "Logo Design Skill (1,400+ SVG Logos)",
+        "cat": "design",
+        "desc": "Precision vector logo designer following Paul Rand & Dieter Rams design criteria, optical overshoot compensation, and SVG export.",
+        "purpose": "Generate distinctive, geometrically balanced vector brand identities and icon marks that scale flawlessly down to 16px.",
+        "trigger": "design a logo, brand identity vector, create SVG logo mark",
+        "example_prompt": "Design a minimalist logo for an autonomous developer tool named 'Antigravity' following the 16px favicon test.",
+        "files": [
+          ".agents/skills/logo-design-skill/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/kaankiziltug/logo-design-skill.git",
+        "act": "LOGO DESIGN: Enforce optical overshoot, geometric grid alignment, and verify crispness at 16x16, 32x32, and 512x512 SVG viewboxes.",
+        "repoName": "kaankiziltug/logo-design-skill",
+        "repoUrl": "https://github.com/kaankiziltug/logo-design-skill",
+        "lang": "SVG / Design",
+        "langColor": "#ff9900",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-antislop",
+    "name": "Anti-Slop AI Quality Gatekeeper",
+    "desc": "Miqdad Badjuber's 38-rule system eliminating AI slop, synthetic jargon, throat-clearing intros, and hallucinated features.",
+    "stars": "4,820",
+    "cat": "writing",
+    "subskills": [
+      {
+        "id": "antislop",
+        "name": "Anti-Slop AI Writing & Code Gatekeeper",
+        "cat": "writing",
+        "desc": "Strict 38-rule audit pipeline banning corporate AI buzzwords ('delve', 'tapestry', 'testament') and enforcing concrete facts.",
+        "purpose": "Ensure all generated content, documentation, copy, and code commit notes are authentic, sharp, and free of AI filler.",
+        "trigger": "review for slop, remove AI fluff, audit writing tone, antislop audit",
+        "example_prompt": "Audit this landing page hero section and feature list using antislop rules. Replace all synthetic buzzwords with concrete figures.",
+        "files": [
+          ".agents/skills/antislop/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/miqdad/antislop.git",
+        "act": "ANTISLOP: Strike out throat-clearing fluff, ban banned vocabulary ('delve', 'testament', 'seamlessly'), and demand verifiable claims.",
+        "repoName": "miqdad/antislop",
+        "repoUrl": "https://github.com/miqdad/antislop",
+        "lang": "Markdown / Rules",
+        "langColor": "#e11d48",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-interface-polish",
+    "name": "Make Interfaces Feel Better",
+    "desc": "Jakub Krehel's micro-interaction design guide: concentric radii (R_outer = R_inner + padding), optical alignment, and dynamic transitions.",
+    "stars": "3,670",
+    "cat": "design",
+    "subskills": [
+      {
+        "id": "make-interfaces-feel-better",
+        "name": "Make Interfaces Feel Better (Micro-Polish)",
+        "cat": "design",
+        "desc": "Calculates nested border radii, prevents awkward border stacking, fixes optical visual weight, and implements snappy physics curves.",
+        "purpose": "Turn standard, clunky UI components into boutique-grade, Apple/Stripe-level tactile digital surfaces.",
+        "trigger": "polish UI micro-interactions, fix nested border radius, optical alignment CSS",
+        "example_prompt": "Audit this card modal component with nested buttons and tags. Apply concentric radius formulas and active scale states.",
+        "files": [
+          ".agents/skills/make-interfaces-feel-better/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/jakubkrehel/make-interfaces-feel-better.git",
+        "act": "INTERFACE POLISH: Calculate nested radii R_in = max(0, R_out - p), add text-wrap: balance, and apply 120ms cubic-bezier active states.",
+        "repoName": "jakubkrehel/make-interfaces-feel-better",
+        "repoUrl": "https://github.com/jakubkrehel/make-interfaces-feel-better",
+        "lang": "CSS / Design",
+        "langColor": "#8b5cf6",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-better-icons",
+    "name": "Better Icons MCP & CLI",
+    "desc": "Access 200,000+ curated icons across 150+ popular open-source icon packs (Lucide, Heroicons, Phosphor, Tabler, Radix) via CLI & MCP.",
+    "stars": "2,980",
+    "cat": "devtools",
+    "subskills": [
+      {
+        "id": "better-icons",
+        "name": "Better Icons MCP & Search",
+        "cat": "devtools",
+        "desc": "Zero-friction icon search and inline SVG insertion across Lucide, Heroicons, Phosphor, Simple Icons, and 150+ library sets.",
+        "purpose": "Instantly fetch consistent, vector-perfect icons by semantic keyword without opening an external browser or npm pack.",
+        "trigger": "search icons, get icon SVG, better-icons Lucide Heroicons",
+        "example_prompt": "Find and insert Lucide icons for 'cloud-rain', 'shield-check', and 'terminal' formatted as inline accessible SVG.",
+        "files": [
+          ".agents/skills/better-icons/SKILL.md"
+        ],
+        "clone_cmd": "npm i -g @better-icons/cli",
+        "act": "BETTER ICONS: Search icon sets matching intent, return clean optimized SVG with stroke-width: 1.5, viewBox, and aria-hidden.",
+        "repoName": "better-icons/better-icons",
+        "repoUrl": "https://github.com/better-icons/better-icons",
+        "lang": "TypeScript",
+        "langColor": "#3178c6",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-libraries-dev",
+    "name": "Libraries.dev Reactive UI Effects",
+    "desc": "Curated showcase of cutting-edge interactive effects: Border Beams, Thinking Orbs, Voice Pulse Glows, Gooey Blobs, and Metal textures.",
+    "stars": "2,540",
+    "cat": "frontend",
+    "subskills": [
+      {
+        "id": "libraries-dev",
+        "name": "Libraries.dev Modern Web Effects",
+        "cat": "frontend",
+        "desc": "Hardware-accelerated CSS and Canvas visual effects: dynamic border beams, audio reactive waveforms, and liquid fluid blobs.",
+        "purpose": "Give AI tools, dashboard cards, and interactive applications stunning, high-tier visual energy without bulky dependencies.",
+        "trigger": "add border beam effect, thinking orb animation, voice glow audio waves",
+        "example_prompt": "Add a shimmering border beam animation and a glowing voice avatar to the assistant response container.",
+        "files": [
+          ".agents/skills/libraries-dev/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/libraries-dev/ui-effects.git",
+        "act": "LIBRARIES.DEV EFFECTS: Inject hardware-accelerated CSS keyframes and CSS custom properties for vibrant, fluid interactive states.",
+        "repoName": "libraries-dev/ui-effects",
+        "repoUrl": "https://github.com/libraries-dev/ui-effects",
+        "lang": "CSS / JS",
+        "langColor": "#f59e0b",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-ralph-loop",
+    "name": "Ralph Loop Autonomous Agentic Loop",
+    "desc": "Geoffrey Huntley's deterministic loop pattern for self-correcting agent execution with test-driven gates and non-interactive autonomy.",
+    "stars": "5,310",
+    "cat": "ai",
+    "subskills": [
+      {
+        "id": "ralph-loop",
+        "name": "Ralph Loop Self-Correcting Execution",
+        "cat": "ai",
+        "desc": "State machine agent protocol: Plan -> Execute -> Test/Lint -> Diff Check -> Auto-Remediate -> Commit, terminating only on 100% green tests.",
+        "purpose": "Run complex multi-file engineering migrations autonomously without human intervention or premature exits.",
+        "trigger": "ralph loop, autonomous self-correction, run until tests pass",
+        "example_prompt": "Execute refactoring of the authentication module using Ralph Loop. Do not stop until all test suites pass with 0 lint errors.",
+        "files": [
+          ".agents/skills/ralph-loop/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/ghuntley/ralph.git",
+        "act": "RALPH LOOP: Enforce strict gatekeeping (RED -> GREEN -> REFACTOR), capture stdout/stderr, diagnose failures, and repeat iteratively.",
+        "repoName": "ghuntley/ralph",
+        "repoUrl": "https://github.com/ghuntley/ralph",
+        "lang": "Shell / Agent",
+        "langColor": "#10b981",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-controlled-ste",
+    "name": "Controlled Simplified Technical English (ASD-STE100)",
+    "desc": "Andrej Karpathy-inspired precision communication framework based on ASD-STE100 aerospace specification to stop LLM drift.",
+    "stars": "3,890",
+    "cat": "ai",
+    "subskills": [
+      {
+        "id": "controlled-english-ste",
+        "name": "Controlled English ASD-STE100 Specification",
+        "cat": "ai",
+        "desc": "Limits vocabulary to approved unambiguous roots, enforces <=20 word imperative sentences, and bans passive voice for bulletproof prompts.",
+        "purpose": "Eliminate semantic ambiguity in mission-critical prompts, system instructions, and agent reasoning chains.",
+        "trigger": "rewrite in controlled english, ASD-STE100 prompt, unambiguous instructions",
+        "example_prompt": "Rewrite our system deployment instructions into ASD-STE100 Controlled English so the autonomous agent makes zero misinterpretations.",
+        "files": [
+          ".agents/skills/controlled-english-ste/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/karpathy/ste-prompting.git",
+        "act": "CONTROLLED ENGLISH: One word = one meaning. Sentences <= 20 words. Active voice only. Action verbs in imperative mood.",
+        "repoName": "karpathy/ste-prompting",
+        "repoUrl": "https://github.com/karpathy/ste-prompting",
+        "lang": "Prompting / Spec",
+        "langColor": "#6366f1",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-tour-onboarding",
+    "name": "Product Onboarding Tour Engine",
+    "desc": "Triad onboarding guide comparing Intro.js, Reactour, and Next.js Onborda with framer-motion positioning, backdrop masking, and storage persistence.",
+    "stars": "4,120",
+    "cat": "frontend",
+    "subskills": [
+      {
+        "id": "tour-onboarding-engine",
+        "name": "Tour Onboarding Engine (Intro.js / Reactour / Onborda)",
+        "cat": "frontend",
+        "desc": "Architect interactive walkthroughs, spotlight overlays, SVG mask cutouts, and step progression with zero layout shift.",
+        "purpose": "Drive first-time user activation with delightful, accessible, keyboard-controllable product tours across React and vanilla apps.",
+        "trigger": "add onboarding tour, product walkthrough, highlight tour steps",
+        "example_prompt": "Scaffold a 4-step onboarding tour introducing new users to The Shelf, the Skill Switcher, and the Custom Presets.",
+        "files": [
+          ".agents/skills/tour-onboarding-engine/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/usablica/intro.js.git",
+        "act": "TOUR ENGINE: Attach high-contrast spotlight overlay, handle resize dynamically, bind Escape/Arrow keys, and save completion to localStorage.",
+        "repoName": "usablica/intro.js",
+        "repoUrl": "https://github.com/usablica/intro.js",
+        "lang": "JavaScript",
+        "langColor": "#f7df1e",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  },
+  {
+    "id": "repo-ai-engineer-roadmap",
+    "name": "8-Stage AI & ML Engineering Roadmap",
+    "desc": "Comprehensive curriculum from Classical ML & Deep Learning through LLMs, RAG, Autonomous Agents (MCP), Fine-Tuning, High-Throughput APIs, and MLOps.",
+    "stars": "8,950",
+    "cat": "ai",
+    "subskills": [
+      {
+        "id": "ai-engineer-roadmap",
+        "name": "AI & ML Engineering Roadmap (Stages 1-8)",
+        "cat": "ai",
+        "desc": "Full architectural guides, tech stacks, and implementation blueprints spanning PyTorch, LangChain, vLLM, Vector DBs, MCP, and Triton.",
+        "purpose": "Provide systematic, production-ready engineering patterns across every layer of the modern AI/LLM stack.",
+        "trigger": "AI engineer roadmap, RAG architecture, agent orchestration blueprint, MLOps stack",
+        "example_prompt": "Show the Stage 4 (Advanced RAG) and Stage 5 (Autonomous Agents & MCP) reference architectures with recommended libraries.",
+        "files": [
+          ".agents/skills/ai-engineer-roadmap/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/ai-engineer/roadmap.git",
+        "act": "AI ROADMAP: Reference concrete production libraries (FastAPI, vLLM, Qdrant, LangGraph, vLLM, DeepSpeed) and multi-turn evaluation metrics.",
+        "repoName": "ai-engineer/roadmap",
+        "repoUrl": "https://github.com/ai-engineer/roadmap",
+        "lang": "Python / AI",
+        "langColor": "#3572A5",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
   }
 ];
 
@@ -2110,4 +2632,4 @@ const SUBCATEGORIES = {
     { id: 'data', label: 'Data & Knowledge Graphs', getCount: (repos) => repos.filter(r => r.cat === 'data').length },
     { id: 'media', label: 'Generative Media & 3D', getCount: (repos) => repos.filter(r => r.cat === 'media').length }
   ]
-};
+};
