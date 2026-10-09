@@ -23,41 +23,70 @@
   let editingDiscoveryId = null;
   let currentRediscoverId = null;
 
-  // Metadata mappings
+  // Professional Octicon SVG Icon System (Zero Cartoon Emojis)
+  const ICONS = {
+    inbox: 'M2.8 2.2A1.75 1.75 0 0 1 4.19 1.5h7.62a1.75 1.75 0 0 1 1.39.7l2.6 3.47c.13.17.2.38.2.59v6.59A1.75 1.75 0 0 1 14.25 14.5H1.75A1.75 1.75 0 0 1 0 12.85V6.26c0-.21.07-.42.2-.59ZM4.19 3a.25.25 0 0 0-.2.1L2.24 5.5h11.52L12.01 3.1a.25.25 0 0 0-.2-.1ZM1.5 7v5.75c0 .14.11.25.25.25h12.5a.25.25 0 0 0 .25-.25V7h-2.5a.75.75 0 0 1-.75.75 2.25 2.25 0 0 1-4.5 0A.75.75 0 0 1 6 7Z',
+    tag: 'M1 7.775V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.75 1.75 0 0 1 1 7.775Zm1.5 0c0 .066.026.13.073.177l6.25 6.25a.25.25 0 0 0 .354 0l5.025-5.025a.25.25 0 0 0 0-.354l-6.25-6.25a.25.25 0 0 0-.177-.073H2.75a.25.25 0 0 0-.25.25ZM6 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z',
+    project: 'M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3.25H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.4 5.55 1 5 1ZM1.5 2.75a.25.25 0 0 1 .25-.25H5c.18 0 .36.14.47.28l.9 1.2c.33.44.85.72 1.38.72h6.5a.25.25 0 0 1 .25.25v8.5a.25.25 0 0 1-.25.25H1.75a.25.25 0 0 1-.25-.25Z',
+    lightbulb: 'M8 1.5c-2.36 0-4.25 1.9-4.25 4.25 0 1.25.54 2.37 1.41 3.16.53.48.84 1.15.84 1.84v.5h4v-.5c0-.69.31-1.36.84-1.84.87-.79 1.41-1.91 1.41-3.16C12.25 3.4 10.36 1.5 8 1.5ZM5.5 12.75c0-.14.11-.25.25-.25h4.5a.25.25 0 0 1 .25.25v.5a.75.75 0 0 1-.75.75h-3.5a.75.75 0 0 1-.75-.75Zm1.25 2.5a.25.25 0 0 0-.25.25.75.75 0 0 0 .75.75h1.5a.75.75 0 0 0 .75-.75.25.25 0 0 0-.25-.25Z',
+    star: 'M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75 7.5 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z',
+    sparkle: 'M7.53 1.282a.5.5 0 0 1 .94 0l.732 2.253a4.5 4.5 0 0 0 2.893 2.893l2.253.732a.5.5 0 0 1 0 .94l-2.253.732a4.5 4.5 0 0 0-2.893 2.893l-.732 2.253a.5.5 0 0 1-.94 0l-.732-2.253a4.5 4.5 0 0 0-2.893-2.893L.655 8.16a.5.5 0 0 1 0-.94l2.253-.732a4.5 4.5 0 0 0 2.893-2.893L7.53 1.282Z',
+    check: 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z',
+    tools: 'M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H11v1.75a.75.75 0 0 1-1.5 0V4.5H7.75a.75.75 0 0 1 0-1.5H9.5V1.75a.75.75 0 0 1 1.5 0ZM4.5 6.5A2.5 2.5 0 0 0 2 9v4.5A2.5 2.5 0 0 0 4.5 16h7a2.5 2.5 0 0 0 2.5-2.5V9a2.5 2.5 0 0 0-2.5-2.5h-7Z',
+    design: 'M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25a1.75 1.75 0 0 1 .445-.758l8.61-8.61Z',
+    repo: 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z',
+    ai: 'M6 1.75a.75.75 0 0 1 .75.75v1h2.5v-1a.75.75 0 0 1 1.5 0v1h.5A2.75 2.75 0 0 1 14 6.25v.5h1a.75.75 0 0 1 0 1.5h-1v2.5h1a.75.75 0 0 1 0 1.5h-1v.5A2.75 2.75 0 0 1 11.25 14h-.5v1a.75.75 0 0 1-1.5 0v-1h-2.5v1a.75.75 0 0 1-1.5 0v-1h-.5A2.75 2.75 0 0 1 2 11.25v-.5H1a.75.75 0 0 1 0-1.5h1v-2.5H1a.75.75 0 0 1 0-1.5h1v-.5A2.75 2.75 0 0 1 4.75 3.5h.5v-1A.75.75 0 0 1 6 1.75Z',
+    book: 'M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.003 1H15.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.247a3.75 3.75 0 0 0-3.003 1.501A3.75 3.75 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75Z',
+    video: 'M0 3.75C0 2.784.784 2 1.75 2h9.5c.966 0 1.75.784 1.75 1.75v1.88l3.18-1.59A.75.75 0 0 1 17 4.71v6.58a.75.75 0 0 1-.82.67.747.747 0 0 1-.25-.06L13 10.37v1.88c0 .966-.784 1.75-1.75 1.75h-9.5A1.75 1.75 0 0 1 0 12.25v-8.5Z',
+    package: 'M1.5 4.25c0-.966.784-1.75 1.75-1.75h9.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0 1 12.75 13.5h-9.5A1.75 1.75 0 0 1 1.5 11.75Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z',
+    beaker: 'M5 1.5A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v2.793l3.854 6.744A2.5 2.5 0 0 1 12.678 15H3.322a2.5 2.5 0 0 1-2.176-3.963L5 4.293V1.5ZM6.5 1.5v3.207a1 1 0 0 1-.134.499L3.02 11.233A1 1 0 0 0 3.89 12.75h8.22a1 1 0 0 0 .87-1.517L9.634 5.206A1 1 0 0 1 9.5 4.707V1.5h-3Z',
+    zap: 'M8.75 1.5a.75.75 0 0 0-1.28-.53l-6 6a.75.75 0 0 0 .53 1.28h4.25v5.5a.75.75 0 0 0 1.28.53l6-6a.75.75 0 0 0-.53-1.28H8.75V1.5Z',
+    graph: 'M1.5 1.75a.75.75 0 0 0-1.5 0v12.5c0 .414.336.75.75.75h14.5a.75.75 0 0 0 0-1.5H1.5V1.75Zm14.28 4.47a.75.75 0 0 0-1.06-1.06L10 9.88l-2.47-2.47a.75.75 0 0 0-1.06 0L3.22 10.66a.75.75 0 1 0 1.06 1.06L7 9l2.47 2.47a.75.75 0 0 0 1.06 0l5.25-5.25Z',
+    focus: 'M3 1.75C3 .784 3.784 0 4.75 0h6.5C12.216 0 13 .784 13 1.75v12.5A1.75 1.75 0 0 1 11.25 16h-6.5A1.75 1.75 0 0 1 3 14.25ZM4.75 1.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h6.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25Z',
+    edit: 'M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm1.414 1.06a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354l-1.086-1.086ZM9.75 4.81l-6.97 6.971a.249.249 0 0 0-.064.108l-.558 1.953 1.953-.558a.249.249 0 0 0 .108-.064L11.19 6.25 9.75 4.81Z',
+    copy: 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Zm5-5C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'
+  };
+
+  function renderSvgIcon(pathData, size = 13, extraStyle = '') {
+    if (!pathData) return '';
+    return `<svg class="octicon" width="${size}" height="${size}" viewBox="0 0 16 16" fill="currentColor" style="${extraStyle}"><path d="${pathData}"></path></svg>`;
+  }
+
+  // Metadata mappings with Octicon icons
   const TYPE_META = {
-    all: { label: 'All Types', emoji: '✨', icon: 'M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Z' },
-    design: { label: 'Design & Inspo', emoji: '🎨', icon: 'M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25a1.75 1.75 0 0 1 .445-.758l8.61-8.61Z' },
-    repo: { label: 'GitHub Repos', emoji: '⚡', icon: 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z' },
-    tool: { label: 'Tools & Modules', emoji: '🛠️', icon: 'M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H11v1.75a.75.75 0 0 1-1.5 0V4.5H7.75a.75.75 0 0 1 0-1.5H9.5V1.75a.75.75 0 0 1 1.5 0ZM4.5 6.5A2.5 2.5 0 0 0 2 9v4.5A2.5 2.5 0 0 0 4.5 16h7a2.5 2.5 0 0 0 2.5-2.5V9a2.5 2.5 0 0 0-2.5-2.5h-7Z' },
-    ai: { label: 'AI & Models', emoji: '🧠', icon: 'M6 1.75a.75.75 0 0 1 .75.75v1h2.5v-1a.75.75 0 0 1 1.5 0v1h.5A2.75 2.75 0 0 1 14 6.25v.5h1a.75.75 0 0 1 0 1.5h-1v2.5h1a.75.75 0 0 1 0 1.5h-1v.5A2.75 2.75 0 0 1 11.25 14h-.5v1a.75.75 0 0 1-1.5 0v-1h-2.5v1a.75.75 0 0 1-1.5 0v-1h-.5A2.75 2.75 0 0 1 2 11.25v-.5H1a.75.75 0 0 1 0-1.5h1v-2.5H1a.75.75 0 0 1 0-1.5h1v-.5A2.75 2.75 0 0 1 4.75 3.5h.5v-1A.75.75 0 0 1 6 1.75Z' },
-    article: { label: 'Articles & Guides', emoji: '📚', icon: 'M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.003 1H15.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.247a3.75 3.75 0 0 0-3.003 1.501A3.75 3.75 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75Z' },
-    video: { label: 'Videos & Motion', emoji: '🎬', icon: 'M0 3.75C0 2.784.784 2 1.75 2h9.5c.966 0 1.75.784 1.75 1.75v1.88l3.18-1.59A.75.75 0 0 1 17 4.71v6.58a.75.75 0 0 1-.82.67.747.747 0 0 1-.25-.06L13 10.37v1.88c0 .966-.784 1.75-1.75 1.75h-9.5A1.75 1.75 0 0 1 0 12.25v-8.5Z' },
-    other: { label: 'Other', emoji: '📦', icon: 'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Z' }
+    all: { label: 'All Types', iconPath: ICONS.package, icon: ICONS.package },
+    design: { label: 'Design & Inspo', iconPath: ICONS.design, icon: ICONS.design },
+    repo: { label: 'GitHub Repos', iconPath: ICONS.repo, icon: ICONS.repo },
+    tool: { label: 'Tools & Modules', iconPath: ICONS.tools, icon: ICONS.tools },
+    ai: { label: 'AI & Models', iconPath: ICONS.ai, icon: ICONS.ai },
+    article: { label: 'Articles & Guides', iconPath: ICONS.book, icon: ICONS.book },
+    video: { label: 'Videos & Motion', iconPath: ICONS.video, icon: ICONS.video },
+    other: { label: 'Other', iconPath: ICONS.package, icon: ICONS.package }
   };
 
   const INTENT_META = {
-    all: { label: 'All Intentions', emoji: '✨' },
-    inspiration: { label: 'Inspiration', emoji: '💡', desc: 'Design, aesthetics & visual ideas' },
-    might_use: { label: 'Might Use', emoji: '🔧', desc: 'Libraries & packages for future features' },
-    experiment: { label: 'Experiment', emoji: '🧪', desc: 'Cutting-edge modules & POC ideas' },
-    learn: { label: 'Learn', emoji: '📚', desc: 'Case studies, architecture & deep dives' },
-    concept: { label: 'Concept', emoji: '🧩', desc: 'Unusual patterns & creative mechanisms' }
+    all: { label: 'All Intentions', iconPath: ICONS.sparkle },
+    inspiration: { label: 'Inspiration', iconPath: ICONS.lightbulb, desc: 'Design, aesthetics & visual ideas' },
+    might_use: { label: 'Might Use', iconPath: ICONS.tools, desc: 'Libraries & packages for future features' },
+    experiment: { label: 'Experiment', iconPath: ICONS.beaker, desc: 'Cutting-edge modules & POC ideas' },
+    learn: { label: 'Learn', iconPath: ICONS.book, desc: 'Case studies, architecture & deep dives' },
+    concept: { label: 'Concept', iconPath: ICONS.zap, desc: 'Unusual patterns & creative mechanisms' }
   };
 
   const STATUS_META = {
-    inbox: { label: 'Inbox', badgeClass: 'status-inbox', icon: '📥' },
-    active: { label: 'Active', badgeClass: 'status-active', icon: '📌' },
-    in_use: { label: 'In Use', badgeClass: 'status-in-use', icon: '🔨' },
-    archived: { label: 'Archived', badgeClass: 'status-archived', icon: '📦' }
+    inbox: { label: 'Inbox', badgeClass: 'status-inbox', iconPath: ICONS.inbox },
+    active: { label: 'Active', badgeClass: 'status-active', iconPath: ICONS.zap },
+    in_use: { label: 'In Use', badgeClass: 'status-in-use', iconPath: ICONS.check },
+    archived: { label: 'Archived', badgeClass: 'status-archived', iconPath: ICONS.package }
   };
 
   const COLLECTION_THEMES = {
-    'Design & Visual Identity': { icon: '🎨', emoji: '🎨', color: 'rgba(163, 113, 247, 0.15)', border: 'rgba(163, 113, 247, 0.4)' },
-    'React & Animation Engines': { icon: '⚡', emoji: '⚡', color: 'rgba(88, 166, 255, 0.15)', border: 'rgba(88, 166, 255, 0.4)' },
-    'Typography & Monospace Lab': { icon: '🧪', emoji: '🧪', color: 'rgba(57, 211, 83, 0.15)', border: 'rgba(57, 211, 83, 0.4)' },
-    'CRO & Growth Psychology': { icon: '📈', emoji: '📈', color: 'rgba(240, 136, 62, 0.15)', border: 'rgba(240, 136, 62, 0.4)' },
-    'AI Tools & Architectures': { icon: '🧠', emoji: '🧠', color: 'rgba(187, 128, 179, 0.15)', border: 'rgba(187, 128, 179, 0.4)' },
-    'Developer Tools': { icon: '🛠️', emoji: '🛠️', color: 'rgba(139, 148, 158, 0.15)', border: 'rgba(139, 148, 158, 0.4)' }
+    'Design & Visual Identity': { iconPath: ICONS.design, color: 'rgba(163, 113, 247, 0.15)', border: 'rgba(163, 113, 247, 0.4)' },
+    'React & Animation Engines': { iconPath: ICONS.zap, color: 'rgba(88, 166, 255, 0.15)', border: 'rgba(88, 166, 255, 0.4)' },
+    'Typography & Monospace Lab': { iconPath: ICONS.beaker, color: 'rgba(57, 211, 83, 0.15)', border: 'rgba(57, 211, 83, 0.4)' },
+    'CRO & Growth Psychology': { iconPath: ICONS.graph, color: 'rgba(240, 136, 62, 0.15)', border: 'rgba(240, 136, 62, 0.4)' },
+    'AI Tools & Architectures': { iconPath: ICONS.ai, color: 'rgba(187, 128, 179, 0.15)', border: 'rgba(187, 128, 179, 0.4)' },
+    'Developer Tools': { iconPath: ICONS.tools, color: 'rgba(139, 148, 158, 0.15)', border: 'rgba(139, 148, 158, 0.4)' }
   };
 
   // Open the Discovery Library View
@@ -227,34 +256,34 @@
     const collectionInfo = {
       'Design & Visual Identity': {
         desc: 'Curated design archives, brutalist typography labs, visual craft and creative web references.',
-        icon: '🎨'
+        iconPath: ICONS.design
       },
       'React & Animation Engines': {
         desc: 'Fluid springs, motion primitives, interactive physics, gesture libraries, and modern React components.',
-        icon: '⚡'
+        iconPath: ICONS.zap
       },
       'Typography & Monospace Lab': {
         desc: 'Variable fonts, experimental monospace typefaces, typographic specimens, and font pairing tools.',
-        icon: '🧪'
+        iconPath: ICONS.beaker
       },
       'CRO & Growth Psychology': {
         desc: 'Behavioral economics, onboarding tear-downs, growth psychology loops, and high-converting UX experiments.',
-        icon: '📈'
+        iconPath: ICONS.graph
       },
       'AI Tools & Architectures': {
         desc: 'Autonomous agent frameworks, LLM memory systems, embeddings, and generative media models.',
-        icon: '🧠'
+        iconPath: ICONS.ai
       },
       'Developer Tools': {
         desc: 'Terminal CLIs, performance monitors, debugging suites, build systems, and local automation scripts.',
-        icon: '🛠️'
+        iconPath: ICONS.tools
       }
     };
 
     if (!collections.length) {
       return `
         <div class="shelf-empty-state">
-          <div class="shelf-empty-icon">🏷️</div>
+          <div class="shelf-empty-icon">${renderSvgIcon(ICONS.tag, 28)}</div>
           <h3 class="shelf-empty-title">No Collections Yet</h3>
           <p class="shelf-empty-text">Organize your discoveries by adding a Collection name in the curated library data.</p>
         </div>
@@ -271,13 +300,13 @@
         </div>
         <div class="collections-grid">
           ${collections.map(col => {
-            const theme = COLLECTION_THEMES[col.name] || { icon: '🏷️', color: 'rgba(88, 166, 255, 0.1)', border: 'rgba(88, 166, 255, 0.3)' };
-            const info = collectionInfo[col.name] || { desc: 'Thematic resource bucket and design inspiration.', icon: theme.icon };
+            const theme = COLLECTION_THEMES[col.name] || { iconPath: ICONS.tag, color: 'rgba(88, 166, 255, 0.1)', border: 'rgba(88, 166, 255, 0.3)' };
+            const info = collectionInfo[col.name] || { desc: 'Thematic resource bucket and design inspiration.', iconPath: theme.iconPath };
             return `
               <div class="collection-folder-card" onclick="selectCollectionFilter('${escapeHtml(col.name)}', event)">
                 <div class="col-card-head">
                   <div class="col-card-icon-wrap" style="background:${theme.color}; border-color:${theme.border};">
-                    <span class="col-card-icon">${theme.icon}</span>
+                    <span class="col-card-icon">${renderSvgIcon(info.iconPath || ICONS.tag, 16)}</span>
                   </div>
                   <div class="col-card-badge">${col.count} ${col.count === 1 ? 'item' : 'items'}</div>
                 </div>
@@ -349,10 +378,10 @@
     if (!snippet) return;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(snippet).then(() => {
-        if (typeof showToast === 'function') showToast('Copied Markdown snippet! 📋');
+        if (typeof showToast === 'function') showToast('Copied Markdown snippet to clipboard');
       });
     } else if (typeof copySnippetText === 'function') {
-      copySnippetText(snippet, 'Copied Markdown snippet! 📋');
+      copySnippetText(snippet, 'Copied Markdown snippet to clipboard');
     }
   }
 
@@ -366,10 +395,10 @@
     const md = window.ShelfStore.formatAllFilteredMarkdown(items);
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(md).then(() => {
-        if (typeof showToast === 'function') showToast(`Copied ${items.length} discoveries as Markdown! 📋`);
+        if (typeof showToast === 'function') showToast(`Copied ${items.length} discoveries to clipboard`);
       });
     } else if (typeof copySnippetText === 'function') {
-      copySnippetText(md, `Copied ${items.length} discoveries as Markdown! 📋`);
+      copySnippetText(md, `Copied ${items.length} discoveries to clipboard`);
     }
   }
 
@@ -405,11 +434,11 @@
     codeInput.select();
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(codeInput.value).then(() => {
-        if (typeof showToast === 'function') showToast('Bookmarklet code copied to clipboard! 📋');
+        if (typeof showToast === 'function') showToast('Bookmarklet code copied to clipboard');
       });
     } else {
       document.execCommand('copy');
-      if (typeof showToast === 'function') showToast('Bookmarklet code copied to clipboard! 📋');
+      if (typeof showToast === 'function') showToast('Bookmarklet code copied to clipboard');
     }
   }
 
@@ -437,14 +466,12 @@
             <div class="shelf-header-titles">
               <div class="shelf-badge-row">
                 <span class="shelf-badge">
-                  <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M7.53 1.282a.5.5 0 0 1 .94 0l.732 2.253a4.5 4.5 0 0 0 2.893 2.893l2.253.732a.5.5 0 0 1 0 .94l-2.253.732a4.5 4.5 0 0 0-2.893 2.893l-.732 2.253a.5.5 0 0 1-.94 0l-.732-2.253a4.5 4.5 0 0 0-2.893-2.893L.655 8.16a.5.5 0 0 1 0-.94l2.253-.732a4.5 4.5 0 0 0 2.893-2.893L7.53 1.282Z"></path>
-                  </svg>
+                  ${renderSvgIcon(ICONS.sparkle, 12, 'margin-right:4px;vertical-align:text-bottom;')}
                   Curated Tech Library
                 </span>
                 <span class="shelf-stat-pill">${stats.total} Resources</span>
-                <span class="shelf-stat-pill">★ ${stats.starred} Starred</span>
-                <span class="shelf-stat-pill">🏷️ ${Object.keys(stats.collections || {}).length} Collections</span>
+                <span class="shelf-stat-pill">${renderSvgIcon(ICONS.star, 11, 'margin-right:3px;vertical-align:text-bottom;')} ${stats.starred} Starred</span>
+                <span class="shelf-stat-pill">${renderSvgIcon(ICONS.tag, 11, 'margin-right:3px;vertical-align:text-bottom;')} ${Object.keys(stats.collections || {}).length} Collections</span>
               </div>
               <h1 class="shelf-title">Technology & Discovery Shelf</h1>
               <p class="shelf-desc">
@@ -455,9 +482,7 @@
             <!-- Global Action Buttons -->
             <div class="shelf-header-actions">
               <button class="btn-gh" onclick="exportShelfMD()" title="Download as clean Markdown reference graph">
-                <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M0 1.75C0 .784.784 0 1.75 0h7.5C9.716 0 10.5.784 10.5 1.75v3.5a.75.75 0 0 1-1.5 0V1.75a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V9.75a.75.75 0 0 1 1.5 0v4.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Zm12.03 3.47a.75.75 0 0 1 1.06 0l2.5 2.5a.751.751 0 0 1 0 1.06l-2.5 2.5a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L13.19 9H7.75a.75.75 0 0 1 0-1.5h5.44l-1.16-1.16a.75.75 0 0 1 0-1.06Z"></path>
-                </svg>
+                ${renderSvgIcon(ICONS.copy, 13, 'margin-right:4px;')}
                 <span>Export MD</span>
               </button>
 
@@ -484,26 +509,31 @@
             </button>
 
             <button class="disc-subnav-btn ${currentTab === 'inbox' ? 'active' : ''}" onclick="switchDiscoveryTab('inbox')">
-              <span>📥 Inbox</span>
+              ${renderSvgIcon(ICONS.inbox, 13, 'margin-right:4px;vertical-align:text-bottom;')}
+              <span>Inbox</span>
               <span class="disc-pill-bubble ${stats.inbox > 0 ? 'highlight' : ''}">${stats.inbox}</span>
             </button>
 
             <button class="disc-subnav-btn ${currentTab === 'collections' ? 'active' : ''}" onclick="switchDiscoveryTab('collections')">
-              <span>🏷️ Collections</span>
+              ${renderSvgIcon(ICONS.tag, 13, 'margin-right:4px;vertical-align:text-bottom;')}
+              <span>Collections</span>
               <span class="disc-pill-bubble">${Object.keys(stats.collections || {}).length}</span>
             </button>
 
             <button class="disc-subnav-btn ${currentTab === 'projects' ? 'active' : ''}" onclick="switchDiscoveryTab('projects')">
-              <span>📁 Projects</span>
+              ${renderSvgIcon(ICONS.project, 13, 'margin-right:4px;vertical-align:text-bottom;')}
+              <span>Projects</span>
               <span class="disc-pill-bubble">${Object.keys(stats.projects).length}</span>
             </button>
 
             <button class="disc-subnav-btn ${currentTab === 'intentions' ? 'active' : ''}" onclick="switchDiscoveryTab('intentions')">
-              <span>💡 Intentions</span>
+              ${renderSvgIcon(ICONS.lightbulb, 13, 'margin-right:4px;vertical-align:text-bottom;')}
+              <span>Intentions</span>
             </button>
 
             <button class="disc-subnav-btn ${currentTab === 'starred' ? 'active' : ''}" onclick="switchDiscoveryTab('starred')">
-              <span>★ Starred</span>
+              ${renderSvgIcon(ICONS.star, 13, 'margin-right:4px;vertical-align:text-bottom;')}
+              <span>Starred</span>
               <span class="disc-pill-bubble">${stats.starred}</span>
             </button>
           </div>
@@ -518,7 +548,7 @@
               <svg class="octicon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M1 2.75C1 1.784 1.784 1 2.75 1h3.5c.966 0 1.75.784 1.75 1.75v3.5A1.75 1.75 0 0 1 8 8H2.75A1.75 1.75 0 0 1 1 6.25v-3.5Zm1.75-.25a.25.25 0 0 0-.25.25v3.5c0 .138.112.25.25.25h3.5a.25.25 0 0 0 .25-.25v-3.5a.25.25 0 0 0-.25-.25h-3.5ZM9 2.75C9 1.784 9.784 1 10.75 1h3.5c.966 0 1.75.784 1.75 1.75v3.5A1.75 1.75 0 0 1 14.25 8h-3.5A1.75 1.75 0 0 1 9 6.25v-3.5Zm1.75-.25a.25.25 0 0 0-.25.25v3.5c0 .138.112.25.25.25h3.5a.25.25 0 0 0 .25-.25v-3.5a.25.25 0 0 0-.25-.25h-3.5ZM1 10.75C1 9.784 1.784 9 2.75 9h3.5c.966 0 1.75.784 1.75 1.75v3.5A1.75 1.75 0 0 1 8 16H2.75A1.75 1.75 0 0 1 1 14.25v-3.5Zm1.75-.25a.25.25 0 0 0-.25.25v3.5c0 .138.112.25.25.25h3.5a.25.25 0 0 0 .25-.25v-3.5a.25.25 0 0 0-.25-.25h-3.5ZM9 10.75c0-.966.784-1.75 1.75-1.75h3.5c.966 0 1.75.784 1.75 1.75v3.5A1.75 1.75 0 0 1 14.25 16h-3.5A1.75 1.75 0 0 1 9 14.25v-3.5Zm1.75-.25a.25.25 0 0 0-.25.25v3.5c0 .138.112.25.25.25h3.5a.25.25 0 0 0 .25-.25v-3.5a.25.25 0 0 0-.25-.25h-3.5Z"></path>
               </svg>
-              <span>🎯 Focused</span>
+              <span>Focused</span>
             </button>
 
             <button
@@ -529,7 +559,7 @@
               <svg class="octicon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.003 1H15.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.247a3.75 3.75 0 0 0-3.003 1.501A3.75 3.75 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75Z"></path>
               </svg>
-              <span>📖 Detailed</span>
+              <span>Detailed</span>
             </button>
 
             <button
@@ -540,7 +570,7 @@
               <svg class="octicon" width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M2 3.75A.75.75 0 0 1 2.75 3h10.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 3.75Zm0 4A.75.75 0 0 1 2.75 7h10.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 7.75Zm0 4a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z"></path>
               </svg>
-              <span>📋 List</span>
+              <span>List</span>
             </button>
           </div>
         </div>
@@ -643,14 +673,14 @@
   // Render Rediscover Banner
   function renderRediscoverBanner(item) {
     const domain = window.ShelfStore ? window.ShelfStore.extractDomain(item.url) : item.url;
-    const projectBadge = item.project ? `<span class="rediscover-proj">📁 ${escapeHtml(item.project)}</span>` : '';
+    const projectBadge = item.project ? `<span class="rediscover-proj">${renderSvgIcon(ICONS.project, 11, 'margin-right:3px;vertical-align:text-bottom;')}${escapeHtml(item.project)}</span>` : '';
     const dateSaved = new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
     return `
       <div class="rediscover-banner">
         <div class="rediscover-head">
           <div class="rediscover-title-row">
-            <span class="rediscover-sparkle">✨ REDISCOVER</span>
+            <span class="rediscover-sparkle">${renderSvgIcon(ICONS.sparkle, 12, 'margin-right:4px;vertical-align:text-bottom;')}REDISCOVER</span>
             <span class="rediscover-saved-date">Saved ${dateSaved}</span>
             ${projectBadge}
           </div>
@@ -668,14 +698,14 @@
 
             ${item.whySaved ? `
               <div class="rediscover-field">
-                <span class="rediscover-label">💭 Why you saved this:</span>
+                <span class="rediscover-label">Why you saved this:</span>
                 <span class="rediscover-text">${escapeHtml(item.whySaved)}</span>
               </div>
             ` : ''}
 
             ${item.potentialUse ? `
               <div class="rediscover-field">
-                <span class="rediscover-label">🚀 Potential use:</span>
+                <span class="rediscover-label">Potential use:</span>
                 <span class="rediscover-text highlight">${escapeHtml(item.potentialUse)}</span>
               </div>
             ` : ''}
@@ -687,7 +717,7 @@
             </a>
             ${item.status !== 'in_use' ? `
               <button class="btn-gh btn-gh-sm" onclick="setDiscoveryStatus('${item.id}', 'in_use')">
-                Mark as In-Use 🔨
+                Mark as In-Use
               </button>
             ` : `
               <span class="rediscover-in-use-tag">Currently In-Use</span>
@@ -720,7 +750,7 @@
           </button>
           ${projects.map(p => `
             <button class="disc-context-pill ${currentProject === p ? 'active' : ''}" onclick="selectProjectFilter('${escapeHtml(p)}')">
-              📁 ${escapeHtml(p)} <span class="disc-pill-bubble">${stats.projects[p]}</span>
+              ${renderSvgIcon(ICONS.project, 11, 'margin-right:3px;vertical-align:text-bottom;')}${escapeHtml(p)} <span class="disc-pill-bubble">${stats.projects[p]}</span>
             </button>
           `).join('')}
         </div>
@@ -736,7 +766,7 @@
             const isActive = currentIntent === key;
             return `
               <button class="disc-context-pill ${isActive ? 'active' : ''}" onclick="selectIntentFilter('${key}')" title="${meta.desc || ''}">
-                ${meta.emoji} ${meta.label}
+                ${renderSvgIcon(meta.iconPath, 12, 'margin-right:4px;vertical-align:text-bottom;')}${meta.label}
               </button>
             `;
           }).join('')}
@@ -799,8 +829,8 @@
   function renderDiscoveryCard(item) {
     const domain = window.ShelfStore ? window.ShelfStore.extractDomain(item.url) : item.url;
     const isStarred = Boolean(item.starred);
-    const intent = INTENT_META[item.intent] || { label: item.intent, emoji: '📌' };
-    const typeMeta = TYPE_META[item.type] || { label: item.type || 'Resource', emoji: '📦' };
+    const intent = INTENT_META[item.intent] || { label: item.intent, iconPath: ICONS.tag };
+    const typeMeta = TYPE_META[item.type] || { label: item.type || 'Resource', iconPath: ICONS.package };
 
     const dateFormatted = new Date(item.createdAt || Date.now()).toLocaleDateString('en-US', {
       month: 'short',
@@ -828,7 +858,7 @@
                   class="shelf-card-favicon"
                   onerror="this.style.display='none';"
                 />
-              ` : `<span class="shelf-card-favicon-fallback">${typeMeta.emoji}</span>`}
+              ` : `<span class="shelf-card-favicon-fallback">${renderSvgIcon(typeMeta.iconPath, 12)}</span>`}
             </div>
             <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="shelf-card-domain-link" title="Visit original link: ${escapeHtml(item.url)}">
               <span>${escapeHtml(domain)}</span>
@@ -836,7 +866,7 @@
                 <path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.75.75a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0V3.81L9.53 8.28a.75.75 0 0 1-1.06-1.06l4.47-4.47H11.25a.75.75 0 0 1-.75-.75Z"></path>
               </svg>
             </a>
-            <span class="shelf-card-type-badge">${typeMeta.emoji} ${typeMeta.label}</span>
+            <span class="shelf-card-type-badge">${renderSvgIcon(typeMeta.iconPath, 11, 'margin-right:3px;vertical-align:text-bottom;')} ${typeMeta.label}</span>
           </div>
 
           <div class="shelf-card-top-right">
@@ -846,7 +876,7 @@
               onclick="toggleShelfCardStar('${item.id}', event)"
               title="${isStarred ? 'Unstar discovery' : 'Star discovery'}"
             >
-              ★
+              ${renderSvgIcon(ICONS.star, 12)}
             </button>
           </div>
         </div>
@@ -892,16 +922,16 @@
           <div class="shelf-card-meta-row">
             ${item.project ? `
               <button class="shelf-project-chip" onclick="selectProjectFilter('${escapeHtml(item.project)}', event)" title="Filter project: ${escapeHtml(item.project)}">
-                📁 ${escapeHtml(item.project)}
+                ${renderSvgIcon(ICONS.project, 11, 'margin-right:3px;vertical-align:text-bottom;')}${escapeHtml(item.project)}
               </button>
             ` : ''}
             ${item.collection ? `
               <button class="shelf-collection-chip" onclick="selectCollectionFilter('${escapeHtml(item.collection)}', event)" title="Filter collection: ${escapeHtml(item.collection)}">
-                🏷️ ${escapeHtml(item.collection)}
+                ${renderSvgIcon(ICONS.tag, 11, 'margin-right:3px;vertical-align:text-bottom;')}${escapeHtml(item.collection)}
               </button>
             ` : ''}
             <span class="disc-intent-tag" title="Intention: ${intent.label}">
-              ${intent.emoji} ${intent.label}
+              ${renderSvgIcon(intent.iconPath, 11, 'margin-right:3px;vertical-align:text-bottom;')}${intent.label}
             </span>
           </div>
 
@@ -929,7 +959,7 @@
             </a>
 
             <button class="shelf-action-btn focus-btn" onclick="openFocusReader('${item.id}', event)" title="Open in distraction-free Focus Mode">
-              <span>🔍 Focus</span>
+              ${renderSvgIcon(ICONS.focus, 11, 'margin-right:3px;vertical-align:text-bottom;')}<span>Focus</span>
             </button>
 
             <button class="shelf-action-btn" onclick="copyShelfMarkdown('${item.id}', event)" title="Copy Markdown reference snippet">
@@ -956,22 +986,22 @@
   function renderDiscoveryListRow(item) {
     const domain = window.ShelfStore ? window.ShelfStore.extractDomain(item.url) : item.url;
     const isStarred = Boolean(item.starred);
-    const intent = INTENT_META[item.intent] || { label: item.intent, emoji: '📌' };
+    const intent = INTENT_META[item.intent] || { label: item.intent, iconPath: ICONS.tag };
 
     return `
       <div class="discovery-list-row ${isStarred ? 'is-starred' : ''}">
         <div class="disc-list-col-main">
           <div style="display:flex;align-items:center;gap:8px;">
-            <button class="shelf-card-star-btn ${isStarred ? 'starred' : ''}" onclick="toggleShelfCardStar('${item.id}', event)">★</button>
+            <button class="shelf-card-star-btn ${isStarred ? 'starred' : ''}" onclick="toggleShelfCardStar('${item.id}', event)">${renderSvgIcon(ICONS.star, 12)}</button>
             <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="disc-list-title">
               ${escapeHtml(item.title)}
             </a>
           </div>
-          <div class="disc-list-url">${escapeHtml(domain)} · ${intent.emoji} ${intent.label}</div>
+          <div class="disc-list-url">${escapeHtml(domain)} · ${renderSvgIcon(intent.iconPath, 11, 'margin-right:3px;vertical-align:text-bottom;')}${intent.label}</div>
         </div>
 
         <div class="disc-list-col-proj">
-          ${item.project ? `<span class="disc-list-proj-tag">📁 ${escapeHtml(item.project)}</span>` : '<span style="color:var(--fg-subtle);">-</span>'}
+          ${item.project ? `<span class="disc-list-proj-tag">${renderSvgIcon(ICONS.project, 11, 'margin-right:3px;vertical-align:text-bottom;')}${escapeHtml(item.project)}</span>` : '<span style="color:var(--fg-subtle);">-</span>'}
         </div>
 
         <div class="disc-list-col-notes">
@@ -1019,7 +1049,7 @@
     window.ShelfStore.addQuick(url);
     input.value = '';
     renderDiscoveryUI();
-    if (typeof showToast === 'function') showToast('Saved to Inbox in 5 seconds! 📥');
+    if (typeof showToast === 'function') showToast('Saved to Inbox in 5 seconds');
   }
 
   // Tab switching
@@ -1261,7 +1291,7 @@
       if (typeof showToast === 'function') showToast('Discovery updated!');
     } else {
       window.ShelfStore.add(payload);
-      if (typeof showToast === 'function') showToast('Added to Discovery Library! ✨');
+      if (typeof showToast === 'function') showToast('Added to Discovery Library!');
     }
 
     closeShelfModalDirect();
@@ -1439,19 +1469,19 @@
 
     const domain = window.ShelfStore ? window.ShelfStore.extractDomain(item.url) : item.url;
     const isStarred = Boolean(item.starred);
-    const typeMeta = TYPE_META[item.type] || { label: item.type || 'Resource', emoji: '📦' };
+    const typeMeta = TYPE_META[item.type] || { label: item.type || 'Resource', iconPath: ICONS.package };
 
     const counterEl = document.getElementById('shelf-focus-counter');
     if (counterEl) counterEl.textContent = `${focusItemIndex + 1} of ${items.length}`;
 
     const badgeEl = document.getElementById('shelf-focus-type-badge');
-    if (badgeEl) badgeEl.textContent = `${typeMeta.emoji} ${typeMeta.label}`;
+    if (badgeEl) badgeEl.innerHTML = `${renderSvgIcon(typeMeta.iconPath, 12, 'margin-right:4px;vertical-align:text-bottom;')} ${typeMeta.label}`;
 
     const projectPill = document.getElementById('shelf-focus-project-pill');
     if (projectPill) {
       if (item.project) {
         projectPill.style.display = 'inline-flex';
-        projectPill.textContent = `📁 ${item.project}`;
+        projectPill.innerHTML = `${renderSvgIcon(ICONS.project, 11, 'margin-right:3px;vertical-align:text-bottom;')} ${escapeHtml(item.project)}`;
       } else {
         projectPill.style.display = 'none';
       }
@@ -1461,6 +1491,7 @@
     if (starBtn) {
       starBtn.classList.toggle('starred', isStarred);
       starBtn.title = isStarred ? 'Unstar discovery' : 'Star discovery';
+      starBtn.innerHTML = renderSvgIcon(ICONS.star, 14);
     }
 
     const faviconEl = document.getElementById('shelf-focus-favicon');

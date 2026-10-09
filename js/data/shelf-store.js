@@ -1017,7 +1017,7 @@
     exportMarkdown: function () {
       const items = loadDiscoveries();
       const lines = [
-        '# ✨ Discovery Library — Technology & Idea Graph',
+        '# Technology & Discovery Shelf — Knowledge Graph',
         `*Exported from Skills-Switcher on ${new Date().toLocaleDateString()} — Total: ${items.length} discoveries*`,
         '',
         '---',
@@ -1034,22 +1034,22 @@
 
       Object.keys(projectGroups).forEach(projName => {
         const projItems = projectGroups[projName];
-        lines.push(`## 📁 Project: ${projName} (${projItems.length})`);
+        lines.push(`## Project: ${projName} (${projItems.length})`);
         lines.push('');
 
         projItems.forEach(item => {
-          const star = item.starred ? ' ⭐' : '';
-          const intentEmoji = {
-            inspiration: '💡 Inspiration',
-            might_use: '🔧 Might Use',
-            experiment: '🧪 Experiment',
-            learn: '📚 Learn',
-            concept: '🧩 Concept'
-          }[item.intent] || '📌 Reference';
+          const star = item.starred ? ' [Starred]' : '';
+          const intentLabel = {
+            inspiration: 'Inspiration',
+            might_use: 'Might Use',
+            experiment: 'Experiment',
+            learn: 'Learn',
+            concept: 'Concept'
+          }[item.intent] || 'Reference';
 
           lines.push(`### [${item.title}](${item.url})${star}`);
           lines.push(`- **URL**: \`${item.url}\``);
-          lines.push(`- **Type**: \`${item.type}\` · **Intention**: \`${intentEmoji}\` · **Status**: \`${item.status}\``);
+          lines.push(`- **Type**: \`${item.type}\` · **Intention**: \`${intentLabel}\` · **Status**: \`${item.status}\``);
           if (item.tags && item.tags.length) lines.push(`- **Tags**: ${item.tags.map(t => '`#' + t + '`').join(' ')}`);
           if (item.whySaved) lines.push(`- **Why I saved this**: ${item.whySaved}`);
           if (item.potentialUse) lines.push(`- **Potential use**: ${item.potentialUse}`);

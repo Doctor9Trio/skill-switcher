@@ -54,7 +54,7 @@ function handleDeepLinking() {
           window.ShelfStore.addQuick(quickSaveUrl, '', '', '');
           if (typeof renderDiscoveryUI === 'function') renderDiscoveryUI();
           if (typeof showToast === 'function') {
-            showToast('Saved resource to Shelf Inbox! 📥');
+            showToast('Saved resource to Shelf Inbox');
           }
         }
       }, 150);
