@@ -8,6 +8,7 @@
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
   <img src="https://img.shields.io/badge/Interface-GitHub%20Primer-1f2328.svg" alt="Interface">
   <img src="https://img.shields.io/badge/Verified%20Tools-87%20Subskills-success.svg" alt="87 Verified Tools">
+  <img src="https://img.shields.io/badge/The%20Shelf-Discovery%20Graph-blueviolet.svg" alt="The Shelf">
   <img src="https://img.shields.io/badge/Offline-100%25%20Local-success.svg" alt="Local Offline">
   <img src="https://img.shields.io/badge/Author-Doctor9Trio-0969da.svg" alt="Author">
 </p>
@@ -32,6 +33,15 @@ Modern AI coding agents (Antigravity IDE, Claude Code, Gemini CLI, Cursor, Winds
 ## ✨ Features & Architecture
 
 - **GitHub Primer UI/UX**: Built natively with GitHub's exact design system, Geist typography, crisp SVG Octicons, and Light/Dark mode.
+- **📚 The Shelf (Technology Discovery Library & Inspiration Graph)**:
+  - High-speed personal engineering repository and design library.
+  - Zero-friction **5-second Quick Capture** directly into your Inbox.
+  - **Curated Topic Collections**: Visual topic folders for *Design & Visual Identity*, *React & Animation Engines*, *Typography & Monospace Lab*, *CRO & Growth Psychology*, *AI Tools & Architectures*, and *Developer Tools*.
+  - **1-Click Browser Bookmarklet**: Draggable bookmarklet button that captures any webpage or repository URL and title from any browser tab into your Shelf without leaving the page.
+  - **Dual-Context Capture**: Captures both *"💭 Why I saved this"* (personal context) and *"🚀 Potential use"* (future application in active codebases).
+  - **✨ Rediscover Engine**: Keeps saved resources alive by resurfacing past discoveries at the top of your feed with original notes and 1-click in-use adoption.
+  - **Interactive Tag Cloud**: Expandable drawer with live tag frequencies and instant cross-cutting filtering.
+  - **1-Click Markdown Citation (`📋 MD`)**: Copies formatted markdown citations and filtered list exports for PRs, notes, and RFCs.
 - **Workflow Stacks (1-Click Presets)**:
   - 🎨 **Frontend Motion** — GSAP Core, ScrollTrigger, React, Timeline, Motion Dev, Emil Kowalski Animate & Impeccable Design.
   - ⚡ **JEV DOM Loop** — Sub-second headless browser clicks & input verification loop, Drone spatial engine, Desktop agent, and Canny verifier.
@@ -57,6 +67,104 @@ Modern AI coding agents (Antigravity IDE, Claude Code, Gemini CLI, Cursor, Winds
   - Modal matrix listing all 87 subskills, file paths, file sizes, and verification status.
 - **100% Offline & Private**:
   - Zero telemetry, zero cloud lock-in. All credentials and configurations stay strictly on your local machine.
+
+---
+
+## 📚 The Shelf — Personal Technology Discovery & Inspiration Graph
+
+**The Shelf** is a high-speed personal technology discovery library integrated directly into Skill Switcher. Inspired by the visual curation of *recent.design*, the typography constraints of *constraint.systems*, and the behavioral teardowns of *growth.design*, The Shelf bridges the gap between discovering exciting open-source libraries, UI patterns, or AI models and actually applying them to your engineering projects.
+
+```
++---------------------------------------------------------------------------------------------------------+
+|                                    THE SHELF — DISCOVERY WORKFLOW                                       |
+|                                                                                                         |
+|  [Any Browser Tab]                                                                                      |
+|         │                                                                                               |
+|         ├── Drag & Click "📥 + Add to Shelf" Bookmarklet                                                |
+|         │                                                                                               |
+|  [The Shelf Inbox] ──────► Enrich GitHub Meta (Stars, Lang, Desc)                                       |
+|         │                                                                                               |
+|         ├── Assign Curated Topic Collection (Design, React, Typography, CRO, AI, Tools)                 |
+|         ├── Record Dual Context: "💭 Why I saved this" & "🚀 Potential use in codebase"                 |
+|         ├── Anchor to Project: (EKA Connect, FrontEnd, Skills-Switcher)                                 |
+|         │                                                                                               |
+|  [✨ Rediscover Engine] ──► Keep discoveries alive at top of feed                                       |
+|  [📋 1-Click MD Copy]  ──► Instantly paste citations into PRs, RFCs, or agent instructions              |
++---------------------------------------------------------------------------------------------------------+
+```
+
+### 🎯 The Core Philosophy: Eliminating "Bookmark Graveyards"
+Most developers save bookmarks that sit forgotten in browser folders. The Shelf solves this through four core architectural pillars:
+1. **5-Second Zero-Friction Capture**: Paste any link into the top bar and press <kbd>Enter</kbd> to save directly to your **Inbox**.
+2. **Dual-Context Capture**: Every discovery records not just a URL, but:
+   - **💭 Why I saved this**: The specific aesthetic, mechanism, or performance win that stood out.
+   - **🚀 Potential use**: Where and how this can be applied in your active codebase (e.g. *"Use in live telematics map or FrontEnd design tokens"*).
+3. **Project Anchoring**: Connects discoveries directly to your active engineering projects.
+4. **✨ Rediscover Engine**: Randomly resurfaces past discoveries at the top of your feed with your original notes, keeping saved resources alive and actionable.
+
+---
+
+### 🏷️ Curated Topic Collections & Folders
+The Shelf automatically organizes discoveries into structured topic buckets:
+
+| Collection | Theme | Focus Areas |
+|---|---|---|
+| 🎨 **Design & Visual Identity** | Aesthetic Reference | Masonry grids, editorial cards, dark mode palettes, visual craft |
+| ⚡ **React & Animation Engines** | Motion & Physics | Framer Motion, spring physics, gesture systems, layout transitions |
+| 🧪 **Typography & Monospace Lab**| Typographic Utility | Variable fonts, monospace experiments, font pairing, specimens |
+| 📈 **CRO & Growth Psychology**  | Behavioral UX | A/B testing teardowns, onboarding friction reduction, psych loops |
+| 🧠 **AI Tools & Architectures**  | Agentic Systems | Multi-agent coordination, memory systems, embeddings, vision models |
+| 🛠️ **Developer Tools**          | Productivity | Terminal CLIs, performance monitors, debuggers, local automation |
+
+- **Collections Overview**: Click the **"🏷️ Collections"** tab to see all topic folders, item counters, and recent sample items.
+- **1-Click Card Navigation**: Click any collection tag (e.g. `🏷️ React & Animation Engines`) on any card to filter immediately to that topic.
+
+---
+
+### 📥 1-Click Browser Bookmarklet
+Save any active web page or GitHub repo into your Shelf Inbox in 1 click without leaving the page:
+
+1. Click the **"Bookmarklet"** button in the Shelf header to open the helper modal.
+2. Drag the **`📥 + Add to Shelf`** button onto your browser's Bookmarks bar.
+3. *Alternative (manual bookmark URL):*
+   ```javascript
+   javascript:(function(){var u=encodeURIComponent(window.location.href);var t=encodeURIComponent(document.title||'');window.open('http://localhost:7891/index.html?quickSaveUrl='+u+'&title='+t,'_blank');})();
+   ```
+4. **How it works**: Clicking the bookmarklet grabs the current page's URL and title, opens Skill Switcher, saves it directly to your Inbox, enriches it with GitHub metadata and favicons, and displays an instant confirmation toast.
+
+---
+
+### 🏷️ Interactive Tag Cloud Drawer
+- Click **"Tags (N)"** in the search bar to toggle the expandable tag cloud drawer.
+- Displays all topic tags ranked by frequency (e.g. `#branding (2)`, `#typography (2)`, `#animation (1)`).
+- Click any tag chip to filter all discoveries across every collection in real time.
+- Active filters display in a top banner with individual remove buttons and a **"Reset All Filters"** button.
+
+---
+
+### 📋 Markdown Export & Quick Citation
+- **Single Discovery Citation (`📋 MD`)**: Click the **`📋 MD`** button on any discovery card to copy a clean markdown link with your personal notes and potential use to your clipboard:
+  ```markdown
+  [Recent Design](https://recent.design/) *(Project: FrontEnd)* — *Why: Pinterest-style masonry layout where cards let screenshots supply the color.* *(Potential use: EKA Connect visual feed redesign.)* #gallery #masonry #inspiration
+  ```
+- **Filtered List Copy (`Copy List`)**: Click **"Copy List"** on the search bar to copy all matching discoveries as an organized markdown list.
+- **Full Markdown Export**: Click **"Export MD"** to download `DISCOVERY-LIBRARY.md` grouped by project anchors.
+- **JSON Backup & Merge Import**: Export full JSON backups or merge JSON files without creating duplicate URLs.
+
+---
+
+### ⌨️ Shelf Keyboard Shortcuts
+
+| Shortcut | Action | Scope |
+|---|---|---|
+| <kbd>/</kbd> | Focus search bar | Global (when no input is focused) |
+| <kbd>n</kbd> or <kbd>+</kbd> | Open "+ Add Resource" modal | Global (when no input is focused) |
+| <kbd>m</kbd> | Export `DISCOVERY-LIBRARY.md` | Global (when no input is focused) |
+| <kbd>b</kbd> | Export JSON Backup | Global (when no input is focused) |
+| <kbd>1</kbd> | Switch to Masonry Card Grid view | Global (when no input is focused) |
+| <kbd>2</kbd> | Switch to Dense Table List view | Global (when no input is focused) |
+| <kbd>Escape</kbd> | Clear active tag/collection/search filter or close modal | Global |
+| <kbd>Ctrl</kbd> + <kbd>Enter</kbd> | Submit & save discovery in modal | Inside Add/Edit modal |
 
 ---
 
@@ -265,10 +373,11 @@ Skills-Switcher/
 │   ├── layout.css               # Navbar, sidebar, three-column grid layout
 │   └── components.css           # Cards, badges, modals, telemetry, animations
 │
-├── js/                          # ← NEW: Modular JavaScript
+├── js/                          # Modular JavaScript
 │   ├── data/
 │   │   ├── repos-catalog.js     # All 62+ skill repository definitions + REPOS array
-│   │   └── presets.js           # WORKFLOW_PRESETS & category definitions
+│   │   ├── presets.js           # WORKFLOW_PRESETS & category definitions
+│   │   └── shelf-store.js       # The Shelf: Discovery Store, Collections & Markdown Engine
 │   ├── state/
 │   │   └── store.js             # Redux-lite state engine + localStorage persistence
 │   ├── services/
@@ -278,16 +387,17 @@ Skills-Switcher/
 │   └── ui/
 │       ├── render-feed.js       # Accordion feed, repo filter, skill cards renderer
 │       ├── render-modals.js     # Intent Router, Inspect modal, markdown formatter
-│       └── app.js               # Application entry point & keyboard shortcuts
+│       ├── render-shelf.js      # The Shelf: Collections, Cards, Tag Cloud & Rediscover UI
+│       └── app.js               # Application entry point, deep-linking & shortcuts
 │
-├── pages/                       # ← NEW: Standalone tools pages
+├── pages/                       # Standalone tools pages
 │   └── token-monitor.html       # Live Token Monitor dashboard
 │
-├── scripts/                     # ← NEW: Build & maintenance scripts
+├── scripts/                     # Build & maintenance scripts
 │   ├── split-to-modules.js      # Extracts monolith → modular structure (run once)
 │   └── inject-nav.js            # Injects nav links into index.html
 │
-├── index.html                   # Lean shell (984 lines, loads modular CSS+JS)
+├── index.html                   # Lean shell (loads modular CSS+JS)
 ├── skill-gui.html               # Mirror of index.html (served as default GUI)
 ├── index.html.bak               # Original monolith backup (8,465 lines)
 ├── skill-gui-server.ps1         # Local HTTP REST server (10 API endpoints)
@@ -359,12 +469,15 @@ A dedicated full-screen telemetry command center styled with GitHub Primer token
 - **1-Click Markdown Export**: Copies formatted forecast tables directly to your clipboard.
 
 ### 🔗 Deep Linking & Bidirectional Redirection
-Seamlessly navigate between Skill Switcher and Token Monitor with URL parameters:
+Seamlessly navigate between Skill Switcher, The Shelf, and Token Monitor with URL parameters:
+- `index.html?open=shelf` — Opens The Shelf discovery library
+- `index.html?quickSaveUrl=https://github.com/...&title=RepoTitle` — 1-Click quick capture to Shelf Inbox from any browser tab via bookmarklet
 - `pages/token-monitor.html?currency=EUR&chart=area&metric=cost&range=14`
 - `pages/token-monitor.html?open=settings`
 - `pages/token-monitor.html?open=estimator`
 - Return to main Skill Switcher tabs directly via subnav breadcrumbs:
   - `../index.html` (Skills & Packs)
+  - `../index.html?open=shelf` (The Shelf)
   - `../index.html?open=laya` (Laya Playground)
   - `../index.html?open=keys` (API Key Vault)
   - `../index.html?open=health` (Verification Matrix)
