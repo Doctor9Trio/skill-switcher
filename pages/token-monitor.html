@@ -743,7 +743,7 @@
           <path d="M1.5 14.25a.75.75 0 0 1 0-1.5H2v-6.25a.75.75 0 0 1 1.5 0V12.75h2V8a.75.75 0 0 1 1.5 0v4.75h2V5a.75.75 0 0 1 1.5 0v7.75h2V3a.75.75 0 0 1 1.5 0v9.75h.5a.75.75 0 0 1 0 1.5Z"></path>
         </svg>
         <span>Live Token Monitor</span>
-        <span class="counter-bubble">Live</span>
+        <span class="counter-bubble" id="subnav-token-count">Live</span>
       </button>
       <a href="../index.html?open=shelf" class="subnav-tab" style="text-decoration:none;" title="Discovery Library — The Shelf">
         <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
@@ -1609,6 +1609,13 @@
     const statsClientCache = {};
     const trendsClientCache = {};
 
+    // ─── DOM Helper ─────────────────────────────────────────────────────────────
+    function setElText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+      return el;
+    }
+
     // ─── Formatters ─────────────────────────────────────────────────────────────
     function fmtIndian(n) {
       if (n === null || n === undefined || isNaN(n)) return '—';
@@ -2019,111 +2026,128 @@
 
     // ─── DOM Renderers ──────────────────────────────────────────────────────────
     function renderStats(d) {
-      const total = d.total_tokens || 0;
-      const inp = d.input_tokens || 0;
-      const out = d.output_tokens || 0;
-      const hit = d.cache_hit_tokens || 0;
-      const miss = d.cache_miss_tokens || 0;
-      const costU = d.cost_usd || 0;
-      const hitPct = d.cache_hit_pct || 86;
+      if (!d) return;
+      try {
+        const total = d.total_tokens || 0;
+        const inp = d.input_tokens || 0;
+        const out = d.output_tokens || 0;
+        const hit = (d.cache_hit_tokens !== undefined && d.cache_hit_tokens !== null) ? d.cache_hit_tokens : Math.round(inp * 0.86);
+        const miss = (d.cache_miss_tokens !== undefined && d.cache_miss_tokens !== null) ? d.cache_miss_tokens : (inp - hit);
+        const costU = (d.cost_usd !== undefined && d.cost_usd !== null) ? d.cost_usd : 0;
+        const hitPct = (d.cache_hit_pct !== undefined && d.cache_hit_pct !== null) ? d.cache_hit_pct : (inp > 0 ? Math.round((hit / inp) * 100) : 86);
 
-      // 1. KPI Total Tokens
-      document.getElementById('kpi-total-tokens').textContent = fmtIndian(total);
-      document.getElementById('kpi-tokens-sub').textContent = `In: ${fmtCompact(inp)} • Out: ${fmtCompact(out)}`;
-      document.getElementById('subnav-token-count').textContent = fmtCompact(total);
+        // 1. KPI Total Tokens
+        setElText('kpi-total-tokens', fmtIndian(total));
+        setElText('kpi-tokens-sub', `In: ${fmtCompact(inp)} • Out: ${fmtCompact(out)}`);
+        const subnavCount = document.getElementById('subnav-token-count');
+        if (subnavCount) subnavCount.textContent = total > 0 ? fmtCompact(total) : 'Live';
 
-      // 2. KPI Cost
-      document.getElementById('kpi-cost-val').textContent = fmtMoney(costU);
-      document.getElementById('kpi-cost-sec').textContent = `$${costU.toFixed(4)} USD`;
-      document.getElementById('kpi-rate-tag').textContent = `${CURRENCIES[currency]?.symbol || '$'}${exchangeRate.toFixed(2)}/USD`;
+        // 2. KPI Cost
+        setElText('kpi-cost-val', fmtMoney(costU));
+        setElText('kpi-cost-sec', `$${costU.toFixed(4)} USD`);
+        setElText('kpi-rate-tag', `${CURRENCIES[currency]?.symbol || '$'}${exchangeRate.toFixed(2)}/USD`);
 
-      // 3. KPI Cache Efficiency
-      document.getElementById('kpi-cache-pct').textContent = `${hitPct}%`;
-      document.getElementById('kpi-cache-saved').textContent = `${fmtCompact(hit)} Cached Tokens`;
+        // 3. KPI Cache Efficiency
+        setElText('kpi-cache-pct', `${hitPct}%`);
+        setElText('kpi-cache-saved', `${fmtCompact(hit)} Cached Tokens`);
 
-      // 4. KPI Trajectory Activity
-      const sess = d.session_count || 1;
-      document.getElementById('kpi-sessions-val').textContent = `${sess} ${sess === 1 ? 'Session' : 'Sessions'}`;
+        // 4. KPI Trajectory Activity
+        const sess = d.session_count || (d.sessions_list ? d.sessions_list.length : 1);
+        setElText('kpi-sessions-val', `${sess} ${sess === 1 ? 'Session' : 'Sessions'}`);
 
-      // Tool Total count
-      const tools = d.tool_breakdown || {};
-      const toolCount = Object.values(tools).reduce((a, b) => a + b, 0);
-      document.getElementById('kpi-tools-total').textContent = `${toolCount} Tool Invocations`;
-      document.getElementById('tool-total-pill').textContent = `${Object.keys(tools).length} Unique Tools`;
+        // Tool Total count
+        const tools = d.tool_breakdown || {};
+        const toolCount = Object.values(tools).reduce((a, b) => a + b, 0);
+        setElText('kpi-tools-total', `${toolCount} Tool Invocations`);
+        setElText('tool-total-pill', `${Object.keys(tools).length} Unique Tools`);
 
-      // 5. Context Stream Anatomy
-      document.getElementById('anat-hit').textContent = `${fmtIndian(hit)} (${inp > 0 ? Math.round((hit / inp) * 100) : 0}%)`;
-      document.getElementById('anat-miss').textContent = `${fmtIndian(miss)} (${inp > 0 ? Math.round((miss / inp) * 100) : 0}%)`;
-      document.getElementById('anat-out').textContent = `${fmtIndian(out)} (${total > 0 ? Math.round((out / total) * 100) : 0}%)`;
-      document.getElementById('anat-total').textContent = fmtIndian(total);
+        // 5. Context Stream Anatomy
+        setElText('anat-hit', `${fmtIndian(hit)} (${inp > 0 ? Math.round((hit / inp) * 100) : 0}%)`);
+        setElText('anat-miss', `${fmtIndian(miss)} (${inp > 0 ? Math.round((miss / inp) * 100) : 0}%)`);
+        setElText('anat-out', `${fmtIndian(out)} (${total > 0 ? Math.round((out / total) * 100) : 0}%)`);
+        setElText('anat-total', fmtIndian(total));
 
-      // Stacked segment widths
-      if (total > 0) {
-        document.getElementById('seg-cache').style.width = `${Math.round((hit / total) * 100)}%`;
-        document.getElementById('seg-miss').style.width = `${Math.round((miss / total) * 100)}%`;
-        document.getElementById('seg-out').style.width = `${Math.round((out / total) * 100)}%`;
-      }
-
-      // 6. Rolling Limits & Budget Thresholds
-      const used5h = (d.rolling_5h !== undefined && d.rolling_5h !== null) ? d.rolling_5h : Math.round(total * 0.25);
-      const usedWk = (d.weekly_total !== undefined && d.weekly_total !== null) ? d.weekly_total : (currentPeriod === 'month' ? Math.round(total * 0.3) : total);
-      const usedMo = (d.monthly_total !== undefined && d.monthly_total !== null) ? d.monthly_total : total;
-
-      function calcPct(used, limit) {
-        if (!limit || limit <= 0) return 0;
-        return (used / limit) * 100;
-      }
-      function fmtPctStr(pct) {
-        if (pct <= 0) return '0% Used';
-        if (pct < 1) return pct.toFixed(1) + '% Used';
-        return Math.round(pct) + '% Used';
-      }
-
-      const rawPct5h = calcPct(used5h, limit5h);
-      const rawPctWk = calcPct(usedWk, limitWk);
-      const rawPctMo = calcPct(usedMo, limitMo);
-
-      const bar5h = document.getElementById('limit-5h-bar');
-      const barWk = document.getElementById('limit-wk-bar');
-      const barMo = document.getElementById('limit-mo-bar');
-
-      // Provide minimum 2.5% visible width when used > 0
-      bar5h.style.width = used5h > 0 ? `${Math.min(100, Math.max(2.5, rawPct5h))}%` : '0%';
-      barWk.style.width = usedWk > 0 ? `${Math.min(100, Math.max(2.5, rawPctWk))}%` : '0%';
-      barMo.style.width = usedMo > 0 ? `${Math.min(100, Math.max(2.5, rawPctMo))}%` : '0%';
-
-      bar5h.className = 'tm-limit-bar-fill' + (rawPct5h >= 90 ? ' danger' : rawPct5h >= alertThreshold ? ' warn' : '');
-      barWk.className = 'tm-limit-bar-fill' + (rawPctWk >= 90 ? ' danger' : rawPctWk >= alertThreshold ? ' warn' : '');
-      barMo.className = 'tm-limit-bar-fill' + (rawPctMo >= 90 ? ' danger' : rawPctMo >= alertThreshold ? ' warn' : '');
-
-      document.getElementById('limit-5h-used').textContent = `${fmtCompact(used5h)} / ${fmtCompact(limit5h)}`;
-      document.getElementById('limit-5h-pct').textContent = fmtPctStr(rawPct5h);
-      document.getElementById('limit-wk-used').textContent = `${fmtCompact(usedWk)} / ${fmtCompact(limitWk)}`;
-      document.getElementById('limit-wk-pct').textContent = fmtPctStr(rawPctWk);
-      document.getElementById('limit-mo-used').textContent = `${fmtCompact(usedMo)} / ${fmtCompact(limitMo)}`;
-      document.getElementById('limit-mo-pct').textContent = fmtPctStr(rawPctMo);
-
-      // Status badge update
-      const statusPill = document.getElementById('budget-status-pill');
-      if (statusPill) {
-        const maxPct = Math.max(rawPct5h, rawPctWk, rawPctMo);
-        if (maxPct >= 90) {
-          statusPill.className = 'gh-pill red';
-          statusPill.textContent = 'Critical (>90%)';
-        } else if (maxPct >= alertThreshold) {
-          statusPill.className = 'gh-pill yellow';
-          statusPill.textContent = `Warning (${Math.round(maxPct)}%)`;
+        // Stacked segment widths
+        const segCache = document.getElementById('seg-cache');
+        const segMiss = document.getElementById('seg-miss');
+        const segOut = document.getElementById('seg-out');
+        if (total > 0) {
+          if (segCache) segCache.style.width = `${Math.round((hit / total) * 100)}%`;
+          if (segMiss) segMiss.style.width = `${Math.round((miss / total) * 100)}%`;
+          if (segOut) segOut.style.width = `${Math.round((out / total) * 100)}%`;
         } else {
-          statusPill.className = 'gh-pill green';
-          statusPill.textContent = 'Healthy';
+          if (segCache) segCache.style.width = '0%';
+          if (segMiss) segMiss.style.width = '0%';
+          if (segOut) segOut.style.width = '0%';
         }
+
+        // 6. Rolling Limits & Budget Thresholds
+        const used5h = (d.rolling_5h !== undefined && d.rolling_5h !== null) ? d.rolling_5h : Math.round(total * 0.25);
+        const usedWk = (d.weekly_total !== undefined && d.weekly_total !== null) ? d.weekly_total : (currentPeriod === 'month' ? Math.round(total * 0.3) : total);
+        const usedMo = (d.monthly_total !== undefined && d.monthly_total !== null) ? d.monthly_total : total;
+
+        function calcPct(used, limit) {
+          if (!limit || limit <= 0) return 0;
+          return (used / limit) * 100;
+        }
+        function fmtPctStr(pct) {
+          if (pct <= 0) return '0% Used';
+          if (pct < 1) return pct.toFixed(1) + '% Used';
+          return Math.round(pct) + '% Used';
+        }
+
+        const rawPct5h = calcPct(used5h, limit5h);
+        const rawPctWk = calcPct(usedWk, limitWk);
+        const rawPctMo = calcPct(usedMo, limitMo);
+
+        const bar5h = document.getElementById('limit-5h-bar');
+        const barWk = document.getElementById('limit-wk-bar');
+        const barMo = document.getElementById('limit-mo-bar');
+
+        if (bar5h) {
+          bar5h.style.width = used5h > 0 ? `${Math.min(100, Math.max(2.5, rawPct5h))}%` : '0%';
+          bar5h.className = 'tm-limit-bar-fill' + (rawPct5h >= 90 ? ' danger' : rawPct5h >= alertThreshold ? ' warn' : '');
+        }
+        if (barWk) {
+          barWk.style.width = usedWk > 0 ? `${Math.min(100, Math.max(2.5, rawPctWk))}%` : '0%';
+          barWk.className = 'tm-limit-bar-fill' + (rawPctWk >= 90 ? ' danger' : rawPctWk >= alertThreshold ? ' warn' : '');
+        }
+        if (barMo) {
+          barMo.style.width = usedMo > 0 ? `${Math.min(100, Math.max(2.5, rawPctMo))}%` : '0%';
+          barMo.className = 'tm-limit-bar-fill' + (rawPctMo >= 90 ? ' danger' : rawPctMo >= alertThreshold ? ' warn' : '');
+        }
+
+        setElText('limit-5h-used', `${fmtCompact(used5h)} / ${fmtCompact(limit5h)}`);
+        setElText('limit-5h-pct', fmtPctStr(rawPct5h));
+        setElText('limit-wk-used', `${fmtCompact(usedWk)} / ${fmtCompact(limitWk)}`);
+        setElText('limit-wk-pct', fmtPctStr(rawPctWk));
+        setElText('limit-mo-used', `${fmtCompact(usedMo)} / ${fmtCompact(limitMo)}`);
+        setElText('limit-mo-pct', fmtPctStr(rawPctMo));
+
+        // Status badge update
+        const statusPill = document.getElementById('budget-status-pill');
+        if (statusPill) {
+          const maxPct = Math.max(rawPct5h, rawPctWk, rawPctMo);
+          if (maxPct >= 90) {
+            statusPill.className = 'gh-pill red';
+            statusPill.textContent = 'Critical (>90%)';
+          } else if (maxPct >= alertThreshold) {
+            statusPill.className = 'gh-pill yellow';
+            statusPill.textContent = `Warning (${Math.round(maxPct)}%)`;
+          } else {
+            statusPill.className = 'gh-pill green';
+            statusPill.textContent = 'Healthy';
+          }
+        }
+
+        // 7. Render Tool Execution Table
+        renderToolTable(tools, toolCount);
+
+        // 8. Render Model Pricing Matrix
+        renderModelMatrix(inp, out);
+      } catch (err) {
+        console.error('[TokenMonitor] Error rendering stats:', err);
       }
-
-      // 7. Render Tool Execution Table
-      renderToolTable(tools, toolCount);
-
-      // 8. Render Model Pricing Matrix
-      renderModelMatrix(inp, out);
     }
 
     function renderToolTable(tools, totalInvocations) {
@@ -2178,6 +2202,16 @@
     function renderModelMatrix(inp, out) {
       const tbody = document.getElementById('model-matrix-body');
       if (!tbody) return;
+
+      const pill = document.getElementById('active-model-pill');
+      if (pill) {
+        const cur = MODEL_PRICES[currentModel];
+        if (cur) {
+          pill.textContent = cur.name.replace(/\s*\(.*?\)/, '').trim();
+        } else {
+          pill.textContent = currentModel;
+        }
+      }
 
       tbody.innerHTML = Object.entries(MODEL_PRICES).map(([key, m]) => {
         const isCur = (key === currentModel);
@@ -2243,10 +2277,10 @@
         : (avgVelocity * 30 / 1_000_000) * ((curPrice.in + curPrice.out) / 2);
       const cacheTokensSaved = Math.round(sumTotal * 0.86);
 
-      document.getElementById('stat-peak-burn').textContent = maxTotal > 0 ? (isHourly ? `${fmtCompact(maxTotal)} (@ ${maxDate})` : `${fmtCompact(maxTotal)} (${maxDate})`) : '—';
-      document.getElementById('stat-avg-velocity').textContent = isHourly ? `${fmtCompact(avgVelocity)}/hr avg` : `${fmtCompact(avgVelocity)}/day avg`;
-      document.getElementById('stat-run-rate').textContent = fmtMoney(monthlyCostRunRateUsd);
-      document.getElementById('stat-cache-savings').textContent = `${fmtCompact(cacheTokensSaved)} tokens`;
+      setElText('stat-peak-burn', maxTotal > 0 ? (isHourly ? `${fmtCompact(maxTotal)} (@ ${maxDate})` : `${fmtCompact(maxTotal)} (${maxDate})`) : '—');
+      setElText('stat-avg-velocity', isHourly ? `${fmtCompact(avgVelocity)}/hr avg` : `${fmtCompact(avgVelocity)}/day avg`);
+      setElText('stat-run-rate', fmtMoney(monthlyCostRunRateUsd));
+      setElText('stat-cache-savings', `${fmtCompact(cacheTokensSaved)} tokens`);
 
       // Canvas Gradient Generator for Smooth Spline Area
       const ctx = canvas.getContext('2d');
