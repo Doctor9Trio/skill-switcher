@@ -1281,6 +1281,8 @@
           return '🗺️';
         case 'zipai-optimizer':
           return '🗜️';
+        case 'getshitdone':
+          return '🎯';
         case 'gemini-prompt-cache':
           return '💾';
         case 'typesafe-mcp':
@@ -1378,19 +1380,23 @@
         'get_architecture_overview_tool': 'Provides high-level system architectural component breakdown.',
         'semantic_search_nodes_tool': 'Vector-powered semantic similarity search across repository functions.',
         'embed_graph_tool': 'Embeds code graph into local high-dimensional vector representations.',
-        'list_graph_stats_tool': 'Returns summary telemetry of nodes, edges, and density.'
+        'list_graph_stats_tool': 'Returns summary telemetry of nodes, edges, and density.',
+        'gsd-core': 'Autonomous execution loop orchestrator (Discuss -> Plan -> Execute -> Verify -> Ship).',
+        'gsd-plan': 'Generates atomic phase specifications and task dependency DAG into persistent PLAN.md.',
+        'gsd-execute': 'Dispatches task execution to fresh subagents with clean context, preventing context rot.',
+        'gsd-verify': 'Executes automated tests and verifies spec compliance before generating atomic git commits.'
       };
 
       plugin.tools.forEach(toolName => {
         const item = document.createElement('div');
         item.className = 'tool-item';
-        const desc = toolDescriptions[toolName] || 'AST code graph tool providing instant symbol resolution.';
-        const isSuperSaver = (toolName === 'get_minimal_context_tool' || toolName === 'get_impact_radius_tool');
+        const desc = toolDescriptions[toolName] || 'Specialized tool providing high-efficiency execution.';
+        const isSuperSaver = (toolName === 'get_minimal_context_tool' || toolName === 'get_impact_radius_tool' || toolName === 'gsd-execute');
 
         item.innerHTML = `
           <div class="tool-item-name">
             <span>${toolName}</span>
-            ${isSuperSaver ? '<span class="pl-badge pl-badge-success">⚡ Saves ~14.9k tok</span>' : '<span class="pl-badge pl-badge-blue">AST Tool</span>'}
+            ${isSuperSaver ? '<span class="pl-badge pl-badge-success">⚡ Saves ~15k+ tok</span>' : '<span class="pl-badge pl-badge-blue">Tool</span>'}
           </div>
           <div class="tool-item-desc">${desc}</div>
         `;

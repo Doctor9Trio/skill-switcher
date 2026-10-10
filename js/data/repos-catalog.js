@@ -2614,6 +2614,142 @@ const REPOS = [
       }
     ],
     "hasApiKey": false
+  },
+  {
+    "id": "repo-token-saver-plugins",
+    "name": "Doctor9Trio/token-saver-plugins",
+    "desc": "Autonomous knowledge graphs, prompt compression, and AST profilers reducing token consumption by 50%–90%.",
+    "cat": "mcp",
+    "subcat": "tools",
+    "stars": 842,
+    "forks": 129,
+    "lang": "TypeScript / Python",
+    "langColor": "#3178c6",
+    "updated": "Today",
+    "icon": "mcp",
+    "subskills": [
+      {
+        "id": "code-review-graph",
+        "name": "code-review-graph",
+        "cat": "mcp",
+        "subcat": "tools",
+        "desc": "Code Review Graph knowledge graph engine providing semantic AST lookups, blast radius checks, and impact analysis without full-file reading.",
+        "purpose": "Cut token usage by replacing blind file reading with graph queries (caller/callee, blast radius, semantic node search).",
+        "trigger": "code-review-graph, review codebase, blast radius, ast query, impact radius, query_graph",
+        "example_prompt": "Use code-review-graph to calculate the blast radius of modifying user-service.ts before editing.",
+        "files": [
+          ".agents/skills/code-review-graph/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/Doctor9Trio/skill-switcher.git",
+        "act": "CODE-REVIEW-GRAPH: ALWAYS use code-review-graph MCP tools BEFORE Grep/Glob/Read.\n• Exploring code: semantic_search_nodes or query_graph instead of Grep\n• Understanding impact: get_impact_radius instead of manually tracing imports\n• Code review: detect_changes + get_review_context instead of reading entire files\n• Finding relationships: query_graph (callers_of, callees_of, imports_of, tests_for)\n• Architecture questions: get_architecture_overview + list_communities\n• Fall back to Grep/Glob/Read ONLY when the graph does not cover what you need.",
+        "repoName": "Doctor9Trio/token-saver-plugins",
+        "repoUrl": "https://github.com/Doctor9Trio/skill-switcher",
+        "lang": "Python",
+        "langColor": "#3572A5",
+        "requiresApiKey": false
+      },
+      {
+        "id": "ponytail",
+        "name": "ponytail",
+        "cat": "mcp",
+        "subcat": "tools",
+        "desc": "Context-preserving AST & code debt pruner that compresses redundant boilerplate, imports, and logs before LLM ingestion.",
+        "purpose": "Reduce prompt context size by 40-60% while preserving high-order semantic code architecture.",
+        "trigger": "ponytail, compress context, prune code, technical debt reduction, optimize tokens",
+        "example_prompt": "Run ponytail analysis on the backend models to prune dead imports and shrink context size.",
+        "files": [
+          "~/.gemini/config/skills/ponytail/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/Doctor9Trio/skill-switcher.git",
+        "act": "PONYTAIL: Identify and prune token bloat in project files, dead abstractions, and repetitive boilerplate before prompt inclusion.",
+        "repoName": "Doctor9Trio/token-saver-plugins",
+        "repoUrl": "https://github.com/Doctor9Trio/skill-switcher",
+        "lang": "TypeScript",
+        "langColor": "#3178c6",
+        "requiresApiKey": false
+      },
+      {
+        "id": "OmniRoute-omni-compression",
+        "name": "OmniRoute-omni-compression",
+        "cat": "mcp",
+        "subcat": "tools",
+        "desc": "Real-time prompt & terminal output compressor utilizing RTK, Caveman prose, and stacked compression modes.",
+        "purpose": "Slash command output and conversational prose tokens by 60%–90% using lossless token compaction.",
+        "trigger": "OmniRoute, omni-compression, compress output, rtk compression, caveman mode",
+        "example_prompt": "Apply omni-compression to terminal command outputs to save 70% of response tokens.",
+        "files": [
+          "~/.gemini/config/skills/OmniRoute-cli-mcp/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/Doctor9Trio/skill-switcher.git",
+        "act": "OMNI-COMPRESSION: Filter repetitive terminal stdout/stderr, condense stack traces, and summarize multi-line logs into concise token-efficient payloads.",
+        "repoName": "Doctor9Trio/token-saver-plugins",
+        "repoUrl": "https://github.com/Doctor9Trio/skill-switcher",
+        "lang": "TypeScript",
+        "langColor": "#3178c6",
+        "requiresApiKey": false
+      },
+      {
+        "id": "graphify",
+        "name": "graphify",
+        "cat": "mcp",
+        "subcat": "tools",
+        "desc": "Structural knowledge graph extraction engine turning complex multi-file workflows into compact queryable network graphs.",
+        "purpose": "Provide structural code topology and caller trees without re-sending entire source files in each conversation turn.",
+        "trigger": "graphify, knowledge graph, caller graph, dependency tree, structural map",
+        "example_prompt": "Generate a graphify dependency tree for the database migration pipeline.",
+        "files": [
+          "~/.gemini/config/skills/graphify/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/Doctor9Trio/skill-switcher.git",
+        "act": "GRAPHIFY: Query dependency graphs and structural maps instead of reading large directory trees.",
+        "repoName": "Doctor9Trio/token-saver-plugins",
+        "repoUrl": "https://github.com/Doctor9Trio/skill-switcher",
+        "lang": "Python",
+        "langColor": "#3572A5",
+        "requiresApiKey": false
+      },
+      {
+        "id": "zipai-optimizer",
+        "name": "zipai-optimizer",
+        "cat": "mcp",
+        "subcat": "tools",
+        "desc": "Adaptive token optimizer providing intelligent filtering, surgical output, context-window awareness, and VCS diff compression.",
+        "purpose": "Ensure responses never exceed token limits while delivering surgically precise code diffs.",
+        "trigger": "zipai, token optimizer, adaptive token, surgical diff, context budget",
+        "example_prompt": "Optimize token budget for the refactor task using zipai surgical diffing.",
+        "files": [
+          "~/.gemini/config/skills/zipai-optimizer/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/Doctor9Trio/skill-switcher.git",
+        "act": "ZIPAI-OPTIMIZER: Enforce strict token budgeting, surgical diff outputs, and minimal prompt overhead.",
+        "repoName": "Doctor9Trio/token-saver-plugins",
+        "repoUrl": "https://github.com/Doctor9Trio/skill-switcher",
+        "lang": "TypeScript",
+        "langColor": "#3178c6",
+        "requiresApiKey": false
+      },
+      {
+        "id": "getshitdone",
+        "name": "Get Shit Done (GSD)",
+        "cat": "mcp",
+        "subcat": "tools",
+        "desc": "Spec-driven autonomous task execution and context-rot prevention loop (Discuss -> Plan -> Execute -> Verify -> Ship) with atomic commits and persistent markdown states.",
+        "purpose": "Eliminate context degradation and token exhaustion by decomposing large projects into isolated subagent milestones with atomic git commits.",
+        "trigger": "getshitdone, /gsd, spec-driven development, prevent context rot, plan execute verify, gsd-core",
+        "example_prompt": "Run /gsd to plan and execute the new feature with atomic commits and test verification.",
+        "files": [
+          ".agents/skills/getshitdone/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/open-gsd/gsd-core.git",
+        "act": "GSD (GET SHIT DONE): Execute in strict 5-phase loop (DISCUSS -> PLAN -> EXECUTE -> VERIFY -> SHIP). Prevent context rot, keep diffs contiguous and surgical, prove execution with tests before completion.",
+        "repoName": "Doctor9Trio/token-saver-plugins",
+        "repoUrl": "https://github.com/open-gsd/gsd-core",
+        "lang": "TypeScript",
+        "langColor": "#3178c6",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
   }
 ];
 

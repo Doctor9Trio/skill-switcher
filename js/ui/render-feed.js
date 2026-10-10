@@ -36,23 +36,28 @@ function collapseAllRepos() {
 function toggleSelectRepoDirect(repoId, e) {
   if (e) e.stopPropagation();
   store.dispatch({ type: ActionTypes.SELECT_REPO_DIRECT, payload: { repoId } });
+  if (typeof scheduleAutoSaveToDisk === 'function') scheduleAutoSaveToDisk();
 }
 
 function toggleSkill(id) {
   store.dispatch({ type: ActionTypes.TOGGLE_SKILL, payload: { id } });
+  if (typeof scheduleAutoSaveToDisk === 'function') scheduleAutoSaveToDisk();
 }
 
 function selectAllVisibleSkills() {
   const visible = getFilteredSkills();
   store.dispatch({ type: ActionTypes.SELECT_ALL_VISIBLE, payload: { visibleSkillIds: visible.map(s => s.id) } });
+  if (typeof scheduleAutoSaveToDisk === 'function') scheduleAutoSaveToDisk();
 }
 
 function selectBatchCategory(cat) {
   store.dispatch({ type: ActionTypes.BATCH_SELECT_CATEGORY, payload: { cat } });
+  if (typeof scheduleAutoSaveToDisk === 'function') scheduleAutoSaveToDisk();
 }
 
 function clearAllSelections() {
   store.dispatch({ type: ActionTypes.CLEAR_ALL_SELECTIONS });
+  if (typeof scheduleAutoSaveToDisk === 'function') scheduleAutoSaveToDisk();
   showToast('Reset all selections', false);
 }
 
@@ -567,6 +572,68 @@ async function applySkills() {
   if (btnDock) { btnDock.disabled = false; btnDock.textContent = 'Apply to Antigravity Memory'; }
   if (btnRight) { btnRight.disabled = false; btnRight.textContent = 'Apply to Antigravity Memory'; }
 }
+
+// ─── Live Auto-Save to Disk Engine (Debounced & Persistent) ───
+let autoSaveDiskTimer = null;
+let isAutoSaveDiskEnabled = true;
+
+function scheduleAutoSaveToDisk(delay = 600) {
+  if (!isAutoSaveDiskEnabled) return;
+  if (autoSaveDiskTimer) clearTimeout(autoSaveDiskTimer);
+  const btnDock = document.getElementById('apply-btn');
+  const btnRight = document.getElementById('apply-btn-right');
+  if (btnDock) { btnDock.textContent = 'Auto-saving to disk...'; }
+  if (btnRight) { btnRight.textContent = 'Auto-saving...'; }
+
+  autoSaveDiskTimer = setTimeout(async () => {
+    try {
+      await applySkillsDirectSilent();
+    } catch (e) {
+      console.warn('Auto-save to disk failed:', e);
+    }
+  }, delay);
+}
+
+async function applySkillsDirectSilent() {
+  if (typeof ensureServerContext === 'function') {
+    try { await ensureServerContext(); } catch (e) {}
+  }
+  const content = generateActiveRules();
+  try {
+    const res = await fetch('/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content })
+    });
+    if (res.ok) {
+      const btnDock = document.getElementById('apply-btn');
+      const btnRight = document.getElementById('apply-btn-right');
+      if (btnDock) btnDock.textContent = '✓ Saved to Antigravity';
+      if (btnRight) btnRight.textContent = '✓ Saved';
+      setTimeout(() => {
+        if (btnDock && !btnDock.disabled) btnDock.textContent = 'Apply to Antigravity';
+        if (btnRight && !btnRight.disabled) btnRight.textContent = 'Apply to Antigravity';
+      }, 2500);
+      const pillText = document.getElementById('memory-live-text');
+      if (pillText) pillText.textContent = 'Disk: ' + (sel ? sel.size : 0) + ' Active';
+    }
+  } catch (err) {}
+}
+
+window.addEventListener('beforeunload', () => {
+  if (autoSaveDiskTimer) {
+    clearTimeout(autoSaveDiskTimer);
+    try {
+      const content = generateActiveRules();
+      const blob = new Blob([JSON.stringify({ content })], { type: 'application/json' });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/apply', blob);
+      } else {
+        fetch('/apply', { method: 'POST', body: blob, keepalive: true });
+      }
+    } catch (e) {}
+  }
+});
 
 function copyActivePrompt() {
   if (!sel.size) { showToast('Select at least one skill first'); return; }

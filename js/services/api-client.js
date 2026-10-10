@@ -66,6 +66,10 @@ async function initServerSync() {
       const data = await resStatus.json();
       diskActiveSkills = data.active_list || [];
       updateDiskStatusBadge(data);
+      // Auto-hydrate on-disk active skills directly into UI selection state
+      if (data.exists && Array.isArray(data.active_list) && data.active_list.length > 0) {
+        syncDiskStateIntoUi(data.active_list);
+      }
     }
   } catch (e) {
     updateDiskStatusBadge({ exists: false, count: 0, offline: true });
@@ -84,6 +88,65 @@ async function initServerSync() {
   } catch (e) {}
 }
 
+// Synchronize disk active skills array directly into Redux store and UI
+function syncDiskStateIntoUi(activeList) {
+  if (!Array.isArray(activeList)) return 0;
+  const catalog = (typeof ALL_SKILLS !== 'undefined' && Array.isArray(ALL_SKILLS)) ? ALL_SKILLS : [];
+  const matchedIds = [];
+
+  activeList.forEach(rawName => {
+    const name = (rawName || '').trim().replace(/[\r\n]/g, '');
+    if (!name) return;
+    const lower = name.toLowerCase();
+
+    // 1. Direct id match
+    let found = catalog.find(s => s.id === name || s.id.toLowerCase() === lower);
+    // 2. Display name match
+    if (!found) {
+      found = catalog.find(s => s.name.toLowerCase() === lower);
+    }
+    // 3. Triggers match
+    if (!found) {
+      found = catalog.find(s => s.triggers && Array.isArray(s.triggers) && s.triggers.some(t => t.toLowerCase() === lower || lower.includes(t.toLowerCase())));
+    }
+    // 4. Fuzzy / partial match
+    if (!found) {
+      found = catalog.find(s => s.id.includes(name) || name.includes(s.id) || (s.repoName && s.repoName.toLowerCase() === lower));
+    }
+
+    if (found) {
+      matchedIds.push(found.id);
+    } else {
+      matchedIds.push(name);
+    }
+  });
+
+  const uniqueIds = Array.from(new Set(matchedIds));
+
+  if (window.store && typeof ActionTypes !== 'undefined') {
+    const curState = window.store.getState();
+    const curSelected = curState.skills?.selectedIds || [];
+    const isSame = curSelected.length === uniqueIds.length && uniqueIds.every(id => curSelected.includes(id));
+    if (!isSame) {
+      window.store.dispatch({
+        type: ActionTypes.HYDRATE_STATE,
+        payload: {
+          savedState: {
+            ...curState,
+            skills: { selectedIds: uniqueIds }
+          }
+        }
+      });
+    }
+  } else if (typeof sel !== 'undefined') {
+    sel.clear();
+    uniqueIds.forEach(id => sel.add(id));
+    if (typeof updateUI === 'function') updateUI();
+  }
+
+  return uniqueIds.length;
+}
+
 function updateDiskStatusBadge(data) {
   const badge = document.getElementById('memory-live-pill');
   const text = document.getElementById('memory-live-text');
@@ -97,7 +160,7 @@ function updateDiskStatusBadge(data) {
   } else if (data.exists && data.count > 0) {
     text.textContent = `Disk: ${data.count} Active`;
     if (dot) dot.className = 'status-indicator-dot active';
-    badge.title = `Active on disk: ${data.active}. Click to sync selection into GUI.`;
+    badge.title = `Active on disk: ${data.active}. Click to re-sync selection into GUI.`;
   } else {
     text.textContent = 'Disk: Clean (0 Active)';
     if (dot) dot.className = 'status-indicator-dot';
@@ -114,18 +177,9 @@ async function syncFromDiskMemory() {
         showToast('Antigravity memory is clean (0 active on disk)');
         return;
       }
-      sel.clear();
-      let matchedCount = 0;
-      data.active_list.forEach(name => {
-        const found = ALL_SKILLS.find(s => s.name.toLowerCase() === name.toLowerCase() || s.id === name);
-        if (found) {
-          sel.add(found.id);
-          matchedCount++;
-        }
-      });
-      updateUI();
+      const count = syncDiskStateIntoUi(data.active_list);
       updateDiskStatusBadge(data);
-      showToast(`Synced ${matchedCount} active skills from disk!`);
+      showToast(`Synced ${count} active skills from disk!`, true);
     } else {
       showToast('Could not reach server to sync disk');
     }
@@ -155,15 +209,23 @@ async function clearDiskMemory() {
 function applyPreset(key) {
   const p = WORKFLOW_PRESETS[key];
   if (!p) return;
-  sel.clear();
-  p.skills.forEach(id => {
-    if (ALL_SKILLS.some(s => s.id === id)) sel.add(id);
-  });
+  const validIds = p.skills.filter(id => (typeof ALL_SKILLS !== 'undefined' ? ALL_SKILLS : []).some(s => s.id === id));
+  if (window.store && typeof ActionTypes !== 'undefined') {
+    const cur = window.store.getState();
+    window.store.dispatch({
+      type: ActionTypes.HYDRATE_STATE,
+      payload: { savedState: { ...cur, skills: { selectedIds: validIds } } }
+    });
+  } else {
+    sel.clear();
+    validIds.forEach(id => sel.add(id));
+    updateUI();
+  }
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   const activeBtn = document.querySelector(`.preset-btn[onclick*="${key}"]`);
   if (activeBtn) activeBtn.classList.add('active');
-  updateUI();
-  showToast(`Loaded Preset: ${p.name} (${sel.size} skills)`);
+  if (typeof scheduleAutoSaveToDisk === 'function') scheduleAutoSaveToDisk();
+  showToast(`Loaded Preset: ${p.name} (${validIds.length} skills)`);
 }
 
 function saveCustomPreset() {
@@ -184,12 +246,20 @@ function loadCustomPreset() {
   }
   try {
     const arr = JSON.parse(raw);
-    sel.clear();
-    arr.forEach(id => {
-      if (ALL_SKILLS.some(s => s.id === id)) sel.add(id);
-    });
-    updateUI();
-    showToast(`Loaded custom preset (${sel.size} skills)!`);
+    const validIds = arr.filter(id => (typeof ALL_SKILLS !== 'undefined' ? ALL_SKILLS : []).some(s => s.id === id));
+    if (window.store && typeof ActionTypes !== 'undefined') {
+      const cur = window.store.getState();
+      window.store.dispatch({
+        type: ActionTypes.HYDRATE_STATE,
+        payload: { savedState: { ...cur, skills: { selectedIds: validIds } } }
+      });
+    } else {
+      sel.clear();
+      validIds.forEach(id => sel.add(id));
+      updateUI();
+    }
+    if (typeof scheduleAutoSaveToDisk === 'function') scheduleAutoSaveToDisk();
+    showToast(`Loaded custom preset (${validIds.length} skills)!`);
   } catch (e) {
     showToast('Failed to load custom preset');
   }
@@ -199,7 +269,7 @@ function loadCustomPreset() {
 function switchModalTab(tab) {
   const tabSpec = document.getElementById('mtab-spec');
   const tabManual = document.getElementById('mtab-manual');
-  const panelSpec = document.ge6+tElementById('modal-panel-spec');
+  const panelSpec = document.getElementById('modal-panel-spec');
   const panelManual = document.getElementById('modal-panel-manual');
 
   if (tab === 'manual') {

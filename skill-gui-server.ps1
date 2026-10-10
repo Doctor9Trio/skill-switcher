@@ -966,9 +966,12 @@ function Get-PluginRegistry() {
     $isGraphifyActive = ($activeList -contains "graphify")
     $graphifySaved = if ($isGraphifyActive) { 25000 * [math]::Max(1, $stats.session_count) } else { 0 }
 
+    $isGsdActive = ($activeList -contains "getshitdone" -or $activeList -contains "gsd")
+    $gsdSaved = if ($isGsdActive) { [math]::Round($stats.input_tokens * 0.30) } else { 0 }
+
     $cacheSaved = if ($stats.cache_hit_tokens) { $stats.cache_hit_tokens } else { 0 }
 
-    $totalTokensSaved = $crgSaved + $ponytailSaved + $omniSaved + $zipaiSaved + $graphifySaved + $cacheSaved
+    $totalTokensSaved = $crgSaved + $ponytailSaved + $omniSaved + $zipaiSaved + $graphifySaved + $gsdSaved + $cacheSaved
     $costSavedUsd = (($totalTokensSaved / 1000000.0) * 0.35)
     $costSavedInr = $costSavedUsd * 86.50
 
@@ -1066,6 +1069,25 @@ function Get-PluginRegistry() {
             headline        = "Enforces surgical outputs, limits shell logs, and truncates terminal dumps to prevent context overflow."
             how_it_works    = "Instruments shell commands with max-line limits and selective regex filters so huge log traces or minified JS dumps never flood the model context."
             impact_details  = "Prevents catastrophic 50k-100k token context spills caused by unbuffered command outputs."
+            config_target   = "active-skills.md"
+        },
+        @{
+            id              = "getshitdone"
+            name            = "Get Shit Done (GSD)"
+            type            = "Autonomous Workflow System"
+            category        = "saver"
+            is_saver        = $true
+            installed       = (Test-Path (Join-Path $GLOBAL_SKILLS "getshitdone")) -or (Test-Path (Join-Path $PROJECT_ROOT ".agents\skills\getshitdone"))
+            active          = $isGsdActive
+            badge           = "65%-80% Context Preserved"
+            badge_type      = "success"
+            token_metric    = "$([math]::Round($gsdSaved / 1000, 1))k tokens saved"
+            invocations     = if ($isGsdActive) { $stats.session_count } else { 0 }
+            tool_count      = 4
+            tools           = @("gsd-core", "gsd-plan", "gsd-execute", "gsd-verify")
+            headline        = "Spec-driven autonomous execution & context-rot prevention engine (Discuss → Plan → Execute → Verify → Ship)."
+            how_it_works    = "Eliminates context degradation and token exhaustion by decomposing large projects into isolated subagent milestones with atomic git commits and persistent disk states (PLAN.md, STATE.md)."
+            impact_details  = "Preserves clean 200k context windows per task, eliminates circular reasoning loops, and prevents multi-turn hallucination rollbacks."
             config_target   = "active-skills.md"
         },
         @{
@@ -1204,6 +1226,8 @@ function Set-PluginToggle($pluginId, [bool]$enable) {
         "zipai-optimizer"   { "zipai-optimizer" }
         "typesafe-mcp"      { "typesafe-mcp" }
         "impeccable"        { "impeccable" }
+        "getshitdone"       { "getshitdone" }
+        "gsd"               { "getshitdone" }
         default             { $pluginId }
     }
 
@@ -1214,6 +1238,7 @@ function Set-PluginToggle($pluginId, [bool]$enable) {
     } else {
         $currentActive = @($currentActive | Where-Object { $_ -ne $skillKey -and $_ -ne $pluginId })
     }
+    $currentActive = @($currentActive | ForEach-Object { $_.Trim().Replace("`r", "").Replace("`n", "") } | Where-Object { $_ -ne "" } | Select-Object -Unique)
 
     $activeStr = ($currentActive -join ", ")
     $newRules = "# Active: $activeStr`r`n`r`n"
@@ -1228,7 +1253,7 @@ function Set-PluginToggle($pluginId, [bool]$enable) {
         if (-not (Test-Path $cand)) { $cand = Join-Path $PROJECT_ROOT ".agents\skills\$cleanS\SKILL.md" }
         if (Test-Path $cand) {
             $sContent = Get-Content $cand -Raw -Encoding UTF8
-            $lines = ($sContent -split "`n") | Select-Object -First 35
+            $lines = ($sContent -split "`n") | Select-Object -First 120
             $newRules += ($lines -join "`n") + "`r`n`r`n"
         } else {
             $newRules += "Active token optimization & workflow rules for $cleanS.`r`n`r`n"
@@ -1258,6 +1283,7 @@ function Apply-PluginPreset($presetName) {
         "ultra-saver" {
             Set-PluginToggle "code-review-graph" $true | Out-Null
             Set-PluginToggle "ponytail" $true | Out-Null
+            Set-PluginToggle "getshitdone" $true | Out-Null
             Set-PluginToggle "zipai-optimizer" $true | Out-Null
             Set-PluginToggle "OmniRoute" $true | Out-Null
             Set-PluginToggle "graphify" $true | Out-Null
@@ -1265,6 +1291,7 @@ function Apply-PluginPreset($presetName) {
         "balanced" {
             Set-PluginToggle "code-review-graph" $true | Out-Null
             Set-PluginToggle "ponytail" $true | Out-Null
+            Set-PluginToggle "getshitdone" $true | Out-Null
             Set-PluginToggle "typesafe-mcp" $true | Out-Null
             Set-PluginToggle "zipai-optimizer" $false | Out-Null
             Set-PluginToggle "OmniRoute" $false | Out-Null
@@ -1272,6 +1299,7 @@ function Apply-PluginPreset($presetName) {
         "minimal" {
             Set-PluginToggle "code-review-graph" $true | Out-Null
             Set-PluginToggle "ponytail" $false | Out-Null
+            Set-PluginToggle "getshitdone" $false | Out-Null
             Set-PluginToggle "zipai-optimizer" $false | Out-Null
             Set-PluginToggle "OmniRoute" $false | Out-Null
             Set-PluginToggle "graphify" $false | Out-Null
@@ -1358,7 +1386,7 @@ while ($listener.IsListening) {
             if (Test-Path $GLOBAL_RULES) {
                 $txt = Get-Content $GLOBAL_RULES -Raw -ErrorAction SilentlyContinue
                 if ($txt -match "(?m)^# Active: (.+)$") {
-                    $activeList = ($Matches[1] -split ",\s*") | Where-Object { $_ -ne "" }
+                    $activeList = @(($Matches[1].Trim() -split ",\s*") | ForEach-Object { $_.Trim().Replace("`r","").Replace("`n","") } | Where-Object { $_ -ne "" })
                     $activeCount = $activeList.Count
                 }
             }
@@ -1383,10 +1411,10 @@ while ($listener.IsListening) {
             $modified = $null
             $ruleSize = 0
             if ($exists) {
-                $txt = Get-Content $GLOBAL_RULES -Raw -ErrorAction SilentlyContinue
+                $txt = [System.IO.File]::ReadAllText($GLOBAL_RULES, [System.Text.Encoding]::UTF8)
                 if ($txt -match "(?m)^# Active: (.+)$") { 
-                    $active = $Matches[1]
-                    $activeList = ($active -split ",\s*") | Where-Object { $_ -ne "" }
+                    $active = $Matches[1].Trim().Replace("`r","").Replace("`n","")
+                    $activeList = @(($active -split ",\s*") | ForEach-Object { $_.Trim().Replace("`r","").Replace("`n","") } | Where-Object { $_ -ne "" } | Select-Object -Unique)
                 }
                 $item = Get-Item $GLOBAL_RULES
                 $modified = $item.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
@@ -1394,7 +1422,7 @@ while ($listener.IsListening) {
             }
             $respData = @{ 
                 ok          = $true
-                active      = $active
+                active      = ($activeList -join ", ")
                 active_list = $activeList
                 count       = $activeList.Count
                 exists      = $exists
@@ -1409,7 +1437,7 @@ while ($listener.IsListening) {
             $exists = Test-Path $GLOBAL_RULES
             $modified = $null
             if ($exists) {
-                $content = Get-Content $GLOBAL_RULES -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
+                $content = [System.IO.File]::ReadAllText($GLOBAL_RULES, [System.Text.Encoding]::UTF8)
                 $modified = (Get-Item $GLOBAL_RULES).LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
             }
             Send-Json $res @{
@@ -1699,6 +1727,7 @@ while ($listener.IsListening) {
         else {
             # Try serving static file if path matches
             $cleanPath = $path.TrimStart("/\").Replace("/", "\")
+            if ([string]::IsNullOrWhiteSpace($cleanPath)) { $cleanPath = "index.html" }
             $staticCand = Join-Path $TOOL_DIR $cleanPath
             if (-not (Test-Path $staticCand -PathType Leaf) -and (Test-Path (Join-Path $TOOL_DIR "pages\$cleanPath") -PathType Leaf)) {
                 $staticCand = Join-Path $TOOL_DIR "pages\$cleanPath"
