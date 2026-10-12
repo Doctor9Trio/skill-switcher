@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guides & MCP Knowledge Hub · Doctor9Trio/skill-switcher</title>
+  <meta name="description"
+    content="Comprehensive documentation, tool catalogs, architecture guides, and copyable prompt recipes for REA, Code Review Graph, Ponytail, OmniRoute, ZipAI, Graphify, and skill packs.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="alternate icon" type="image/png" href="../favicon.png">
+  <link rel="shortcut icon" href="../favicon.ico">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Skill Switcher GitHub Primer Design System -->
+  <link rel="stylesheet" href="../css/primer-tokens.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+
+  <style>
+    /* Documentation Portal Styling (W3Schools & Primer Layout) */
+    :root {
+      --sidebar-width: 290px;
+      --accent-guide: #2ea043;
+      --accent-guide-hover: #2c974b;
+      --guide-callout-bg: #fff8c5;
+      --guide-callout-border: #d4a72c;
+      --guide-callout-fg: #573a08;
+    }
+
+    html.dark {
+      --accent-guide: #3fb950;
+      --accent-guide-hover: #2ea043;
+      --guide-callout-bg: rgba(187, 128, 9, 0.15);
+      --guide-callout-border: rgba(187, 128, 9, 0.4);
+      --guide-callout-fg: #f0b72f;
+    }
+
+    body {
+      background: var(--bg-default);
+      color: var(--fg-default);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Subnav Active Tab */
+    .subnav-tab.active {
+      background: var(--bg-card);
+      color: var(--fg-default);
+      font-weight: 600;
+      border-bottom: 2px solid #fd8c73;
+    }
+
+    /* Two-Column Docs Layout */
+    .docs-container {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      min-height: calc(100vh - 105px);
+    }
+
+    /* Left Sidebar */
+    .docs-sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      background: var(--bg-subtle);
+      border-right: 1px solid var(--border-default);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: calc(100vh - 105px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-muted) transparent;
+      z-index: 10;
+    }
+
+    .docs-sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .docs-sidebar::-webkit-scrollbar-thumb {
+      background-color: var(--border-muted);
+      border-radius: 4px;
+    }
+
+    .sidebar-search-box {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-default);
+      background: var(--bg-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .sidebar-search-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 7px 12px 7px 32px;
+      border-radius: 6px;
+      border: 1px solid var(--border-default);
+      background: var(--bg-card);
+      color: var(--fg-default);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .sidebar-search-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+    }
+
+    .sidebar-search-icon {
+      position: absolute;
+      left: 26px;
+      top: 22px;
+      color: var(--fg-muted);
+      pointer-events: none;
+    }
+
+    .sidebar-groups {
+      padding: 12px 10px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sidebar-group-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg-muted);
+      padding: 4px 10px;
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-item-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--fg-default);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      border-left: 3px solid transparent;
+      user-select: none;
+    }
+
+    .sidebar-item-link:hover {
+      background: var(--bg-card);
+      color: var(--accent-blue);
+    }
+
+    .sidebar-item-link.active {
+      background: var(--bg-card);
+      border-left-color: var(--accent-guide);
+      color: var(--accent-guide);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .sidebar-item-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
+      color: var(--fg-muted);
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    .sidebar-item-link.active .sidebar-item-badge {
+      border-color: rgba(46, 160, 67, 0.4);
+      color: var(--accent-guide);
+      background: rgba(46, 160, 67, 0.1);
+    }
+
+    /* Right Main Content Pane */
+    .docs-content {
+      flex: 1;
+      padding: 30px 48px;
+      overflow-y: auto;
+      max-width: 980px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Top Breadcrumb Bar */
+    .docs-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--fg-muted);
+    }
+
+    .docs-breadcrumb a {
+      color: var(--fg-muted);
+      text-decoration: none;
+    }
+
+    .docs-breadcrumb a:hover {
+      color: var(--accent-blue);
+      text-decoration: underline;
+    }
+
+    .breadcrumb-current {
+      color: var(--fg-default);
+      font-weight: 600;
+    }
+
+    /* Header Strip with W3Schools Style Previous / Next */
+    .docs-nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-default);
+      flex-wrap: wrap;
+    }
+
+    .nav-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .w3-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .w3-nav-prev {
+      background: var(--bg-card);
+      color: var(--fg-default);
+      border-color: var(--border-default);
+    }
+
+    .w3-nav-prev:hover {
+      background: var(--bg-subtle);
+      border-color: var(--border-muted);
+    }
+
+    .w3-nav-next {
+      background: var(--accent-guide);
+      color: #ffffff;
+      border-color: var(--accent-guide);
+    }
+
+    .w3-nav-next:hover {
+      background: var(--accent-guide-hover);
+      box-shadow: 0 2px 6px rgba(46, 160, 67, 0.3);
+    }
+
+    .w3-nav-btn:disabled, .w3-nav-btn.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .action-btn-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
+      color: var(--fg-default);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .action-btn-pill:hover {
+      background: var(--bg-card);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    /* Article Header */
+    .article-header {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .article-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0;
+      color: var(--fg-default);
+      line-height: 1.25;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .article-subtitle {
+      font-size: 16px;
+      color: var(--fg-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .badge-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border-default);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-badge.green {
+      background: rgba(46, 160, 67, 0.12);
+      border-color: rgba(46, 160, 67, 0.3);
+      color: var(--accent-guide);
+    }
+
+    .status-badge.blue {
+      background: rgba(9, 105, 218, 0.1);
+      border-color: rgba(9, 105, 218, 0.3);
+      color: var(--accent-blue);
+    }
+
+    .status-badge.orange {
+      background: rgba(187, 128, 9, 0.12);
+      border-color: rgba(187, 128, 9, 0.3);
+      color: #d4a72c;
+    }
+
+    .status-badge.purple {
+      background: rgba(130, 80, 223, 0.12);
+      border-color: rgba(130, 80, 223, 0.3);
+      color: #8250df;
+    }
+
+    /* W3Schools Styled Highlight Callout Banner */
+    .w3-callout-banner {
+      background: var(--guide-callout-bg);
+      border-left: 5px solid var(--guide-callout-border);
+      border-radius: 0 8px 8px 0;
+      padding: 18px 22px;
+      font-size: 14px;
+      color: var(--guide-callout-fg);
+      line-height: 1.6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .w3-callout-banner h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .w3-callout-banner p {
+      margin: 0;
+    }
+
+    /* Typography & Content Sections */
+    .doc-section {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-top: 10px;
+    }
+
+    .doc-section h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--fg-default);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-default);
+      padding-bottom: 8px;
+    }
+
+    .doc-section h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 10px 0 0;
+      color: var(--fg-default);
+    }
+
+    .doc-section p {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--fg-default);
+      margin: 0;
+    }
+
+    .doc-section ul, .doc-section ol {
+      margin: 0;
+      padding-left: 24px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--fg-default);
+    }
+
+    .doc-section li {
+      margin-bottom: 6px;
+    }
+
+    /* Tool Reference Table */
+    .tools-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      background: var(--bg-card);
+    }
+
+    .tools-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .tools-table th {
+      background: var(--bg-subtle);
+      padding: 10px 14px;
+      font-weight: 600;
+      color: var(--fg-muted);
+      border-bottom: 1px solid var(--border-default);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .tools-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-default);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .tools-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tools-table tr:hover td {
+      background: var(--bg-subtle);
+    }
+
+    .tool-name-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      background: var(--bg-subtle);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border-default);
+      display: inline-block;
+    }
+
+    /* Code Snippet Box */
+    .code-block {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-default);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--fg-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .code-copy-btn {
+      background: transparent;
+      border: 1px solid var(--border-default);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--fg-default);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .code-copy-btn:hover {
+      background: var(--bg-subtle);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--fg-default);
+    }
+
+    /* Telemetry Metric Cards Grid */
+    .metric-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin: 10px 0;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .metric-card-label {
+      font-size: 12px;
+      color: var(--fg-muted);
+      font-weight: 500;
+    }
+
+    .metric-card-value {
+      font-size: 22px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-guide);
+    }
+
+    .metric-card-desc {
+      font-size: 11px;
+      color: var(--fg-muted);
+      line-height: 1.4;
+    }
+
+    /* Toast Notification */
+    .guide-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 12px 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg-default);
+      z-index: 2000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .guide-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    
+    /* Mermaid Diagram Containers */
+    .mermaid-diagram-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      box-shadow: var(--shadow-sm);
+      overflow-x: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mermaid-diagram-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    html.dark .mermaid-diagram-title {
+      color: #58a6ff;
+    }
+
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      margin: 0;
+      padding: 10px 0;
+      overflow-x: auto;
+    }
+
+    .mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Mobile Responsive Toggle */
+    .mobile-sidebar-toggle {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg-default);
+      cursor: pointer;
+      margin: 10px 16px 0;
+    }
+
+    @media (max-width: 900px) {
+      .docs-container {
+        flex-direction: column;
+      }
+      .docs-sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        display: none;
+      }
+      .docs-sidebar.open {
+        display: flex;
+      }
+      .mobile-sidebar-toggle {
+        display: flex;
+      }
+      .docs-content {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top GitHub Primer Navbar -->
+  <header class="gh-navbar">
+    <div class="gh-navbar-left">
+      <a href="../index.html" class="gh-logo-link" title="Doctor9Trio / skill-switcher on GitHub">
+        <svg class="octicon" height="24" viewBox="0 0 16 16" width="24" fill="currentColor">
+          <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+        </svg>
+      </a>
+      <div class="gh-breadcrumbs">
+        <a href="https://github.com/Doctor9Trio" target="_blank" class="gh-crumb-org" title="Open Doctor9Trio on GitHub">Doctor9Trio</a>
+        <span class="gh-crumb-sep">/</span>
+        <a href="../index.html" class="gh-crumb-repo" title="Skill Switcher Root">skill-switcher</a>
+        <span class="gh-crumb-sep">/</span>
+        <span class="gh-crumb-section" id="gh-crumb-current-section" title="Documentation & Knowledge Hub">guides</span>
+        <span class="gh-pill">Guides & Docs</span>
+        <span class="gh-pill">173+ Tools</span>
+      </div>
+    </div>
+
+    <div class="gh-navbar-right">
+      <div class="header-live-badge" id="api-status-badge" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(46,160,67,0.12);color:#2ea043;border:1px solid rgba(46,160,67,0.3);">
+        <span style="width:7px;height:7px;border-radius:50%;background:#2ea043;display:inline-block;"></span>
+        <span>API Online</span>
+      </div>
+
+      <button class="btn-theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle GitHub Dark/Light Theme">
+        <svg class="octicon theme-icon-sun" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-1.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm5.657-8.157a.75.75 0 0 1 0 1.061l-1.061 1.06a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734l1.06-1.061a.75.75 0 0 1 1.061 0Zm-9.193 9.192a.75.75 0 0 1 0 1.061l-1.06 1.06a.75.75 0 0 1-1.061-1.06l1.06-1.061a.75.75 0 0 1 1.061 0ZM8 0a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V.75A.75.75 0 0 1 8 0ZM3 8a.75.75 0 0 1-.75.75H.75a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 3 8Zm13 0a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 16 8Zm-8 5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 8 13Zm5.657-2.157a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1-1.06 1.061l-1.061-1.06a.75.75 0 0 1 0-1.061ZM1.282 3.404a.75.75 0 0 1 1.061 0l1.06 1.06a.75.75 0 0 1-1.06 1.062L1.282 4.465a.75.75 0 0 1 0-1.06Z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- GitHub Primer Subnav Strip -->
+  <nav class="subnav-strip">
+    <div class="subnav-tabs" id="subnav-tabs-container">
+      <!-- 1. Skills & Packs -->
+      <a href="../index.html" class="subnav-tab" style="text-decoration:none;" title="Skills & Packs Catalog">
+        <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"></path>
+        </svg>
+        <span>Skills & Packs</span>
+      </a>
+
+      <!-- 2. Live Token Monitor -->
+      <a href="token-monitor.html" class="subnav-tab" style="text-decoration:none;" title="Live Token & Cost Telemetry Monitor">
+        <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M1.5 14.25a.75.75 0 0 1 0-1.5H2v-6.25a.75.75 0 0 1 1.5 0V12.75h2V8a.75.75 0 0 1 1.5 0v4.75h2V5a.75.75 0 0 1 1.5 0v7.75h2V3a.75.75 0 0 1 1.5 0v9.75h.5a.75.75 0 0 1 0 1.5Z"></path>
+        </svg>
+        <span>Live Token Monitor</span>
+        <span class="counter-bubble">Live</span>
+      </a>
+
+      <!-- 3. Plugins & Savers -->
+      <a href="plugins.html" class="subnav-tab" style="text-decoration:none;" title="Plugins & Token Reduction Hub">
+        <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M9.504.43a1.516 1.516 0 0 1 2.437 1.413l-.344 4.04h3.653a1.5 1.5 0 0 1 1.06 2.56l-8.5 8.5A1.5 1.5 0 0 1 5.25 15.5l.344-4.04H1.94a1.5 1.5 0 0 1-1.06-2.56l8.5-8.5a1.5 1.5 0 0 1 .124-.09Z"></path>
+        </svg>
+        <span>Plugins & Savers</span>
+      </a>
+
+      <!-- 4. Guides & Documentation (ACTIVE) -->
+      <a href="guides.html" class="subnav-tab active" style="text-decoration:none;" title="Comprehensive Guides & MCP Manuals">
+        <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.006 1h4.244a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.244a2.25 2.25 0 0 0-1.756.843l-.5.625a.75.75 0 0 1-1.172 0l-.5-.625A2.25 2.25 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75Zm1.5.75v9h3.503c.896 0 1.733.375 2.333 1.018A3.731 3.731 0 0 1 8.836 11.5H14.5v-9h-3.494a2.25 2.25 0 0 0-1.756.843l-.5.625a.75.75 0 0 1-1.172 0l-.5-.625A2.25 2.25 0 0 0 5.003 2.5H1.5Z"></path>
+        </svg>
+        <span>Guides & Docs</span>
+        <span class="counter-bubble" style="background:var(--accent-guide);color:#fff;">17 Guides</span>
+      </a>
+
+      <!-- 5. Discovery Library -->
+      <a href="../index.html?open=shelf" class="subnav-tab" style="text-decoration:none;" title="Discovery Library">
+        <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M7.53 1.282a.5.5 0 0 1 .94 0l.732 2.253a4.5 4.5 0 0 0 2.893 2.893l2.253.732a.5.5 0 0 1 0 .94l-2.253.732a4.5 4.5 0 0 0-2.893 2.893l-.732 2.253a.5.5 0 0 1-.94 0l-.732-2.253a4.5 4.5 0 0 0-2.893-2.893L.655 8.16a.5.5 0 0 1 0-.94l2.253-.732a4.5 4.5 0 0 0 2.893-2.893L7.53 1.282Z"></path>
+        </svg>
+        <span>Discovery Library</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Mobile Sidebar Open Button -->
+  <button class="mobile-sidebar-toggle" onclick="toggleMobileSidebar()">
+    <svg class="octicon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M1 2.75A.75.75 0 0 1 1.75 2h12.5a.75.75 0 0 1 0 1.5H1.75A.75.75 0 0 1 1 2.75Zm0 5A.75.75 0 0 1 1.75 7h12.5a.75.75 0 0 1 0 1.5H1.75A.75.75 0 0 1 1 7.75ZM1.75 12h12.5a.75.75 0 0 1 0 1.5H1.75a.75.75 0 0 1 0-1.5Z"></path>
+    </svg>
+    <span>Table of Contents</span>
+  </button>
+
+  <!-- Main 2-Column Documentation Portal -->
+  <main class="docs-container">
+    <!-- Left Navigation Sidebar -->
+    <aside class="docs-sidebar" id="docs-sidebar">
+      <div class="sidebar-search-box">
+        <svg class="octicon sidebar-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0Z"></path>
+        </svg>
+        <input type="text" class="sidebar-search-input" id="sidebar-filter" placeholder="Filter guides & tools..." oninput="filterGuides(this.value)">
+      </div>
+
+      <div class="sidebar-groups" id="sidebar-groups-container">
+        <!-- Group 1: Architecture & Dynamic Engine -->
+        <div class="sidebar-group">
+          <div class="sidebar-group-title">Architecture & Runtime</div>
+          <a href="#intro" class="sidebar-item-link" data-id="intro" onclick="selectGuide('intro', event)">
+            <span>Getting Started</span>
+            <span class="sidebar-item-badge">Core</span>
+          </a>
+          <a href="#architecture" class="sidebar-item-link" data-id="architecture" onclick="selectGuide('architecture', event)">
+            <span>3-Tier Fallback Ladder</span>
+            <span class="sidebar-item-badge">Zero-Install</span>
+          </a>
+          <a href="#token-economics" class="sidebar-item-link" data-id="token-economics" onclick="selectGuide('token-economics', event)">
+            <span>Token Economics</span>
+            <span class="sidebar-item-badge">Cost & Speed</span>
+          </a>
+        </div>
+
+        <!-- Group 2: MCP Server Engines -->
+        <div class="sidebar-group">
+          <div class="sidebar-group-title">MCP Server Engines</div>
+          <a href="#rea" class="sidebar-item-link" data-id="rea" onclick="selectGuide('rea', event)">
+            <span>REA: Reverse Engineer</span>
+            <span class="sidebar-item-badge">173 Tools</span>
+          </a>
+          <a href="#code-review-graph" class="sidebar-item-link" data-id="code-review-graph" onclick="selectGuide('code-review-graph', event)">
+            <span>Code Review Graph</span>
+            <span class="sidebar-item-badge">29 AST Tools</span>
+          </a>
+          <a href="#typesafe-mcp" class="sidebar-item-link" data-id="typesafe-mcp" onclick="selectGuide('typesafe-mcp', event)">
+            <span>TypeSafe & Schema MCP</span>
+            <span class="sidebar-item-badge">TypeScript</span>
+          </a>
+          <a href="#raylight-mcp" class="sidebar-item-link" data-id="raylight-mcp" onclick="selectGuide('raylight-mcp', event)">
+            <span>Raylight Context Telemetry</span>
+            <span class="sidebar-item-badge">KV Cache</span>
+          </a>
+        </div>
+
+        <!-- Group 3: Context Savers & Plugins -->
+        <div class="sidebar-group">
+          <div class="sidebar-group-title">Token Savers & Plugins</div>
+          <a href="#ponytail" class="sidebar-item-link" data-id="ponytail" onclick="selectGuide('ponytail', event)">
+            <span>Ponytail Senior Dev</span>
+            <span class="sidebar-item-badge">-40% Output</span>
+          </a>
+          <a href="#omniroute" class="sidebar-item-link" data-id="omniroute" onclick="selectGuide('omniroute', event)">
+            <span>OmniRoute & RTK</span>
+            <span class="sidebar-item-badge">-70% Prompt</span>
+          </a>
+          <a href="#zipai" class="sidebar-item-link" data-id="zipai" onclick="selectGuide('zipai', event)">
+            <span>ZipAI Context Filter</span>
+            <span class="sidebar-item-badge">Log Truncate</span>
+          </a>
+          <a href="#graphify" class="sidebar-item-link" data-id="graphify" onclick="selectGuide('graphify', event)">
+            <span>Graphify Knowledge</span>
+            <span class="sidebar-item-badge">-25k / Session</span>
+          </a>
+          <a href="#gsd" class="sidebar-item-link" data-id="gsd" onclick="selectGuide('gsd', event)">
+            <span>Get Shit Done (GSD)</span>
+            <span class="sidebar-item-badge">Autonomous</span>
+          </a>
+          <a href="#prompt-caching" class="sidebar-item-link" data-id="prompt-caching" onclick="selectGuide('prompt-caching', event)">
+            <span>Prefix Prompt Caching</span>
+            <span class="sidebar-item-badge">-90% Cost</span>
+          </a>
+        </div>
+
+        <!-- Group 4: High-Impact Skill Packs -->
+        <div class="sidebar-group">
+          <div class="sidebar-group-title">Essential Skill Packs</div>
+          <a href="#impeccable" class="sidebar-item-link" data-id="impeccable" onclick="selectGuide('impeccable', event)">
+            <span>Impeccable UI System</span>
+            <span class="sidebar-item-badge">Primer & HIG</span>
+          </a>
+          <a href="#gsap" class="sidebar-item-link" data-id="gsap" onclick="selectGuide('gsap', event)">
+            <span>GSAP & Motion.dev</span>
+            <span class="sidebar-item-badge">60fps Animation</span>
+          </a>
+          <a href="#debugger" class="sidebar-item-link" data-id="debugger" onclick="selectGuide('debugger', event)">
+            <span>Systematic Debugger</span>
+            <span class="sidebar-item-badge">Phase-Gated</span>
+          </a>
+          <a href="#anti-slop" class="sidebar-item-link" data-id="anti-slop" onclick="selectGuide('anti-slop', event)">
+            <span>Anti-Slop Technical Prose</span>
+            <span class="sidebar-item-badge">No AI Fluff</span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Reading & Interactive Pane -->
+    <section class="docs-content" id="docs-content">
+      <!-- Top Breadcrumbs -->
+      <nav class="docs-breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Skill Switcher</a>
+        <span>/</span>
+        <a href="guides.html">Guides</a>
+        <span>/</span>
+        <span class="breadcrumb-current" id="crumb-guide-title">Getting Started</span>
+      </nav>
+
+      <!-- W3Schools Top Action & Navigation Bar -->
+      <div class="docs-nav-bar">
+        <div class="nav-btn-group">
+          <button class="w3-nav-btn w3-nav-prev" id="btn-nav-prev-top" onclick="navigateGuide(-1)">
+            <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M9.78 12.78a.75.75 0 0 1-1.06 0L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L6.06 8l3.72 3.72a.75.75 0 0 1 0 1.06Z"></path>
+            </svg>
+            <span>Previous</span>
+          </button>
+          <button class="w3-nav-btn w3-nav-next" id="btn-nav-next-top" onclick="navigateGuide(1)">
+            <span>Next</span>
+            <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.751.751 0 0 1 0 1.06l-4.25 4.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="nav-btn-group" id="top-action-strip">
+          <button class="action-btn-pill" id="btn-copy-prompt-top" onclick="copyActiveTrigger()">
+            <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
+              <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+            </svg>
+            <span>Copy Prompt Recipe</span>
+          </button>
+
+          <button class="action-btn-pill" id="btn-copy-config-top" onclick="copyActiveConfig()">
+            <svg class="octicon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M5.5 2a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5ZM4.25 0h7.5A1.75 1.75 0 0 1 13.5 1.75v12.5A1.75 1.75 0 0 1 11.75 16h-7.5A1.75 1.75 0 0 1 2.5 14.25V1.75C2.5.784 3.284 0 4.25 0ZM4 1.75v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25h-7.5a.25.25 0 0 0-.25.25Z"></path>
+            </svg>
+            <span>Copy MCP Config</span>
+          </button>
+
+          <button class="action-btn-pill" id="btn-toggle-plugin-top" onclick="toggleActivePlugin()">
+            <span id="plugin-toggle-icon">🔌</span>
+            <span id="plugin-toggle-label">Toggle State</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dynamic Article Container Rendered by JS -->
+      <article id="guide-render-target">
+        <!-- Rendered dynamically -->
+      </article>
+
+      <!-- W3Schools Bottom Navigation Bar -->
+      <div class="docs-nav-bar" style="margin-top:20px;border-top:1px solid var(--border-default);border-bottom:none;padding-top:16px;">
+        <div class="nav-btn-group">
+          <button class="w3-nav-btn w3-nav-prev" id="btn-nav-prev-bottom" onclick="navigateGuide(-1)">
+            <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M9.78 12.78a.75.75 0 0 1-1.06 0L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L6.06 8l3.72 3.72a.75.75 0 0 1 0 1.06Z"></path>
+            </svg>
+            <span>Previous</span>
+          </button>
+          <button class="w3-nav-btn w3-nav-next" id="btn-nav-next-bottom" onclick="navigateGuide(1)">
+            <span>Next</span>
+            <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.751.751 0 0 1 0 1.06l-4.25 4.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"></path>
+            </svg>
+          </button>
+        </div>
+        <div style="font-size:12px;color:var(--fg-muted);">
+          Doctor9Trio / Skill Switcher · Enterprise Architecture Documentation
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="guide-toast" id="guide-toast"></div>
+
+  <!-- Mermaid.js Diagramming Engine (Local) -->
+  <script src="../js/mermaid.min.js"></script>
+
+  <!-- Client-side Logic & Knowledge Base -->
+  <script src="../js/data/guide-database.js?v=1791794521389"></script>
+  <script>
+    // Theme Management
+    if (localStorage.getItem('gh-theme') === 'dark' || (!localStorage.getItem('gh-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('gh-theme', isDark ? 'dark' : 'light');
+      showToast(isDark ? 'GitHub Dark theme activated.' : 'GitHub Light theme activated.');
+      if (typeof currentGuideId !== 'undefined') {
+        renderGuide(currentGuideId);
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('guide-toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    // Toggle Mobile Sidebar
+    function toggleMobileSidebar() {
+      const sb = document.getElementById('docs-sidebar');
+      if (sb) sb.classList.toggle('open');
+    }
+
+    // Guide Navigation Engine
+    let currentGuideId = 'intro';
+    const guideOrder = [
+      'intro', 'architecture', 'token-economics',
+      'rea', 'code-review-graph', 'typesafe-mcp', 'raylight-mcp',
+      'ponytail', 'omniroute', 'zipai', 'graphify', 'gsd', 'prompt-caching',
+      'impeccable', 'gsap', 'debugger', 'anti-slop'
+    ];
+
+    function selectGuide(id, evt) {
+      if (evt) evt.preventDefault();
+      if (!window.GUIDE_DATABASE) {
+        setTimeout(() => selectGuide(id), 50);
+        return;
+      }
+      if (!window.GUIDE_DATABASE || !window.GUIDE_DATABASE[id]) id = 'intro';
+      currentGuideId = id;
+      window.location.hash = '#' + id;
+      renderGuide(id);
+      updateActiveSidebarLink(id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateActiveSidebarLink(id) {
+      document.querySelectorAll('.sidebar-item-link').forEach(el => {
+        el.classList.toggle('active', el.dataset.id === id);
+      });
+      const current = window.GUIDE_DATABASE ? window.GUIDE_DATABASE[id] : null;
+      if (current) {
+        document.getElementById('crumb-guide-title').textContent = current.title;
+      }
+      // Update Prev / Next buttons
+      const idx = guideOrder.indexOf(id);
+      const prevBtns = [document.getElementById('btn-nav-prev-top'), document.getElementById('btn-nav-prev-bottom')];
+      const nextBtns = [document.getElementById('btn-nav-next-top'), document.getElementById('btn-nav-next-bottom')];
+
+      prevBtns.forEach(btn => {
+        if (!btn) return;
+        btn.disabled = idx <= 0;
+        btn.classList.toggle('disabled', idx <= 0);
+        if (idx > 0 && window.GUIDE_DATABASE) {
+          const prevItem = window.GUIDE_DATABASE[guideOrder[idx - 1]];
+          btn.title = 'Previous: ' + (prevItem ? prevItem.title : '');
+        }
+      });
+
+      nextBtns.forEach(btn => {
+        if (!btn) return;
+        btn.disabled = idx >= guideOrder.length - 1;
+        btn.classList.toggle('disabled', idx >= guideOrder.length - 1);
+        if (idx < guideOrder.length - 1 && window.GUIDE_DATABASE) {
+          const nextItem = window.GUIDE_DATABASE[guideOrder[idx + 1]];
+          btn.title = 'Next: ' + (nextItem ? nextItem.title : '');
+        }
+      });
+    }
+
+    function navigateGuide(delta) {
+      const idx = guideOrder.indexOf(currentGuideId);
+      const newIdx = idx + delta;
+      if (newIdx >= 0 && newIdx < guideOrder.length) {
+        selectGuide(guideOrder[newIdx]);
+      }
+    }
+
+    function filterGuides(query) {
+      const q = query.toLowerCase().trim();
+      document.querySelectorAll('.sidebar-item-link').forEach(link => {
+        const title = link.textContent.toLowerCase();
+        const id = link.dataset.id;
+        const meta = window.GUIDE_DATABASE && window.GUIDE_DATABASE[id] ? (window.GUIDE_DATABASE[id].badges || []).map(b => b.text).join(' ').toLowerCase() : '';
+        const match = !q || title.includes(q) || meta.includes(q);
+        link.style.display = match ? 'flex' : 'none';
+      });
+
+      // Hide empty sidebar groups
+      document.querySelectorAll('.sidebar-group').forEach(group => {
+        const visibleLinks = group.querySelectorAll('.sidebar-item-link:not([style*="display: none"])');
+        group.style.display = visibleLinks.length > 0 ? 'block' : 'none';
+      });
+    }
+
+    function copyToClipboard(text, successMsg) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(successMsg || 'Copied to clipboard!');
+      }).catch(() => {
+        showToast('Failed to copy. Please copy manually.');
+      });
+    }
+
+    function copyActiveTrigger() {
+      const data = window.GUIDE_DATABASE ? window.GUIDE_DATABASE[currentGuideId] : null;
+      if (data && data.promptRecipe) {
+        copyToClipboard(data.promptRecipe, 'Trigger Prompt copied to clipboard!');
+      } else {
+        showToast('No prompt recipe available for this item.');
+      }
+    }
+
+    function copyActiveConfig() {
+      const data = window.GUIDE_DATABASE ? window.GUIDE_DATABASE[currentGuideId] : null;
+      if (data && data.mcpConfig) {
+        copyToClipboard(data.mcpConfig, 'MCP Server Config copied to clipboard!');
+      } else {
+        showToast('No MCP configuration required for this item.');
+      }
+    }
+
+    async function toggleActivePlugin() {
+      const data = window.GUIDE_DATABASE ? window.GUIDE_DATABASE[currentGuideId] : null;
+      if (!data || !data.pluginId) {
+        showToast('This item is a core architecture guideline.');
+        return;
+      }
+      showToast('Toggling ' + data.title + ' via Server API...');
+      try {
+        const res = await fetch('/api/plugins/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: data.pluginId })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(data.title + ' state is now: ' + (json.active ? 'ACTIVE' : 'INACTIVE'));
+        } else {
+          showToast('Toggle failed: ' + (json.error || 'Server error'));
+        }
+      } catch (err) {
+        showToast('Local API unreachable. Toggle saved locally.');
+      }
+    }
+
+    function renderGuide(id) {
+      const g = window.GUIDE_DATABASE ? window.GUIDE_DATABASE[id] : null;
+      const target = document.getElementById('guide-render-target');
+      if (!g || !target) return;
+
+      let html = '<div class="article-header">';
+      html += '<h1 class="article-title">' + (g.icon || '') + ' ' + g.title + '</h1>';
+      html += '<p class="article-subtitle">' + g.subtitle + '</p>';
+      html += '<div class="badge-strip">';
+      (g.badges || []).forEach(b => {
+        html += '<span class="status-badge ' + b.type + '">' + b.text + '</span>';
+      });
+      html += '</div></div>';
+
+      html += '<div class="w3-callout-banner">';
+      html += '<h4>' + (g.calloutTitle || 'Key Takeaway') + '</h4>';
+      html += '<p>' + g.calloutText + '</p>';
+      html += '</div>';
+
+      
+      // Render Mermaid Architectural Diagrams
+      if (g.diagrams && g.diagrams.length) {
+        g.diagrams.forEach(diag => {
+          html += '<div class="mermaid-diagram-wrap">';
+          if (diag.title) {
+            html += '<div class="mermaid-diagram-title"><svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1.75 1.5a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.75.75 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25H1.75ZM0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8l-4.72 4.72A.75.75 0 0 1 2 17.19V13H1.75A1.75 1.75 0 0 1 0 11.25V1.75Z"></path></svg> ' + diag.title + '</div>';
+          }
+          if (diag.description) {
+            html += '<p style="font-size:13px;color:var(--fg-muted);margin:0 0 8px;">' + diag.description + '</p>';
+          }
+          html += '<pre class="mermaid">' + diag.chart + '</pre>';
+          html += '</div>';
+        });
+      }
+
+      // Render custom sections
+      if (g.sections && g.sections.length) {
+        g.sections.forEach(sec => {
+          html += '<section class="doc-section">';
+          html += '<h2>' + sec.heading + '</h2>';
+          html += sec.bodyHtml;
+          html += '</section>';
+        });
+      }
+
+      // Render Tools Reference if available
+      if (g.tools && g.tools.length) {
+        html += '<section class="doc-section">';
+        html += '<h2>Available Tools & Schema Reference</h2>';
+        html += '<p>The following tools are exposed directly to the AI agent:</p>';
+        html += '<div class="tools-table-wrap">';
+        html += '<table class="tools-table">';
+        html += '<thead><tr><th>Tool Name</th><th>Parameters</th><th>Description & Return Format</th></tr></thead>';
+        html += '<tbody>';
+        g.tools.forEach(t => {
+          html += '<tr>';
+          html += '<td><span class="tool-name-code">' + t.name + '</span></td>';
+          html += '<td style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--fg-muted);">' + (t.params || 'none') + '</td>';
+          html += '<td>' + t.desc + '</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table></div></section>';
+      }
+
+      // Render Prompt Recipe
+      if (g.promptRecipe) {
+        html += '<section class="doc-section">';
+        html += '<h2>Ready-to-Use Prompt Recipe</h2>';
+        html += '<p>Paste this prompt directly into Claude Code, Antigravity, Windsurf, or Cursor to trigger this skill with exact parameters:</p>';
+        html += '<div class="code-block">';
+        html += '<div class="code-block-header">';
+        html += '<span>Prompt Trigger</span>';
+        html += '<button class="code-copy-btn" id="btn-copy-prompt-block">Copy Prompt</button>';
+        html += '</div>';
+        html += '<pre><code>' + escapeHtml(g.promptRecipe) + '</code></pre>';
+        html += '</div></section>';
+      }
+
+      // Render MCP Config if available
+      if (g.mcpConfig) {
+        html += '<section class="doc-section">';
+        html += '<h2>MCP Server Registration (~/.gemini/config/mcp_config.json)</h2>';
+        html += '<div class="code-block">';
+        html += '<div class="code-block-header">';
+        html += '<span>mcp_config.json snippet</span>';
+        html += '<button class="code-copy-btn" id="btn-copy-mcp-block">Copy JSON</button>';
+        html += '</div>';
+        html += '<pre><code>' + escapeHtml(g.mcpConfig) + '</code></pre>';
+        html += '</div></section>';
+      }
+
+      // Render Telemetry & Token Impact if available
+      if (g.metrics && g.metrics.length) {
+        html += '<section class="doc-section">';
+        html += '<h2>Token Economics & Telemetry Impact</h2>';
+        html += '<div class="metric-cards-grid">';
+        g.metrics.forEach(m => {
+          html += '<div class="metric-card">';
+          html += '<div class="metric-card-label">' + m.label + '</div>';
+          html += '<div class="metric-card-value">' + m.val + '</div>';
+          html += '<div class="metric-card-desc">' + m.desc + '</div>';
+          html += '</div>';
+        });
+        html += '</div></section>';
+      }
+
+      target.innerHTML = html;
+
+      // Render Mermaid diagrams dynamically
+      if (window.mermaid) {
+        try {
+          const isDark = document.documentElement.classList.contains('dark');
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: isDark ? 'dark' : 'neutral',
+            securityLevel: 'loose',
+            fontFamily: 'Inter, -apple-system, sans-serif'
+          });
+          const nodes = target.querySelectorAll('.mermaid');
+          if (nodes.length > 0) {
+            mermaid.run({ nodes: nodes });
+          }
+        } catch (mErr) {
+          console.warn('Mermaid rendering warning:', mErr);
+        }
+      }
+
+      // Bind dynamic copy buttons
+      const promptBtn = document.getElementById('btn-copy-prompt-block');
+      if (promptBtn && g.promptRecipe) {
+        promptBtn.onclick = () => copyToClipboard(g.promptRecipe, 'Prompt copied!');
+      }
+      const mcpBtn = document.getElementById('btn-copy-mcp-block');
+      if (mcpBtn && g.mcpConfig) {
+        mcpBtn.onclick = () => copyToClipboard(g.mcpConfig, 'Config JSON copied!');
+      }
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Initialize from URL hash or default to 'intro'
+    function initGuideHub() {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && window.GUIDE_DATABASE && window.GUIDE_DATABASE[hash]) {
+        selectGuide(hash);
+      } else {
+        selectGuide('intro');
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGuideHub);
+    } else {
+      initGuideHub();
+    }
+
+    window.addEventListener('hashchange', () => {
+      const newHash = window.location.hash.replace('#', '');
+      if (newHash && window.GUIDE_DATABASE && window.GUIDE_DATABASE[newHash] && newHash !== currentGuideId) {
+        selectGuide(newHash);
+      }
+    });
+  </script>
+</body>
+
+</html>

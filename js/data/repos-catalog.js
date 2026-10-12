@@ -2751,6 +2751,46 @@ const REPOS = [
     ],
     "hasApiKey": false
   }
+  ,
+  {
+    "id": "repo-morluto-rea",
+    "name": "morluto/rea",
+    "title": "REA: Reverse Engineer Anything",
+    "repoUrl": "https://github.com/morluto/rea",
+    "desc": "One MCP server and CLI for reverse engineering across native binaries, JavaScript & Electron apps, .NET assemblies, and websites.",
+    "cat": "mcp",
+    "subcat": "tools",
+    "stars": "110k+",
+    "forks": "5.4k",
+    "lang": "TypeScript",
+    "langColor": "#3178c6",
+    "updated": "Today",
+    "icon": "mcp",
+    "subskills": [
+      {
+        "id": "reverse-engineer-anything",
+        "name": "Reverse Engineer Anything (REA)",
+        "cat": "mcp",
+        "subcat": "tools",
+        "desc": "Universal reverse engineering suite with 173 specialized MCP tools for native binaries, .NET CIL assemblies, Electron ASAR packages, source map recovery, and CDP runtime inspection.",
+        "purpose": "Analyze application internals, decompile bytecode, recover source trees, trace call paths, and investigate binary behavior with cryptographic local evidence.",
+        "trigger": "reverse-engineer-anything, /rea, decompile, reverse engineer, inspect binary, electron asar inspection, .net assembly decompile, cdp inspect",
+        "example_prompt": "Use REA to inspect the Electron ASAR bundle at ./dist/app.asar, recover its internal modules, and trace IPC handlers.",
+        "files": [
+          ".agents/skills/reverse-engineer-anything/SKILL.md",
+          "~/.gemini/config/skills/reverse-engineer-anything/SKILL.md"
+        ],
+        "clone_cmd": "git clone https://github.com/morluto/rea.git",
+        "act": "REA: REVERSE ENGINEER ANYTHING. Use REA MCP tools (binary_overview, analyze_javascript_application, inspect_managed_artifact, decompile, xrefs, inspect_go_binary, recover_javascript_sources) to inspect binaries, assemblies, and applications with verifiable evidence.",
+        "repoName": "morluto/rea",
+        "repoUrl": "https://github.com/morluto/rea",
+        "lang": "TypeScript",
+        "langColor": "#3178c6",
+        "requiresApiKey": false
+      }
+    ],
+    "hasApiKey": false
+  }
 ];
 
 // Flat array derived dynamically from REPOS (Zero duplication)

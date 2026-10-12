@@ -23,6 +23,18 @@ if %errorlevel% equ 0 (
     exit /b 0
 )
 
+:: Check if port 7892 is already in use
+netstat -ano | findstr ":7892 " >nul 2>&1
+if %errorlevel% equ 0 (
+    echo [INFO] Skill Switcher server is already running on port 7892.
+    echo [INFO] Opening dashboard in your default browser...
+    start http://localhost:7892
+    echo.
+    echo Dashboard active at: http://localhost:7892
+    ping 127.0.0.1 -n 3 >nul
+    exit /b 0
+)
+
 echo [INFO] Starting background server daemon on port 7891...
 
 :: Start the PowerShell server in background without blocking

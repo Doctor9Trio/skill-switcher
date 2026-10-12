@@ -184,6 +184,7 @@ A dedicated command center for activating structural MCP servers and context com
 
 | Plugin | Type | Token Impact | How It Delivers Value |
 |---|---|---|---|
+| **🔍 REA (Reverse Engineer Anything)** | Reverse Engineering MCP (173 Tools) | **Deep Inspection & Forensics** | Unpacks Electron ASARs, decompiles .NET/CIL assemblies, extracts sourcemaps, and inspects native binaries with local evidence. |
 | **🌳 Code Review Graph** | AST Knowledge Graph | **~14.9k saved / task** | Replaces recursive Grep and multi-file scans with symbol dependency graphs (`semantic_search_nodes`, `get_impact_radius`). Injects full decision matrix into `active-skills.md`. |
 | **🎯 Get Shit Done (GSD)** | Autonomous Workflow | **65%–80% preserved** | Eliminates context rot and hallucination loops via the 5-phase cycle (`DISCUSS` ➔ `PLAN` ➔ `EXECUTE` ➔ `VERIFY` ➔ `SHIP`), fresh subagent milestones, and persistent `PLAN.md`. |
 | **✂️ Ponytail Optimizer** | Instruction Compressor | **35%–50% reduction** | Strips conversational pleasantries and enforces surgical, single-target code diffs. |
@@ -239,6 +240,9 @@ Skill Switcher is **100% portable** across any PC, username, or operating system
 ---
 
 ## 📖 Reference & Deep Dives
+
+> **📘 Architecture & Dynamic Integration Guide**: See [**`docs/ARCHITECTURE_AND_MCP_GUIDE.md`**](docs/ARCHITECTURE_AND_MCP_GUIDE.md) for a comprehensive explanation of how pure-prompt skills vs tool-backed MCP servers work, and how the **3-tier dynamic resolution ladder** ensures zero-install portability across all dynamic users.
+
 
 <details>
 <summary><strong>⌨️ Keyboard Shortcuts</strong></summary>

@@ -140,6 +140,9 @@ for ($i = 0; $i -lt $maxPortAttempts; $i++) {
     try {
         $testListener = New-Object System.Net.HttpListener
         $testListener.Prefixes.Add("http://localhost:$currentPort/")
+        if ($currentPort -ne 7892) {
+            try { $testListener.Prefixes.Add("http://localhost:7892/") } catch {}
+        }
         $testListener.Start()
         $listener = $testListener
         $actualPort = $currentPort
@@ -189,9 +192,17 @@ Write-Host ""
 Start-Process "http://localhost:$actualPort"
 
 function Send-CorsHeaders($res) {
-    $res.AddHeader("Access-Control-Allow-Origin", "*")
-    $res.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-    $res.AddHeader("Access-Control-Allow-Headers", "Content-Type")
+    try {
+        if (-not $res.Headers["Access-Control-Allow-Origin"]) {
+            $res.AddHeader("Access-Control-Allow-Origin", "*")
+        }
+        if (-not $res.Headers["Access-Control-Allow-Methods"]) {
+            $res.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        }
+        if (-not $res.Headers["Access-Control-Allow-Headers"]) {
+            $res.AddHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+        }
+    } catch {}
 }
 
 function Send-Json($res, $data, [int]$status = 200) {
@@ -920,6 +931,7 @@ function Get-PluginRegistry() {
 
     $mcpServersObj = @{}
     $mcpCandidates = @(
+        (Join-Path $GLOBAL_CONFIG "mcp_config.json"),
         (Join-Path $GEMINI_HOME "antigravity-ide\mcp_config.json"),
         (Join-Path $PROJECT_ROOT "mcp_config.json"),
         (Join-Path $TOOL_DIR "mcp_config.json")
@@ -942,6 +954,13 @@ function Get-PluginRegistry() {
     if (Test-Path $crgDir) {
         $crgTools = @(Get-ChildItem -Path $crgDir -Filter "*.json" | ForEach-Object { $_.BaseName })
     }
+
+    $reaDir = Join-Path $GEMINI_HOME "antigravity-ide\mcp\rea"
+    $reaTools = @()
+    if (Test-Path $reaDir) {
+        $reaTools = @(Get-ChildItem -Path $reaDir -Filter "*.json" | ForEach-Object { $_.BaseName })
+    }
+    $isReaActive = ($mcpServersObj.ContainsKey("rea") -or ($mcpServersObj.Keys | Where-Object { $_ -eq "rea" }))
 
     $stats = Get-TokenStats "all"
     $toolBreakdown = if ($stats.tool_breakdown) { $stats.tool_breakdown } else { @{} }
@@ -993,6 +1012,25 @@ function Get-PluginRegistry() {
             headline        = "Replaces 10k-30k token file dumps with surgical ~100 token AST context slices."
             how_it_works    = "Instead of dumping whole files into memory to locate functions or callers, Gemini calls 'get_minimal_context_tool' or 'get_impact_radius_tool' to fetch only the AST slice needed (~100 tokens vs 20,000 tokens per file). This reduces token burn by up to 85% during debugging and code review."
             impact_details  = "Each minimal context invocation saves ~14,900 tokens. In 10 queries, that is ~149,000 tokens preserved in your context window."
+            config_target   = "mcp_config.json"
+        },
+        @{
+            id              = "rea"
+            name            = "REA: Reverse Engineer Anything"
+            type            = "MCP Server & Engine"
+            category        = "mcp"
+            is_saver        = $false
+            installed       = ($reaTools.Count -gt 0 -or (Test-Path (Join-Path $USER_HOME "Desktop/Tools/REA/scripts/rea.mjs")) -or (Test-Path (Join-Path (Split-Path $TOOL_DIR -Parent) "Tools/REA/scripts/rea.mjs")) -or (Test-Path (Join-Path $TOOL_DIR "scripts/rea.mjs")))
+            active          = $isReaActive
+            badge           = "173 RE Analysis Tools"
+            badge_type      = "accent"
+            token_metric    = "$($reaTools.Count) tools available"
+            invocations     = 0
+            tool_count      = $reaTools.Count
+            tools           = $reaTools
+            headline        = "One MCP for deep reverse engineering across native binaries, JavaScript/Electron apps, .NET assemblies, and websites."
+            how_it_works    = "Exposes 173 specialized reverse engineering tools directly to the AI agent. Analyzes local executables, decompiles CIL/.NET methods, extracts Electron ASAR bundles, recovers sourcemaps, and inspects native binaries without external cloud dependencies."
+            impact_details  = "Enables deep binary inspection, bytecode decompilation, call-graph reconstruction, and application forensics with verified local evidence."
             config_target   = "mcp_config.json"
         },
         @{
@@ -1151,10 +1189,27 @@ function Get-PluginRegistry() {
 
     $activeSaversCount = @($plugins | Where-Object { $_.is_saver -and $_.active }).Count
 
+    $detectedPreset = "custom"
+    $hasCrg = ($mcpServersObj.ContainsKey("code-review-graph") -or ($activeList -contains "code-review-graph"))
+    $hasPony = ($activeList -contains "ponytail")
+    $hasGsd = ($activeList -contains "getshitdone" -or $activeList -contains "gsd")
+    $hasZipai = ($activeList -contains "zipai-optimizer")
+    $hasOmni = ($activeList -like "*OmniRoute*" -or $activeList -contains "omni-compression" -or $activeList -contains "OmniRoute-omni-compression")
+    $hasGraphify = ($activeList -contains "graphify")
+
+    if ($hasCrg -and $hasPony -and $hasGsd -and $hasZipai -and $hasOmni -and $hasGraphify) {
+        $detectedPreset = "ultra-saver"
+    } elseif ($hasCrg -and $hasPony -and $hasGsd -and (-not $hasZipai) -and (-not $hasOmni) -and (-not $hasGraphify)) {
+        $detectedPreset = "balanced"
+    } elseif ($hasCrg -and (-not $hasPony) -and (-not $hasGsd) -and (-not $hasZipai) -and (-not $hasOmni) -and (-not $hasGraphify)) {
+        $detectedPreset = "minimal"
+    }
+
     return @{
         ok                  = $true
         total_plugins       = $plugins.Count
         active_savers_count = $activeSaversCount
+        active_preset       = $detectedPreset
         total_tokens_saved  = $totalTokensSaved
         total_tokens_saved_fmt = "$([math]::Round($totalTokensSaved / 1000, 1))k"
         cost_saved_usd      = [math]::Round($costSavedUsd, 4)
@@ -1163,13 +1218,25 @@ function Get-PluginRegistry() {
         cost_saved_usd_fmt  = "$" + ([math]::Round($costSavedUsd, 4)).ToString("N4")
         efficiency_boost    = if ($stats.total_tokens -gt 0) { [math]::Round(($totalTokensSaved / ($stats.total_tokens + $totalTokensSaved)) * 100) } else { 72 }
         plugins             = $plugins
+        rules_path          = $GLOBAL_RULES
         timestamp           = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
     }
 }
 
 function Set-PluginToggle($pluginId, [bool]$enable) {
+    if ($pluginId -eq "gemini-prompt-cache") {
+        return @{
+            ok          = $true
+            plugin_id   = $pluginId
+            enabled     = $true
+            message     = "Gemini Cloud Prompt Caching is a built-in TPU hardware acceleration feature on Google infrastructure."
+            timestamp   = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        }
+    }
+
     if ($pluginId -eq "code-review-graph") {
         $mcpConfigPaths = @(
+            (Join-Path $GLOBAL_CONFIG "mcp_config.json"),
             (Join-Path $GEMINI_HOME "antigravity-ide\mcp_config.json"),
             (Join-Path $PROJECT_ROOT "mcp_config.json"),
             (Join-Path $TOOL_DIR "mcp_config.json")
@@ -1186,8 +1253,20 @@ function Set-PluginToggle($pluginId, [bool]$enable) {
             
             if ($enable) {
                 $pythonExe = "python"
-                if (Test-Path "C:/Users/1000859/AppData/Local/Programs/Python/Python311/Scripts/code-review-graph.exe") {
-                    $pythonExe = "C:/Users/1000859/AppData/Local/Programs/Python/Python311/Scripts/code-review-graph.exe"
+                $crgCmd = Get-Command code-review-graph -ErrorAction SilentlyContinue
+                if ($crgCmd) {
+                    $pythonExe = $crgCmd.Source
+                } else {
+                    $localApp = [Environment]::GetFolderPath('LocalApplicationData')
+                    $crgCandidates = @(
+                        (Join-Path $USER_HOME "AppData/Local/Programs/Python/Python311/Scripts/code-review-graph.exe"),
+                        (Join-Path $localApp "Programs/Python/Python311/Scripts/code-review-graph.exe"),
+                        (Join-Path $localApp "Programs/Python/Python312/Scripts/code-review-graph.exe"),
+                        (Join-Path $localApp "Programs/Python/Python310/Scripts/code-review-graph.exe")
+                    )
+                    foreach ($c in $crgCandidates) {
+                        if ($c -and (Test-Path $c)) { $pythonExe = $c; break }
+                    }
                 }
                 $srvObj = [pscustomobject]@{
                     command = $pythonExe
@@ -1207,18 +1286,99 @@ function Set-PluginToggle($pluginId, [bool]$enable) {
         } catch {
             Write-Host "  [WARN] Could not update mcp_config.json: $($_.Exception.Message)"
         }
+    } elseif ($pluginId -eq "rea") {
+        $mcpConfigPaths = @(
+            (Join-Path $GLOBAL_CONFIG "mcp_config.json"),
+            (Join-Path $GEMINI_HOME "antigravity-ide\mcp_config.json"),
+            (Join-Path $PROJECT_ROOT "mcp_config.json"),
+            (Join-Path $TOOL_DIR "mcp_config.json")
+        )
+        $mcpPath = $null
+        foreach ($p in $mcpConfigPaths) {
+            if (Test-Path $p) { $mcpPath = $p; break }
+        }
+        if (-not $mcpPath) { $mcpPath = $mcpConfigPaths[0] }
+
+        try {
+            $mcpData = if (Test-Path $mcpPath) { (Get-Content $mcpPath -Raw -Encoding UTF8) | ConvertFrom-Json } else { [pscustomobject]@{ mcpServers = [pscustomobject]@{} } }
+            if ($null -eq $mcpData.mcpServers) { $mcpData | Add-Member -MemberType NoteProperty -Name "mcpServers" -Value ([pscustomobject]@{}) }
+
+            if ($enable) {
+                $nodeExe = "node"
+                $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
+                if ($nodeCmd) {
+                    $nodeExe = $nodeCmd.Source
+                } elseif (Test-Path "C:/Program Files/nodejs/node.exe") {
+                    $nodeExe = "C:/Program Files/nodejs/node.exe"
+                }
+
+                $reaScript = $null
+                $reaCandidates = @(
+                    $env:REA_SCRIPT_PATH,
+                    (Join-Path $USER_HOME "Desktop/Tools/REA/scripts/rea.mjs"),
+                    (Join-Path (Split-Path $TOOL_DIR -Parent) "Tools/REA/scripts/rea.mjs"),
+                    (Join-Path $TOOL_DIR "scripts/rea.mjs")
+                )
+                foreach ($cand in $reaCandidates) {
+                    if ($cand -and (Test-Path $cand)) { $reaScript = $cand; break }
+                }
+
+                $reaGlobal = Get-Command rea -ErrorAction SilentlyContinue
+                if ($reaScript -and (Test-Path $reaScript)) {
+                    $srvObj = [pscustomobject]@{
+                        command = $nodeExe
+                        args    = @($reaScript, "mcp")
+                    }
+                } elseif ($reaGlobal) {
+                    $srvObj = [pscustomobject]@{
+                        command = $reaGlobal.Source
+                        args    = @("mcp")
+                    }
+                } else {
+                    $srvObj = [pscustomobject]@{
+                        command = "cmd.exe"
+                        args    = @("/d", "/c", "npx", "-y", "rea-agents@latest", "mcp")
+                    }
+                }
+                $mcpData.mcpServers | Add-Member -MemberType NoteProperty -Name "rea" -Value $srvObj -Force
+            } else {
+                if ($mcpData.mcpServers.psobject.properties['rea']) {
+                    $mcpData.mcpServers.psobject.properties.Remove('rea')
+                }
+            }
+            $jsonOut = $mcpData | ConvertTo-Json -Depth 10
+            $dir = Split-Path $mcpPath
+            if (!(Test-Path $dir)) { New-Item -ItemType Directory -Force $dir | Out-Null }
+            Set-Content -Path $mcpPath -Value $jsonOut -Encoding UTF8
+        } catch {
+            Write-Host "  [WARN] Could not update mcp_config.json for rea: $($_.Exception.Message)"
+        }
     }
 
     $currentActive = @()
+    $existingSections = @{}
     if (Test-Path $GLOBAL_RULES) {
         $fullContent = Get-Content $GLOBAL_RULES -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
         if ($fullContent -match "(?m)^# Active: (.+)$") {
             $currentActive = @(($Matches[1].Trim() -split ",\s*") | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" })
         }
+        if ($fullContent) {
+            $pattern = "(?ms)^## Skill:\s*([^\r\n]+)\r?\n(.*?)(?=(?:^## Skill:|\Z))"
+            $secMatches = [regex]::Matches($fullContent, $pattern)
+            foreach ($m in $secMatches) {
+                $secName = $m.Groups[1].Value.Trim()
+                $secBody = $m.Groups[2].Value.Trim()
+                if ($secName) {
+                    $existingSections[$secName] = $secBody
+                }
+            }
+        }
     }
 
     $skillKey = switch ($pluginId) {
-        "code-review-graph" { "code-review-graph" }
+        "rea"                       { "reverse-engineer-anything" }
+        "reverse-engineer-anything" { "reverse-engineer-anything" }
+        "code-review-graph"         { "code-review-graph" }
         "ponytail"          { "ponytail" }
         "OmniRoute"         { "OmniRoute-omni-compression" }
         "omniroute"         { "OmniRoute-omni-compression" }
@@ -1249,14 +1409,18 @@ function Set-PluginToggle($pluginId, [bool]$enable) {
         $cleanS = $s.Trim().Replace("`r", "").Replace("`n", "")
         if ([string]::IsNullOrWhiteSpace($cleanS)) { continue }
         $newRules += "## Skill: $cleanS`r`n"
-        $cand = Join-Path $GLOBAL_SKILLS "$cleanS\SKILL.md"
-        if (-not (Test-Path $cand)) { $cand = Join-Path $PROJECT_ROOT ".agents\skills\$cleanS\SKILL.md" }
-        if (Test-Path $cand) {
-            $sContent = Get-Content $cand -Raw -Encoding UTF8
-            $lines = ($sContent -split "`n") | Select-Object -First 120
-            $newRules += ($lines -join "`n") + "`r`n`r`n"
+        if ($existingSections.ContainsKey($cleanS) -and (-not [string]::IsNullOrWhiteSpace($existingSections[$cleanS]))) {
+            $newRules += $existingSections[$cleanS] + "`r`n`r`n"
         } else {
-            $newRules += "Active token optimization & workflow rules for $cleanS.`r`n`r`n"
+            $cand = Join-Path $GLOBAL_SKILLS "$cleanS\SKILL.md"
+            if (-not (Test-Path $cand)) { $cand = Join-Path $PROJECT_ROOT ".agents\skills\$cleanS\SKILL.md" }
+            if (Test-Path $cand) {
+                $sContent = Get-Content $cand -Raw -Encoding UTF8
+                $lines = ($sContent -split "`n") | Select-Object -First 120
+                $newRules += ($lines -join "`n") + "`r`n`r`n"
+            } else {
+                $newRules += "Active token optimization & workflow rules for $cleanS.`r`n`r`n"
+            }
         }
     }
 
@@ -1279,33 +1443,143 @@ function Set-PluginToggle($pluginId, [bool]$enable) {
 }
 
 function Apply-PluginPreset($presetName) {
-    switch ($presetName) {
-        "ultra-saver" {
-            Set-PluginToggle "code-review-graph" $true | Out-Null
-            Set-PluginToggle "ponytail" $true | Out-Null
-            Set-PluginToggle "getshitdone" $true | Out-Null
-            Set-PluginToggle "zipai-optimizer" $true | Out-Null
-            Set-PluginToggle "OmniRoute" $true | Out-Null
-            Set-PluginToggle "graphify" $true | Out-Null
+    # 1. MCP Server settings
+    # All presets utilize code-review-graph for AST minimal slicing
+    $mcpConfigPaths = @(
+        (Join-Path $GLOBAL_CONFIG "mcp_config.json"),
+        (Join-Path $GEMINI_HOME "antigravity-ide\mcp_config.json"),
+        (Join-Path $PROJECT_ROOT "mcp_config.json"),
+        (Join-Path $TOOL_DIR "mcp_config.json")
+    )
+    $mcpPath = $null
+    foreach ($p in $mcpConfigPaths) {
+        if (Test-Path $p) { $mcpPath = $p; break }
+    }
+    if (-not $mcpPath) { $mcpPath = $mcpConfigPaths[0] }
+
+    try {
+        $mcpData = if (Test-Path $mcpPath) { (Get-Content $mcpPath -Raw -Encoding UTF8) | ConvertFrom-Json } else { [pscustomobject]@{ mcpServers = [pscustomobject]@{} } }
+        if ($null -eq $mcpData.mcpServers) { $mcpData | Add-Member -MemberType NoteProperty -Name "mcpServers" -Value ([pscustomobject]@{}) }
+
+        $pythonExe = "python"
+        $crgCmd = Get-Command code-review-graph -ErrorAction SilentlyContinue
+        if ($crgCmd) {
+            $pythonExe = $crgCmd.Source
+        } else {
+            $localApp = [Environment]::GetFolderPath('LocalApplicationData')
+            $crgCandidates = @(
+                (Join-Path $USER_HOME "AppData/Local/Programs/Python/Python311/Scripts/code-review-graph.exe"),
+                (Join-Path $localApp "Programs/Python/Python311/Scripts/code-review-graph.exe"),
+                (Join-Path $localApp "Programs/Python/Python312/Scripts/code-review-graph.exe"),
+                (Join-Path $localApp "Programs/Python/Python310/Scripts/code-review-graph.exe")
+            )
+            foreach ($c in $crgCandidates) {
+                if ($c -and (Test-Path $c)) { $pythonExe = $c; break }
+            }
         }
-        "balanced" {
-            Set-PluginToggle "code-review-graph" $true | Out-Null
-            Set-PluginToggle "ponytail" $true | Out-Null
-            Set-PluginToggle "getshitdone" $true | Out-Null
-            Set-PluginToggle "typesafe-mcp" $true | Out-Null
-            Set-PluginToggle "zipai-optimizer" $false | Out-Null
-            Set-PluginToggle "OmniRoute" $false | Out-Null
+        $srvObj = [pscustomobject]@{
+            command = $pythonExe
+            args = @("serve")
+            env = [pscustomobject]@{ PYTHONWARNINGS = "ignore" }
         }
-        "minimal" {
-            Set-PluginToggle "code-review-graph" $true | Out-Null
-            Set-PluginToggle "ponytail" $false | Out-Null
-            Set-PluginToggle "getshitdone" $false | Out-Null
-            Set-PluginToggle "zipai-optimizer" $false | Out-Null
-            Set-PluginToggle "OmniRoute" $false | Out-Null
-            Set-PluginToggle "graphify" $false | Out-Null
+        $mcpData.mcpServers | Add-Member -MemberType NoteProperty -Name "code-review-graph" -Value $srvObj -Force
+        $jsonOut = $mcpData | ConvertTo-Json -Depth 10
+        $dir = Split-Path $mcpPath
+        if (!(Test-Path $dir)) { New-Item -ItemType Directory -Force $dir | Out-Null }
+        Set-Content -Path $mcpPath -Value $jsonOut -Encoding UTF8
+    } catch {
+        Write-Host "  [WARN] Could not update mcp_config.json during preset apply: $($_.Exception.Message)"
+    }
+
+    # 2. Read existing active-skills.md and retain user's other non-preset skills
+    $currentActive = @()
+    $existingSections = @{}
+    if (Test-Path $GLOBAL_RULES) {
+        $fullContent = Get-Content $GLOBAL_RULES -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
+        if ($fullContent -match "(?m)^# Active: (.+)$") {
+            $currentActive = @(($Matches[1].Trim() -split ",\s*") | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" })
+        }
+        if ($fullContent) {
+            $pattern = "(?ms)^## Skill:\s*([^\r\n]+)\r?\n(.*?)(?=(?:^## Skill:|\Z))"
+            $secMatches = [regex]::Matches($fullContent, $pattern)
+            foreach ($m in $secMatches) {
+                $secName = $m.Groups[1].Value.Trim()
+                $secBody = $m.Groups[2].Value.Trim()
+                if ($secName) {
+                    $existingSections[$secName] = $secBody
+                }
+            }
         }
     }
-    return (Get-PluginRegistry)
+
+    # Known plugin skill identifiers managed by profiles
+    $managedSkillKeys = @(
+        "code-review-graph",
+        "ponytail",
+        "getshitdone",
+        "gsd",
+        "zipai-optimizer",
+        "OmniRoute-omni-compression",
+        "omni-compression",
+        "OmniRoute",
+        "graphify",
+        "typesafe-mcp"
+    )
+
+    # Retain non-managed skills
+    $newActiveList = @($currentActive | Where-Object { $managedSkillKeys -notcontains $_ })
+
+    # Add targeted preset skills
+    switch ($presetName) {
+        "ultra-saver" {
+            $newActiveList += @("code-review-graph", "ponytail", "getshitdone", "zipai-optimizer", "OmniRoute-omni-compression", "graphify", "typesafe-mcp")
+        }
+        "balanced" {
+            $newActiveList += @("code-review-graph", "ponytail", "getshitdone", "typesafe-mcp")
+        }
+        "minimal" {
+            $newActiveList += @("code-review-graph")
+        }
+    }
+
+    $newActiveList = @($newActiveList | ForEach-Object { $_.Trim().Replace("`r", "").Replace("`n", "") } | Where-Object { $_ -ne "" } | Select-Object -Unique)
+
+    $activeStr = ($newActiveList -join ", ")
+    $newRules = "# Active: $activeStr`r`n`r`n"
+    $newRules += "# Active Skills & Customizations System`r`n"
+    $newRules += "# Updated automatically by Skill Switcher Hub on $((Get-Date).ToString('yyyy-MM-dd HH:mm:ss'))`r`n`r`n"
+
+    foreach ($s in $newActiveList) {
+        $cleanS = $s.Trim().Replace("`r", "").Replace("`n", "")
+        if ([string]::IsNullOrWhiteSpace($cleanS)) { continue }
+        $newRules += "## Skill: $cleanS`r`n"
+        if ($existingSections.ContainsKey($cleanS) -and (-not [string]::IsNullOrWhiteSpace($existingSections[$cleanS]))) {
+            $newRules += $existingSections[$cleanS] + "`r`n`r`n"
+        } else {
+            $cand = Join-Path $GLOBAL_SKILLS "$cleanS\SKILL.md"
+            if (-not (Test-Path $cand)) { $cand = Join-Path $PROJECT_ROOT ".agents\skills\$cleanS\SKILL.md" }
+            if (Test-Path $cand) {
+                $sContent = Get-Content $cand -Raw -Encoding UTF8
+                $lines = ($sContent -split "`n") | Select-Object -First 120
+                $newRules += ($lines -join "`n") + "`r`n`r`n"
+            } else {
+                $newRules += "Active token optimization & workflow rules for $cleanS.`r`n`r`n"
+            }
+        }
+    }
+
+    $rd = Split-Path $GLOBAL_RULES
+    if (!(Test-Path $rd)) { New-Item -ItemType Directory -Force $rd | Out-Null }
+    Set-Content -Path $GLOBAL_RULES -Value $newRules -Encoding UTF8
+
+    $global:TokenStatsCache.Clear()
+    $global:TokenTrendsCache.Clear()
+
+    $reg = Get-PluginRegistry
+    $reg.ok = $true
+    $reg.preset = $presetName
+    $reg.active_preset = $presetName
+    return $reg
 }
 
 while ($listener.IsListening) {
@@ -1705,7 +1979,7 @@ while ($listener.IsListening) {
                 $reader.Close()
                 $data   = $body | ConvertFrom-Json
                 $pluginId = $data.id
-                $enable   = [bool]$data.enable
+                $enable   = ($data.enable -eq $true -or $data.enable -eq "true" -or $data.enable -eq 1)
                 $resData  = Set-PluginToggle $pluginId $enable
                 Send-Json $res $resData
             } catch {

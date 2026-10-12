@@ -47,6 +47,10 @@ const WORKFLOW_PRESETS = {
     name: 'AI Engineering & MCP Architect',
     skills: ['ai-engineer-roadmap', 'ralph-loop', 'controlled-english-ste', 'better-icons']
   },
+  reverse_engineering: {
+    name: 'Reverse Engineering & Binary Analysis',
+    skills: ['reverse-engineer-anything', 'code-review-graph', 'typesafe-mcp']
+  },
   full: {
     name: 'Full Stack Master Suite',
     skills: [
