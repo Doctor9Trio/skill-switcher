@@ -1,3 +1,4 @@
+
 # Skill Switcher
 
 <p align="center">
@@ -36,9 +37,11 @@
 **Skill Switcher** is an offline-first, developer-grade orchestrator designed to eliminate prompt fatigue, context bloat, and token waste in AI pair-programming sessions.
 
 Modern AI coding agents (Antigravity IDE, Claude Code, Gemini CLI, Cursor) ingest custom rules from:
+
 ```
 ~/.gemini/config/rules/active-skills.md
 ```
+
 Instead of manually copying rules or bloating your context window with all skills at once, Skill Switcher lets you **activate, inspect, and hot-swap specialized skills and token-reducing plugins with 1 click**.
 
 ---
@@ -59,13 +62,13 @@ Simply double-click:
 
 ### 2. Launch Script Reference
 
-| File | Purpose | Recommended For |
-|---|---|---|
-| **[`start-skill-switcher.bat`](start-skill-switcher.bat)** | **1-Second Silent Background Launcher** | **Daily use (Windows)**. Starts daemon and opens browser. |
-| **[`skill-gui.bat`](skill-gui.bat)** | Foreground Web GUI Server | Windows users who want to see live HTTP console logs. |
-| **[`skill-gui.sh`](skill-gui.sh)** | Shell Script Launcher | macOS / Linux workstations (`chmod +x skill-gui.sh && ./skill-gui.sh`). |
-| **[`skill-loader.bat`](skill-loader.bat)** | Interactive Terminal CLI Menu | Terminal-only keyboard workflow in PowerShell (no browser needed). |
-| **[`index.html`](index.html)** | 100% Offline Static UI | Zero servers required; select skills and copy prompts directly. |
+| File                                                              | Purpose                                       | Recommended For                                                           |
+| ----------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------- |
+| **[`start-skill-switcher.bat`](start-skill-switcher.bat)** | **1-Second Silent Background Launcher** | **Daily use (Windows)**. Starts daemon and opens browser.           |
+| **[`skill-gui.bat`](skill-gui.bat)**                       | Foreground Web GUI Server                     | Windows users who want to see live HTTP console logs.                     |
+| **[`skill-gui.sh`](skill-gui.sh)**                         | Shell Script Launcher                         | macOS / Linux workstations (`chmod +x skill-gui.sh && ./skill-gui.sh`). |
+| **[`skill-loader.bat`](skill-loader.bat)**                 | Interactive Terminal CLI Menu                 | Terminal-only keyboard workflow in PowerShell (no browser needed).        |
+| **[`index.html`](index.html)**                             | 100% Offline Static UI                        | Zero servers required; select skills and copy prompts directly.           |
 
 ---
 
@@ -90,12 +93,12 @@ Simply double-click:
 
 ### 1. Token Reduction & Cost Benchmarks
 
-| Configuration | Context Burn / Task | Avg. Cost (₹ INR) | Avg. Cost ($ USD) | Efficiency Gain |
-|---|---|---|---|---|
-| **❌ Vanilla Assistant (No Plugins)** | `[████████████████████]` **180k tokens** | ₹42.50 | $0.49 | Baseline (0%) |
-| **🌳 + Code Review Graph** | `[██████████████░░░░░░]` **125k tokens** | ₹29.50 | $0.34 | **+30.5% Saved** |
-| **✂️ + Ponytail & ZipAI Verbosity** | `[████████░░░░░░░░░░░░]` **75k tokens** | ₹17.70 | $0.20 | **+58.3% Saved** |
-| **⚡ Ultra-Saver (CRG + GSD + Ponytail)** | `[███░░░░░░░░░░░░░░░░░]` **35k tokens** | ₹8.20 | $0.09 | **+80.5% Saved ⚡** |
+| Configuration                                   | Context Burn / Task                                                  | Avg. Cost (₹ INR) | Avg. Cost ($ USD) | Efficiency Gain           |
+| ----------------------------------------------- | -------------------------------------------------------------------- | ------------------ | ----------------- | ------------------------- |
+| **❌ Vanilla Assistant (No Plugins)**     | `[████████████████████]` **180k tokens** | ₹42.50            | $0.49             | Baseline (0%)             |
+| **🌳 + Code Review Graph**                | `[██████████████░░░░░░]` **125k tokens** | ₹29.50            | $0.34             | **+30.5% Saved**    |
+| **✂️ + Ponytail & ZipAI Verbosity**     | `[████████░░░░░░░░░░░░]` **75k tokens**  | ₹17.70            | $0.20             | **+58.3% Saved**    |
+| **⚡ Ultra-Saver (CRG + GSD + Ponytail)** | `[███░░░░░░░░░░░░░░░░░]` **35k tokens**  | ₹8.20             | $0.09             | **+80.5% Saved ⚡** |
 
 ---
 
@@ -113,14 +116,14 @@ flowchart LR
 
 ### 3. Feature Comparison Matrix
 
-| Workflow Dimension | ❌ Vanilla AI Coding Assistant | ⚡ With Skill Switcher & Plugins Hub |
-|---|---|---|
-| **Context Window Hygiene** | Suffers severe **Context Rot** as redundant logs and chat accumulate. | **Spec-Driven Milestones (GSD)** with clean subagent context and persistent `PLAN.md`. |
-| **Codebase Navigation** | Blind recursive Grep & reading full files (**15k–50k tokens** wasted). | **AST Knowledge Graph (`code-review-graph`)** queries exact symbol radius (**100–300 tokens**). |
-| **Conversational Conciseness** | Repetitive preamble, polite disclaimers, and rambling explanations. | **Surgical Diff Enforcement (`ponytail`)** + 38 Anti-Slop precision writing rules. |
-| **Terminal & Shell Output** | Unbuffered stdout/stderr dumps flood and blow the context window. | **Regex Truncation (`zipai-optimizer`)** prevents overflow from minified logs. |
-| **Cost & Token Transparency** | Blind spend until month-end invoice; zero per-turn tracking. | **Real-Time Telemetry Engine** streaming **₹ INR** & **$ USD** per turn from trajectory logs. |
-| **Rule & Skill Switching** | Tedious manual editing of hidden dotfiles and markdown rules. | **1-Click Primer GUI & Presets** with instant two-way disk synchronization. |
+| Workflow Dimension                   | ❌ Vanilla AI Coding Assistant                                                | ⚡ With Skill Switcher & Plugins Hub                                                                             |
+| ------------------------------------ | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Context Window Hygiene**     | Suffers severe**Context Rot** as redundant logs and chat accumulate.    | **Spec-Driven Milestones (GSD)** with clean subagent context and persistent `PLAN.md`.                   |
+| **Codebase Navigation**        | Blind recursive Grep & reading full files (**15k–50k tokens** wasted). | **AST Knowledge Graph (`code-review-graph`)** queries exact symbol radius (**100–300 tokens**).   |
+| **Conversational Conciseness** | Repetitive preamble, polite disclaimers, and rambling explanations.           | **Surgical Diff Enforcement (`ponytail`)** + 38 Anti-Slop precision writing rules.                       |
+| **Terminal & Shell Output**    | Unbuffered stdout/stderr dumps flood and blow the context window.             | **Regex Truncation (`zipai-optimizer`)** prevents overflow from minified logs.                           |
+| **Cost & Token Transparency**  | Blind spend until month-end invoice; zero per-turn tracking.                  | **Real-Time Telemetry Engine** streaming **₹ INR** & **$ USD** per turn from trajectory logs. |
+| **Rule & Skill Switching**     | Tedious manual editing of hidden dotfiles and markdown rules.                 | **1-Click Primer GUI & Presets** with instant two-way disk synchronization.                                |
 
 ---
 
@@ -168,7 +171,9 @@ flowchart TD
 ## 🧩 Core Modules
 
 ### 1. 🎛️ Skills & Presets Engine
+
 Manage over **105+ battle-tested skills** categorized into ready-to-use 1-click stacks:
+
 - 🎨 **Frontend Motion** — GSAP Core, ScrollTrigger, Motion Dev, Impeccable, Better Icons.
 - ⚡ **JEV DOM Loop** — Sub-second headless browser automation, Drone spatial engine, Canny verifier.
 - ✍️ **Anti-Slop & Precision** — Miqdad Badjuber's 38 anti-fluff rules + ASD-STE100 Controlled English.
@@ -182,18 +187,18 @@ Manage over **105+ battle-tested skills** categorized into ready-to-use 1-click 
 
 A dedicated command center for activating structural MCP servers and context compression systems:
 
-| Plugin | Type | Token Impact | How It Delivers Value |
-|---|---|---|---|
-| **🔍 REA (Reverse Engineer Anything)** | Reverse Engineering MCP (173 Tools) | **Deep Inspection & Forensics** | Unpacks Electron ASARs, decompiles .NET/CIL assemblies, extracts sourcemaps, and inspects native binaries with local evidence. |
-| **🌳 Code Review Graph** | AST Knowledge Graph | **~14.9k saved / task** | Replaces recursive Grep and multi-file scans with symbol dependency graphs (`semantic_search_nodes`, `get_impact_radius`). Injects full decision matrix into `active-skills.md`. |
-| **🎯 Get Shit Done (GSD)** | Autonomous Workflow | **65%–80% preserved** | Eliminates context rot and hallucination loops via the 5-phase cycle (`DISCUSS` ➔ `PLAN` ➔ `EXECUTE` ➔ `VERIFY` ➔ `SHIP`), fresh subagent milestones, and persistent `PLAN.md`. |
-| **✂️ Ponytail Optimizer** | Instruction Compressor | **35%–50% reduction** | Strips conversational pleasantries and enforces surgical, single-target code diffs. |
-| **⚡ OmniRoute & RTK** | Token Router & Cache | **40%–60% reduction** | Lossless prompt compression and dynamic context budgeting. |
-| **🗺️ Graphify** | Architecture Indexer | **~25k saved / session** | Pre-indexes codebase AST dependencies into `GRAPH_REPORT.md`. |
-| **🗜️ ZipAI Verbosity Filter** | Output Truncator | **40%–60% log savings** | Limits unbuffered terminal dumps and minified JS spills. |
-| **💾 Gemini Prompt Caching** | Cloud Acceleration | **86% billing discount** | Pins static prompt prefixes in Google Cloud RAM. |
+| Plugin                                | Type                   | Token Impact                   | How It Delivers Value                                                                                                                                                                           |
+| ------------------------------------- | ---------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **🌳 Code Review Graph**        | AST Knowledge Graph    | **~14.9k saved / task**  | Replaces recursive Grep and multi-file scans with symbol dependency graphs (`semantic_search_nodes`, `get_impact_radius`). Injects full decision matrix into `active-skills.md`.          |
+| **🎯 Get Shit Done (GSD)**      | Autonomous Workflow    | **65%–80% preserved**   | Eliminates context rot and hallucination loops via the 5-phase cycle (`DISCUSS` ➔ `PLAN` ➔ `EXECUTE` ➔ `VERIFY` ➔ `SHIP`), fresh subagent milestones, and persistent `PLAN.md`. |
+| **✂️ Ponytail Optimizer**     | Instruction Compressor | **35%–50% reduction**   | Strips conversational pleasantries and enforces surgical, single-target code diffs.                                                                                                             |
+| **⚡ OmniRoute & RTK**          | Token Router & Cache   | **40%–60% reduction**   | Lossless prompt compression and dynamic context budgeting.                                                                                                                                      |
+| **🗺️ Graphify**               | Architecture Indexer   | **~25k saved / session** | Pre-indexes codebase AST dependencies into`GRAPH_REPORT.md`.                                                                                                                                  |
+| **🗜️ ZipAI Verbosity Filter** | Output Truncator       | **40%–60% log savings** | Limits unbuffered terminal dumps and minified JS spills.                                                                                                                                        |
+| **💾 Gemini Prompt Caching**    | Cloud Acceleration     | **86% billing discount** | Pins static prompt prefixes in Google Cloud RAM.                                                                                                                                                |
 
 #### 1-Click Optimization Presets:
+
 - ⚡ **Ultra-Low Token Mode**: Activates all savers for **70%+ context reduction**.
 - ⚖️ **Balanced Precision Mode**: Balances high token efficiency with type safety.
 - 🚀 **Baseline Standard Profile**: Restores minimal baseline configuration.
@@ -203,6 +208,7 @@ A dedicated command center for activating structural MCP servers and context com
 ### 3. 📊 Token & Cost Telemetry Monitor (`/pages/token-monitor.html`)
 
 Real-time, zero-overhead telemetry dashboard streaming directly from Antigravity session trajectories (`transcript.jsonl`):
+
 - **Dual Currency Tracking**: Primary in **₹ INR** (@ benchmark ₹86.50/USD) with instant **$ USD** toggle.
 - **Interactive Visualizations (Chart.js)**: Stacked Bars, Spline Gradient Area, and Cumulative Burn-up curves across 7D, 14D, 30D, and 90D timeframes.
 - **Cost Estimator & Forecaster**: Model hypothetical context runs across Gemini Flash, Gemini Pro, Claude Sonnet, Claude Haiku, and GPT-4o.
@@ -214,6 +220,7 @@ Real-time, zero-overhead telemetry dashboard streaming directly from Antigravity
 ### 4. 📚 The Shelf — Technology Discovery Library
 
 High-speed engineering repository and design inspiration graph:
+
 - **5-Second Quick Capture**: Save any URL directly into your Inbox from the top bar or via the **1-Click Browser Bookmarklet**.
 - **Dual-Context Capture**: Records both *"💭 Why I saved this"* (aesthetic/mechanism) and *"🚀 Potential use"* (codebase application).
 - **Curated Topic Collections**: Visual folders for *Design & Visual Identity*, *React & Animation Engines*, *Typography*, *CRO & Growth*, *AI Tools*, and *Developer Tools*.
@@ -226,14 +233,14 @@ High-speed engineering repository and design inspiration graph:
 
 Skill Switcher is **100% portable** across any PC, username, or operating system:
 
-| What | How It Is Resolved at Runtime |
-|---|---|
-| User Profile | `%USERPROFILE%` / `$HOME` profile root |
-| Antigravity Config | `<home>/.gemini` |
-| Active Rules Path | `<home>/.gemini/config/rules/active-skills.md` |
-| Global Skills | `<home>/.gemini/config/skills` |
-| Session Telemetry | `<home>/.gemini/antigravity-ide/brain` (auto-detects fallback paths) |
-| Skill File Pointers | Dynamic absolute paths pointing to your local clone |
+| What                | How It Is Resolved at Runtime                                          |
+| ------------------- | ---------------------------------------------------------------------- |
+| User Profile        | `%USERPROFILE%` / `$HOME` profile root                             |
+| Antigravity Config  | `<home>/.gemini`                                                     |
+| Active Rules Path   | `<home>/.gemini/config/rules/active-skills.md`                       |
+| Global Skills       | `<home>/.gemini/config/skills`                                       |
+| Session Telemetry   | `<home>/.gemini/antigravity-ide/brain` (auto-detects fallback paths) |
+| Skill File Pointers | Dynamic absolute paths pointing to your local clone                    |
 
 *Paths are verified and displayed directly in the dashboard under System Environment.*
 
@@ -241,13 +248,11 @@ Skill Switcher is **100% portable** across any PC, username, or operating system
 
 ## 📖 Reference & Deep Dives
 
-> **📘 Architecture & Dynamic Integration Guide**: See [**`docs/ARCHITECTURE_AND_MCP_GUIDE.md`**](docs/ARCHITECTURE_AND_MCP_GUIDE.md) for a comprehensive explanation of how pure-prompt skills vs tool-backed MCP servers work, and how the **3-tier dynamic resolution ladder** ensures zero-install portability across all dynamic users.
-
-
 <details>
 <summary><strong>⌨️ Keyboard Shortcuts</strong></summary>
 
 ### Web GUI (Shelf & Dashboard):
+
 - <kbd>/</kbd> — Focus search bar
 - <kbd>n</kbd> or <kbd>+</kbd> — Open "+ Add Resource" modal
 - <kbd>1</kbd> — Switch to Card Grid view
@@ -257,6 +262,7 @@ Skill Switcher is **100% portable** across any PC, username, or operating system
 - <kbd>Esc</kbd> — Clear filters / Close modals
 
 ### Interactive CLI (`skill-loader.bat`):
+
 - `1` – `11` — Toggle individual skill packs
 - `A` — Apply active selection to disk
 - `S` — Status check
