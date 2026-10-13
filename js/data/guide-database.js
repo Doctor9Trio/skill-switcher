@@ -43,6 +43,18 @@ const GUIDE_DATABASE = {
       {
         "heading": "3. The Three Layers of Skill Switcher",
         "bodyHtml": "<p>The ecosystem is organized into three distinct operational layers:</p><ol><li><b>Behavioral Skill Packs:</b> Plain markdown instructions that guide model behavior (e.g., <code>ponytail</code>, <code>impeccable</code>, <code>gsap</code>, <code>systematic-debugging</code>). Stored in <code>~/.gemini/config/skills/</code> and activated via <code>active-skills.md</code>.</li><li><b>Functional MCP Servers:</b> External executable engines that expose JSON-RPC tools to the model (e.g., <code>rea</code> with 173 reverse-engineering tools, <code>code-review-graph</code> with 29 AST tools). Configured in <code>~/.gemini/config/mcp_config.json</code>.</li><li><b>Token Reduction Savers:</b> Algorithmic compression layers (OmniRoute, ZipAI, Graphify) that actively compact prompts, filter runaway command outputs, and preserve KV cache lines.</li></ol>"
+      },
+      {
+        "heading": "4. Repository & Installation Requirements: Do I Need to Clone Repos?",
+        "bodyHtml": "\n    <p>A frequent question from developers is: <b>\"Do I need to clone and keep full git repositories for every plugin, skill, and MCP server?\"</b></p>\n    <p>The answer depends on the architectural tier:</p>\n    <div class=\"tools-table-wrap\">\n      <table class=\"tools-table\">\n        <thead>\n          <tr>\n            <th>Component Type</th>\n            <th>Needs Full Git Repo?</th>\n            <th>Required Prerequisites</th>\n            <th>How It Runs</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><b>REA Reverse Engineer Engine</b></td>\n            <td><span class=\"status-badge orange\">YES (or npx rea)</span></td>\n            <td>Node.js v20+, <code>npm run build:cached</code></td>\n            <td>Local background MCP JSON-RPC process at <code>Desktop/Tools/REA</code></td>\n          </tr>\n          <tr>\n            <td><b>Code Review Graph (CRG)</b></td>\n            <td><span class=\"status-badge green\">NO (Pip Package)</span></td>\n            <td>Python 3.10+, <code>pip install code-review-graph</code></td>\n            <td>Local background MCP process via <code>code-review-graph.exe</code></td>\n          </tr>\n          <tr>\n            <td><b>Skill Rule Plugins</b><br/>(Ponytail, OmniRoute, ZipAI, Graphify, GSD, Impeccable, Typesafe-MCP)</td>\n            <td><span class=\"status-badge green\">NO (Zero Repo)</span></td>\n            <td>None! Plain Markdown files in <code>.agents/skills/</code> and <code>active-skills.md</code></td>\n            <td>Injected directly into AI context window by Skill Switcher</td>\n          </tr>\n          <tr>\n            <td><b>Gemini Prompt Cache</b></td>\n            <td><span class=\"status-badge purple\">NO (Cloud TPU)</span></td>\n            <td>Zero install! Built into Google TPU RAM infrastructure</td>\n            <td>Automatic hardware-level KV-cache reuse for prefixes &gt; 1,024 tokens</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n    <div class=\"w3-callout-banner\" style=\"margin-top:14px;\">\n      <h4>💡 Rule of Thumb</h4>\n      <p>Only <b>REA</b> requires maintaining a compiled local repository folder (or global npm package). All prompt/rule skills run purely from their lightweight Markdown definitions!</p>\n    </div>\n  "
+      },
+      {
+        "heading": "5. How to Trigger Any Plugin, MCP, or Skill",
+        "bodyHtml": "\n    <p>Every tool and skill in Skill Switcher can be triggered in multiple ergonomic ways:</p>\n    <ul>\n      <li><b>Automatic Tool Invocations:</b> When MCP servers (REA, CRG) are active in <code>mcp_config.json</code>, the AI agent automatically invokes relevant tools (e.g. <code>get_minimal_context_tool</code> or <code>rea_inspect_binary</code>) whenever your task requires code analysis or reverse engineering.</li>\n      <li><b>Explicit Prompt Keywords:</b> Mention the plugin or skill name directly in your prompt. For example: <code>\"Audit this module using ponytail rules\"</code> or <code>\"Run graphify to map dependencies\"</code>.</li>\n      <li><b>Slash Commands:</b> If supported in your IDE interface, trigger specialized workflows like <code>/gsd</code> for autonomous execution.</li>\n      <li><b>Skill Switcher UI Toggles:</b> Simply flip the switch on the <a href=\"plugins.html\" style=\"color:var(--accent-blue);font-weight:600;\">Plugins Hub</a>. Enabled skills are immediately injected into your active session via <code>active-skills.md</code>.</li>\n    </ul>\n  "
+      },
+      {
+        "heading": "6. Universal Troubleshooting & Diagnostic Guide",
+        "bodyHtml": "\n    <p>If you encounter any unexpected behavior while using plugins, MCP servers, or skills, follow this checklist:</p>\n    <div class=\"tools-table-wrap\">\n      <table class=\"tools-table\">\n        <thead>\n          <tr>\n            <th>Observed Symptom</th>\n            <th>Underlying Cause</th>\n            <th>Resolution Steps</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><b>MCP server not showing up in IDE</b></td>\n            <td>IDE has not reloaded <code>mcp_config.json</code> or server failed to boot</td>\n            <td>1. Check <code>~/.gemini/config/mcp_config.json</code>.<br/>2. Test running command manually in terminal (e.g. <code>code-review-graph --version</code>).<br/>3. Restart IDE or reload MCP servers.</td>\n          </tr>\n          <tr>\n            <td><b>Skill instructions not being followed</b></td>\n            <td>Skill is toggled OFF or rule file was overwritten</td>\n            <td>1. Open <a href=\"plugins.html\" style=\"color:var(--accent-blue);\">Plugins Hub</a> and ensure plugin toggle is GREEN.<br/>2. Check <code>~/.gemini/config/rules/active-skills.md</code>.<br/>3. Explicitly mention skill name in prompt.</td>\n          </tr>\n          <tr>\n            <td><b>Executable not found on Windows</b></td>\n            <td>Path contains unescaped backslashes or missing from system PATH</td>\n            <td>Use forward slashes (e.g. <code>C:/Python311/Scripts</code>) or verify PATH environment variable in PowerShell.</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  "
       }
     ],
     "promptRecipe": "Inspect the active skill configuration and activate only the essential skills for this refactoring session:\n- poncho senior developer optimization\n- code review graph AST querying\n- systematic debugging\nEnsure token reduction is active before analyzing the codebase.",
@@ -210,6 +222,18 @@ const GUIDE_DATABASE = {
       {
         "heading": "3. Analyzing .NET, Electron, and Web Targets",
         "bodyHtml": "<ul><li><b>.NET Assemblies (.dll / .exe):</b> Call <code>decompile_csharp_method</code> with <code>assemblyPath</code> and <code>typeName</code> to recover complete C# source code from Intermediate Language.</li><li><b>Electron Desktop Apps:</b> Target <code>app.asar</code> using <code>extract_asar_bundle</code>. REA unpackages all HTML/JS assets into a temporary directory for structural audit.</li><li><b>Production Web Bundles:</b> If a production site has <code>bundle.js.map</code>, run <code>recover_sourcemaps</code> to reconstitute the original TypeScript project structure with filenames and comments!</li></ul>"
+      },
+      {
+        "heading": "4. Requirements & Repository Dependency: Do I Need the Repo?",
+        "bodyHtml": "\n    <div class=\"w3-callout-banner\">\n      <h4>📦 Repository Requirement: YES (or npx rea)</h4>\n      <p>REA is a full-featured multi-engine reverse engineering suite. To run it as a local MCP server, you need either the compiled repository locally on disk or the published global npm package.</p>\n    </div>\n    <div class=\"tools-table-wrap\">\n      <table class=\"tools-table\">\n        <thead>\n          <tr>\n            <th>Prerequisite</th>\n            <th>Specification / Status</th>\n            <th>Purpose</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><b>Local Repository</b></td>\n            <td><code>C:\\Users\\1000859\\Desktop\\Tools\\REA</code></td>\n            <td>Holds disassembler adapters, Ghidra scripts, and build artifacts.</td>\n          </tr>\n          <tr>\n            <td><b>Node.js Runtime</b></td>\n            <td>Node.js v20.x or v22.x (Verified v22.20.0 installed)</td>\n            <td>Executes the MCP JSON-RPC server and ESM pipeline.</td>\n          </tr>\n          <tr>\n            <td><b>Build Artifacts</b></td>\n            <td><code>dist/mcp/main.js</code> (Compiled ESM bundle)</td>\n            <td>Must be generated by running <code>npm ci && npm run build:cached</code>.</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  "
+      },
+      {
+        "heading": "5. How to Trigger REA & Tool Syntax",
+        "bodyHtml": "\n    <p>REA exposes 173 specialized reverse-engineering tools over MCP. You can trigger it via:</p>\n    <ul>\n      <li><b>Natural Language Prompt:</b> <code>\"Use REA tools to inspect the exports and section entropy of C:/path/to/binary.exe\"</code>.</li>\n      <li><b>Decompilation Prompt:</b> <code>\"Decompile the C# method ProcessPayload in assembly C:/path/to/Assembly.dll using REA\"</code>.</li>\n      <li><b>Direct CLI Execution:</b> In your terminal, run:\n        <pre class=\"code-block\" style=\"margin:8px 0;\"><code>node C:/Users/1000859/Desktop/Tools/REA/scripts/rea.mjs analyze \"C:/path/to/target.exe\"</code></pre>\n      </li>\n    </ul>\n  "
+      },
+      {
+        "heading": "6. Troubleshooting REA Common Problems",
+        "bodyHtml": "\n    <div class=\"tools-table-wrap\">\n      <table class=\"tools-table\">\n        <thead>\n          <tr>\n            <th>Error / Symptom</th>\n            <th>Root Cause</th>\n            <th>Solution</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><code>Cannot find module 'dist/mcp/main.js'</code></td>\n            <td>REA repository has not been built after git clone</td>\n            <td>Run <code>cd C:\\Users\\1000859\\Desktop\\Tools\\REA && npm run build:cached</code>.</td>\n          </tr>\n          <tr>\n            <td><code>MCP connection timeout</code></td>\n            <td>Node.js path missing or port blocked</td>\n            <td>Verify <code>mcp_config.json</code> points to absolute path of <code>node.exe</code> and <code>scripts/rea.mjs</code>.</td>\n          </tr>\n          <tr>\n            <td><code>Target format unrecognized</code></td>\n            <td>Target file is empty, encrypted, or unsupported format</td>\n            <td>Check file header magic bytes. REA supports PE, ELF, Mach-O, .NET CIL, and Electron ASAR.</td>\n          </tr>\n          <tr>\n            <td><code>File path backslash error on Windows</code></td>\n            <td>Unescaped Windows backslashes in tool argument</td>\n            <td>Always provide paths using forward slashes: <code>C:/path/to/binary.exe</code>.</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n    <div style=\"margin-top:12px;\">\n      <a href=\"plugins.html\" class=\"btn-preset\" style=\"display:inline-flex;align-items:center;gap:6px;text-decoration:none;padding:6px 12px;font-size:12px;color:var(--accent-blue);\">\n        ← Return to Plugins Hub to toggle REA\n      </a>\n    </div>\n  "
       }
     ],
     "tools": [
@@ -294,6 +318,18 @@ const GUIDE_DATABASE = {
       {
         "heading": "2. Step-by-Step Instructions: Refactoring with CRG",
         "bodyHtml": "<p>Follow this procedure whenever performing multi-file refactoring or reviewing code:</p><ol><li><b>Build/Refresh AST Index:</b> Call <code>build_or_update_graph_tool</code> pointing to your project directory. This scans AST nodes incrementally into SQLite.</li><li><b>Query Blast Radius:</b> Before changing any public function or export, call <code>get_impact_radius_tool</code> with the file path. It returns every caller across the repository that depends on that symbol.</li><li><b>Fetch Minimal Signatures:</b> For each affected caller, call <code>get_minimal_context_tool</code> to retrieve only its signature and docstring. Do not read the entire caller file into memory.</li><li><b>Execute Surgical Edits:</b> Apply edits with exact line ranges, keeping token overhead minimal.</li></ol>"
+      },
+      {
+        "heading": "3. Requirements & Repository Dependency: Do I Need the Repo?",
+        "bodyHtml": "\n    <div class=\"w3-callout-banner\">\n      <h4>🐍 Repository Requirement: NO! (Pip Package Only)</h4>\n      <p><b>You DO NOT need to clone or maintain a git repository for Code Review Graph.</b></p>\n      <p>CRG is distributed as a standalone Python CLI tool. It is already installed on your system via <code>pip install code-review-graph</code> (version 2.3.3 verified in PATH at Python 3.11).</p>\n    </div>\n    <div class=\"tools-table-wrap\">\n      <table class=\"tools-table\">\n        <thead>\n          <tr>\n            <th>Prerequisite</th>\n            <th>Required?</th>\n            <th>Your Machine Status</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><b>Git Repository Cloned</b></td>\n            <td><span class=\"status-badge green\">NO</span></td>\n            <td>Not needed. Runs as installed binary.</td>\n          </tr>\n          <tr>\n            <td><b>Python 3.10+</b></td>\n            <td><span class=\"status-badge green\">YES</span></td>\n            <td>Python 3.11.9 confirmed in PATH.</td>\n          </tr>\n          <tr>\n            <td><b>code-review-graph CLI</b></td>\n            <td><span class=\"status-badge green\">YES</span></td>\n            <td>v2.3.3 installed in Python Scripts.</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  "
+      },
+      {
+        "heading": "4. How to Trigger Code Review Graph",
+        "bodyHtml": "\n    <p>CRG provides 29 AST query tools. Trigger it via:</p>\n    <ul>\n      <li><b>Automatic Agent Invocations:</b> When asking the agent to review, refactor, or find callers of a function, Gemini automatically calls <code>get_minimal_context_tool</code> or <code>get_impact_radius_tool</code> instead of reading entire 30,000-token files.</li>\n      <li><b>Prompt Recipe:</b> <code>\"Use Code Review Graph minimal context to inspect function parsePayload in src/engine.ts and its callers.\"</code></li>\n      <li><b>CLI Verification:</b> In PowerShell:\n        <pre class=\"code-block\" style=\"margin:8px 0;\"><code>code-review-graph --help</code></pre>\n      </li>\n    </ul>\n  "
+      },
+      {
+        "heading": "5. Troubleshooting CRG Common Problems",
+        "bodyHtml": "\n    <div class=\"tools-table-wrap\">\n      <table class=\"tools-table\">\n        <thead>\n          <tr>\n            <th>Symptom</th>\n            <th>Cause</th>\n            <th>Fix</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td><code>'code-review-graph' is not recognized</code></td>\n            <td>Python Scripts folder not in system PATH</td>\n            <td>Run <code>pip install code-review-graph</code> and add <code>C:\\Python311\\Scripts</code> to PATH.</td>\n          </tr>\n          <tr>\n            <td><code>AST parse failure</code></td>\n            <td>File contains syntax errors or unsupported language</td>\n            <td>Verify file syntax before querying. CRG supports Python, TS, JS, Go, and Rust.</td>\n          </tr>\n          <tr>\n            <td><code>Tools missing in chat</code></td>\n            <td><code>mcp_config.json</code> not registered</td>\n            <td>Ensure <code>code-review-graph</code> entry is present in <code>~/.gemini/config/mcp_config.json</code>.</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n    <div style=\"margin-top:12px;\">\n      <a href=\"plugins.html\" class=\"btn-preset\" style=\"display:inline-flex;align-items:center;gap:6px;text-decoration:none;padding:6px 12px;font-size:12px;color:var(--accent-blue);\">\n        ← Return to Plugins Hub\n      </a>\n    </div>\n  "
       }
     ],
     "tools": [
@@ -349,6 +385,14 @@ const GUIDE_DATABASE = {
       {
         "heading": "1. How It Operates",
         "bodyHtml": "<p>When editing complex TypeScript or Zod schemas, TypeSafe MCP queries the AST compiler directly to confirm that types, generics, and return signatures match across modules without needing a slow global build step.</p>"
+      },
+      {
+        "heading": "2. Requirements & Repository Dependency: Do I Need the Repo?",
+        "bodyHtml": "\n    <div class=\"w3-callout-banner\">\n      <h4>🛡️ Repository Requirement: NO! (Pure Skill Rule)</h4>\n      <p>TypeSafe MCP enforces strict JSON Schema compliance and validation for MCP tool handlers. Runs entirely from <code>skills/typesafe-mcp/SKILL.md</code> with zero repo dependencies.</p>\n    </div>\n  "
+      },
+      {
+        "heading": "3. How to Trigger & Troubleshooting",
+        "bodyHtml": "\n    <p><b>How to Trigger:</b> Active automatically during MCP development. Prompt: <code>\"Validate tool schemas with typesafe-mcp\"</code>.</p>\n    <p><b>Troubleshooting:</b> If schema errors occur, ensure parameters use exact primitive types (string, number, boolean) and avoid loose objects.</p>\n  "
       }
     ],
     "promptRecipe": "Inspect the types of the returned object in 'src/api/user.ts' using TypeSafe MCP. Ensure all required fields conform to the UserResponse interface and report any strict null check violations."
@@ -422,6 +466,18 @@ const GUIDE_DATABASE = {
       {
         "heading": "2. Step-by-Step Instructions: Activating Ponytail",
         "bodyHtml": "<p>To enforce Ponytail across your agent sessions:</p><ol><li>In Skill Switcher, enable <b>Ponytail Senior Dev Optimizer</b> in the Plugins tab.</li><li>Add <code>ponytail</code> to your active skills in <code>active-skills.md</code>.</li><li>When issuing prompts, add the prefix: <i>'Apply Ponytail Senior Dev mindset: provide only surgical contiguous diffs without boilerplate.'</i></li></ol>"
+      },
+      {
+        "heading": "3. Requirements & Repository Dependency: Do I Need the Repo?",
+        "bodyHtml": "\n    <div class=\"w3-callout-banner\">\n      <h4>✂️ Repository Requirement: NO! (Pure Skill Rule)</h4>\n      <p><b>Ponytail requires ZERO external repositories or binary packages.</b> It is a pure prompt instruction skill codified in <code>.agents/skills/ponytail/SKILL.md</code> and <code>~/.gemini/config/skills/ponytail/SKILL.md</code>.</p>\n      <p>When enabled in Skill Switcher, its rules are injected into <code>~/.gemini/config/rules/active-skills.md</code>, instantly constraining AI behavior to eliminate wasteful tokens and premature abstractions.</p>\n    </div>\n  "
+      },
+      {
+        "heading": "4. How to Trigger Ponytail & Prompts",
+        "bodyHtml": "\n    <p>Trigger Ponytail with any of the following:</p>\n    <ul>\n      <li><b>Toggle Switch:</b> Turn Ponytail ON in <a href=\"plugins.html\" style=\"color:var(--accent-blue);font-weight:600;\">Plugins Hub</a>. Its rules apply to every prompt in your workspace automatically.</li>\n      <li><b>Prompt Keywords:</b> <code>\"Audit this file using ponytail principles\"</code> or <code>\"Write this feature following ponytail minimalism\"</code>.</li>\n      <li><b>Slash Command:</b> <code>/ponytail</code> to trigger a code debt & bloat inspection.</li>\n    </ul>\n  "
+      },
+      {
+        "heading": "5. Troubleshooting Ponytail",
+        "bodyHtml": "\n    <div class=\"tools-table-wrap\">\n      <table class=\"tools-table\">\n        <thead>\n          <tr>\n            <th>Problem</th>\n            <th>Cause</th>\n            <th>Resolution</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td>Agent adds excessive comments or wrappers</td>\n            <td>Ponytail rule is disabled in active rules</td>\n            <td>Check <a href=\"plugins.html\" style=\"color:var(--accent-blue);\">Plugins Hub</a> and verify toggle is green; inspect <code>active-skills.md</code>.</td>\n          </tr>\n          <tr>\n            <td>Agent removes necessary code</td>\n            <td>Task specification was underspecified</td>\n            <td>Instruct the agent: \"Keep essential validation while applying Ponytail to redundant helpers\".</td>\n          </tr>\n        </tbody>\n      </table>\n    </div>\n  "
       }
     ],
     "promptRecipe": "Activate the Ponytail Senior Dev mindset: Refactor the authentication handler in 'src/auth.ts' using a surgical, single-chunk replacement. Do not reprint unchanged lines or add unnecessary abstractions. Keep output tokens strictly minimal."
@@ -459,6 +515,14 @@ const GUIDE_DATABASE = {
       {
         "heading": "1. RTK (Real-Time Knowledge) Syntax",
         "bodyHtml": "<p>OmniRoute translates verbose prompts into ultra-dense, unambiguous directives:</p><div class=\"code-block\"><pre><code>// Before (78 tokens):\n\"Could you please write a Node.js function that will read a JSON file from disk, validate that it has an 'id' and 'name' property, and return false if it doesn't?\"\n\n// After RTK Compaction (19 tokens):\n\"fn: readJsonValidate(path) -> bool | assert schema {id: str, name: str} | fs.readFileSync UTF-8\"</code></pre></div><p>The model understands both identically, but the compressed version saves 59 tokens on turn 1, and saves those 59 tokens on every subsequent turn of the conversation!</p>"
+      },
+      {
+        "heading": "2. Requirements & Repository Dependency: Do I Need the Repo?",
+        "bodyHtml": "\n    <div class=\"w3-callout-banner\">\n      <h4>⚡ Repository Requirement: NO! (Pure Skill Rule)</h4>\n      <p>OmniRoute is a pure prompt compression protocol. No repository, no npm package, and no daemon are needed. It operates entirely inside the system prompt and <code>active-skills.md</code>.</p>\n    </div>\n  "
+      },
+      {
+        "heading": "3. How to Trigger OmniRoute & Troubleshooting",
+        "bodyHtml": "\n    <p><b>How to Trigger:</b></p>\n    <ul>\n      <li>Prompt: <code>\"Route this task using OmniRoute RTK syntax\"</code> or <code>\"Compress prompt with OmniRoute\"</code>.</li>\n      <li>Automatic: Active on every turn when enabled in Skill Switcher.</li>\n    </ul>\n    <p><b>Troubleshooting:</b> If output is too concise or lacks explanation, ask: <code>\"Expand with full explanation\"</code> or toggle OmniRoute OFF in <a href=\"plugins.html\" style=\"color:var(--accent-blue);\">Plugins Hub</a>.</p>\n  "
       }
     ],
     "promptRecipe": "Use OmniRoute to compress this requirement into high-density RTK syntax before executing the task. Maintain 100% semantic coverage while minimizing prompt token footprint."
@@ -492,6 +556,14 @@ const GUIDE_DATABASE = {
       {
         "heading": "1. How ZipAI Protects You",
         "bodyHtml": "<p>ZipAI instruments terminal commands with surgical output filters:</p><ul><li>Limits command output to the first and last 25 lines of relevant errors.</li><li>Filters noisy compiler warnings and minified bundle logs.</li><li>Prompts for ambiguity resolution before making wide-scale assumptions.</li></ul>"
+      },
+      {
+        "heading": "2. Requirements & Repository Dependency: Do I Need the Repo?",
+        "bodyHtml": "\n    <div class=\"w3-callout-banner\">\n      <h4>🗜️ Repository Requirement: NO! (Pure Skill Rule)</h4>\n      <p>ZipAI is a context verbosity optimizer that eliminates pleasantries, boilerplate, and duplicate snippets. Zero git repos required. Runs entirely from <code>skills/zipai-optimizer/SKILL.md</code>.</p>\n    </div>\n  "
+      },
+      {
+        "heading": "3. How to Trigger ZipAI & Troubleshooting",
+        "bodyHtml": "\n    <p><b>How to Trigger:</b></p>\n    <ul>\n      <li>Prompt: <code>\"Apply zipai token optimizer\"</code> or <code>\"Give me a surgical, high-density response\"</code>.</li>\n      <li>Toggle ON in <a href=\"plugins.html\" style=\"color:var(--accent-blue);\">Plugins Hub</a>.</li>\n    </ul>\n    <p><b>Troubleshooting:</b> If you need conversational or exploratory guidance, toggle ZipAI OFF in Skill Switcher.</p>\n  "
       }
     ],
     "promptRecipe": "Execute the build test using ZipAI filtering: capture only failing assertion lines and stack trace origins. Truncate passing test logs and minified output to prevent context overflow."
@@ -525,6 +597,14 @@ const GUIDE_DATABASE = {
       {
         "heading": "1. The GRAPH_REPORT.md Architecture",
         "bodyHtml": "<p>Graphify generates an offline, human-readable dependency map summarizing:</p><ol><li><b>Entrypoints:</b> Server routers, main binaries, and CLI entry files.</li><li><b>Core Services:</b> Business logic controllers and database models.</li><li><b>Cross-Module Contracts:</b> Shared interfaces, DTOs, and event buses.</li></ol><p>Reading this pre-indexed map saves ~25,000 exploration tokens per session.</p>"
+      },
+      {
+        "heading": "2. Requirements & Repository Dependency: Do I Need the Repo?",
+        "bodyHtml": "\n    <div class=\"w3-callout-banner\">\n      <h4>🗺️ Repository Requirement: NO! (Pure Skill Rule)</h4>\n      <p>Graphify requires no external repository. It is a structured prompt skill that instructs the agent to analyze codebase imports and generate clean Mermaid architecture and call graph diagrams.</p>\n    </div>\n  "
+      },
+      {
+        "heading": "3. How to Trigger Graphify & Troubleshooting",
+        "bodyHtml": "\n    <p><b>How to Trigger:</b></p>\n    <ul>\n      <li>Prompt: <code>\"Run graphify on the src/ directory and output GRAPH_REPORT.md\"</code>.</li>\n      <li>Prompt: <code>\"Generate Mermaid architecture map for module X\"</code>.</li>\n    </ul>\n    <p><b>Troubleshooting:</b> If diagrams are overly dense, instruct: <code>\"Graphify only top-level module interfaces\"</code>.</p>\n  "
       }
     ],
     "promptRecipe": "Generate a Graphify architecture report for this project. Map all entrypoints, services, and shared types into GRAPH_REPORT.md so future agent sessions can navigate the repo without multi-file grepping."
@@ -558,6 +638,14 @@ const GUIDE_DATABASE = {
       {
         "heading": "1. The 5 Phases of GSD",
         "bodyHtml": "<ol><li><b>Discuss:</b> Clarify ambiguous requirements before writing any code.</li><li><b>Plan:</b> Break the task into 3-5 atomic, verifiable milestones.</li><li><b>Execute:</b> Implement one milestone at a time using surgical edits.</li><li><b>Verify:</b> Run the exact regression test verifying the milestone.</li><li><b>Ship:</b> Commit clean, conventional commit changes and update docs.</li></ol>"
+      },
+      {
+        "heading": "2. Requirements & Repository Dependency: Do I Need the Repo?",
+        "bodyHtml": "\n    <div class=\"w3-callout-banner\">\n      <h4>🎯 Repository Requirement: NO! (Pure Skill Rule)</h4>\n      <p>Get Shit Done (GSD) is an autonomous task execution framework defined in <code>.agents/skills/getshitdone/SKILL.md</code>. Zero external repositories or installations required.</p>\n    </div>\n  "
+      },
+      {
+        "heading": "3. How to Trigger GSD & Troubleshooting",
+        "bodyHtml": "\n    <p><b>How to Trigger:</b></p>\n    <ul>\n      <li>Prompt: <code>\"/gsd Implement user authentication with JWT\"</code>.</li>\n      <li>Prompt: <code>\"Execute task following getshitdone 5-phase protocol\"</code>.</li>\n    </ul>\n    <p><b>Troubleshooting:</b> If the agent spends too many turns planning, instruct: <code>\"GSD: Proceed immediately to Phase 3 Execution\"</code>.</p>\n  "
       }
     ],
     "promptRecipe": "Follow the GSD framework to implement this feature: First, generate a phased implementation plan with atomic milestones. Stop and request confirmation before executing Phase 1."
@@ -590,6 +678,14 @@ const GUIDE_DATABASE = {
       {
         "heading": "1. Prompt Ordering Rules for 100% Cache Hits",
         "bodyHtml": "<p>To maximize cache hit rates, order your prompts from most static to most dynamic:</p><ol><li><b>Fixed System Prompt & Rules (100% Static):</b> Always place guidelines and unchanging rules first.</li><li><b>Tool & MCP Definitions (Static):</b> Register tool schemas in constant order.</li><li><b>Project Documentation & Architecture (Semi-Static):</b> Include core schemas and design tokens.</li><li><b>Conversation History (Dynamic):</b> Previous turns.</li><li><b>Current User Request (Most Dynamic):</b> Always placed at the very end.</li></ol>"
+      },
+      {
+        "heading": "2. Requirements & Hardware Dependency",
+        "bodyHtml": "\n    <div class=\"w3-callout-banner\">\n      <h4>☁️ Repository Requirement: NO! (Built-in Google Cloud TPU RAM)</h4>\n      <p>Gemini Prompt Caching is a hardware-level feature executed on Google Tensor Processing Unit clusters. No software, repo, or daemon needs to be installed on your machine!</p>\n    </div>\n  "
+      },
+      {
+        "heading": "3. How to Maximize Cache Hits & Troubleshooting",
+        "bodyHtml": "\n    <p><b>How to Maximize Hits:</b></p>\n    <ul>\n      <li>Keep static rules and system instructions at the very beginning of the prompt.</li>\n      <li>Do not insert dynamic timestamps or random IDs in the prompt prefix.</li>\n      <li>Keep prompt prefixes &gt; 1,024 tokens so the TPU triggers hardware caching.</li>\n    </ul>\n    <p><b>Troubleshooting:</b> If cache misses occur, check whether dynamic session data was injected before system instructions.</p>\n  "
       }
     ],
     "metrics": [
@@ -638,6 +734,14 @@ const GUIDE_DATABASE = {
       {
         "heading": "1. Design Foundations",
         "bodyHtml": "<ul><li><b>Typography:</b> Modern web fonts (Inter, Roboto, JetBrains Mono) with precise font-weight hierarchy (400 regular, 500 medium, 600 semibold, 700 bold).</li><li><b>Theme Tokens:</b> Pure CSS variables for background, foreground, border, and accent colors that adapt seamlessly between dark and light modes.</li><li><b>Interactive Feedback:</b> Every button, link, and toggle must provide hover and focus transitions (0.15s ease) with clear visual affordances.</li></ul>"
+      },
+      {
+        "heading": "2. Requirements & Repository Dependency: Do I Need the Repo?",
+        "bodyHtml": "\n    <div class=\"w3-callout-banner\">\n      <h4>🎨 Repository Requirement: NO! (Pure Skill Rule)</h4>\n      <p>Impeccable is a design system instruction skill in <code>~/.gemini/config/skills/impeccable/SKILL.md</code>. Requires zero git repos or external builds.</p>\n    </div>\n  "
+      },
+      {
+        "heading": "3. How to Trigger Impeccable & Troubleshooting",
+        "bodyHtml": "\n    <p><b>How to Trigger:</b></p>\n    <ul>\n      <li>Prompt: <code>\"Build this page with impeccable design principles, glassmorphism, and dark mode\"</code>.</li>\n      <li>Prompt: <code>\"Polish this UI to look state-of-the-art with impeccable\"</code>.</li>\n    </ul>\n    <p><b>Troubleshooting:</b> If output looks plain or generic, prompt: <code>\"Enforce impeccable design system: curated palette, smooth typography, micro-interactions\"</code>.</p>\n  "
       }
     ],
     "promptRecipe": "Apply the Impeccable Design System: Rebuild this UI using GitHub Primer CSS tokens, responsive layout grid, smooth dark mode support, and micro-interactions for every interactive element."
@@ -702,6 +806,10 @@ const GUIDE_DATABASE = {
       {
         "heading": "1. The 4-Phase Protocol",
         "bodyHtml": "<ol><li><b>Phase 1 — Minimal Reproduction:</b> Write a standalone test script that reproduces the bug in isolation.</li><li><b>Phase 2 — Boundary Isolation:</b> Trace input data through producing and consuming boundaries until the exact line of divergence is identified.</li><li><b>Phase 3 — Root Cause Fix:</b> Fix the owning representation or data model, not just downstream symptoms.</li><li><b>Phase 4 — Regression Lock:</b> Commit a permanent test case ensuring this bug can never recur.</li></ol>"
+      },
+      {
+        "heading": "2. Requirements & How to Trigger",
+        "bodyHtml": "\n      <p><b>Repo Needed?</b> NO. Pure instruction skill.</p>\n      <p><b>How to Trigger:</b> Prompt <code>\"/debug [describe issue]\"</code> or <code>\"Run systematic debugger protocol on this error\"</code>.</p>\n    "
       }
     ],
     "promptRecipe": "Follow the Systematic Debugging protocol: Do not modify source files yet. First, write a minimal reproduction script to verify the issue and isolate the exact root cause."
@@ -734,14 +842,16 @@ const GUIDE_DATABASE = {
       {
         "heading": "1. Words to Eliminate Immediately",
         "bodyHtml": "<ul><li><b>Banned AI Buzzwords:</b> 'delve', 'tapestry', 'plethora', 'game-changer', 'revolutionize', 'leverage', 'beacon'.</li><li><b>Empty Preamble:</b> 'Certainly! I would be happy to help you with that...', 'In this fast-paced modern world...'.</li><li><b>Direct Replacements:</b> State facts, provide exact paths, cite metrics, and write actionable instructions in active voice.</li></ul>"
+      },
+      {
+        "heading": "2. Requirements & How to Trigger",
+        "bodyHtml": "\n      <p><b>Repo Needed?</b> NO. Pure instruction skill.</p>\n      <p><b>How to Trigger:</b> Prompt <code>\"Rewrite this documentation using anti-slop guidelines\"</code>.</p>\n    "
       }
     ],
     "promptRecipe": "Review and rewrite this technical document using the Anti-Slop style guide: eliminate all AI clichés, conversational preamble, and generic filler. Keep sentences active, concise, and focused on verifiable technical facts."
   }
 };
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { GUIDE_DATABASE };
-} else {
+if (typeof window !== "undefined") {
   window.GUIDE_DATABASE = GUIDE_DATABASE;
 }

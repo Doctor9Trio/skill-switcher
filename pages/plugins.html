@@ -1325,6 +1325,8 @@
           p.badge_type === 'attention' ? 'pl-badge-attention' : 'pl-badge-blue';
 
         const iconSvg = getPluginIcon(p.id);
+        const req = getPluginRequirementInfo(p.id);
+        const guideId = getPluginGuideId(p.id);
 
         card.innerHTML = `
           <div class="pl-card-top">
@@ -1358,6 +1360,11 @@
 
           <div class="pl-card-headline">${p.headline}</div>
 
+          <div class="pl-req-strip" style="display:flex;align-items:center;gap:8px;margin:8px 0 10px;padding:6px 10px;background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;font-size:11.5px;">
+            <span class="pl-badge ${req.badgeClass}" style="font-size:10px;padding:2px 6px;white-space:nowrap;">${req.badge}</span>
+            <span style="color:var(--fg-muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(req.text)}">${escapeHtml(req.text)}</span>
+          </div>
+
           <div class="pl-card-metric-strip">
             <div class="pl-card-metric-item">
               <span style="color:var(--fg-muted);">Impact:</span>
@@ -1384,27 +1391,117 @@
               <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M12.78 5.22a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L3.22 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L8 8.94l3.72-3.72a.75.75 0 0 1 1.06 0Z"></path>
               </svg>
-              <span>How It Works & Mechanism</span>
+              <span>How It Works, Triggering & Guide</span>
             </button>
             <div class="pl-drawer-content" id="drawer-${p.id}">
+              <h5 style="margin-top:0;">⚡ How to Trigger:</h5>
+              <div style="background:var(--bg-code, #0d1117);padding:8px 10px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--fg-default);border:1px solid var(--border-color);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                <span style="overflow-x:auto;">${escapeHtml(req.trigger)}</span>
+                <button class="btn-preset" style="padding:2px 8px;font-size:10px;white-space:nowrap;" onclick="copyTriggerText('${p.id}')">Copy</button>
+              </div>
+
+              <h5>📦 Prerequisites & Repo Requirement:</h5>
+              <p style="margin-bottom:10px;">${req.needsRepo ? '<strong>Full Repository Required:</strong> Keep source repository cloned and built locally on disk.' : '<strong>No Repository Needed:</strong> Operates directly without cloning any external repository.'} ${escapeHtml(req.text)}</p>
+
               <h5>How it reduces tokens / delivers value:</h5>
               <p>${p.how_it_works}</p>
               <h5>Estimated Savings Formula:</h5>
               <p>${p.impact_details}</p>
-              <div style="font-size:11px;color:var(--fg-muted);margin-top:6px;">
-                Configuration: <code>${p.config_target}</code>
+              <div style="font-size:11px;color:var(--fg-muted);margin:8px 0 12px;">
+                Configuration Target: <code>${p.config_target}</code>
+              </div>
+
+              <div style="padding-top:10px;border-top:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                <span style="font-size:11.5px;color:var(--fg-muted);">Facing an issue or need deep setup instructions?</span>
+                <a href="guides.html#${guideId}" class="btn-preset" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;padding:5px 12px;font-size:11.5px;color:var(--accent-blue);font-weight:600;">
+                  📖 View Full Guide & Troubleshooting →
+                </a>
               </div>
             </div>
           </div>
 
-          <div class="pl-card-footer">
+          <div class="pl-card-footer" style="display:flex;align-items:center;justify-content:space-between;">
             <span>Status: ${p.installed ? '✓ Installed on machine' : 'Configured'}</span>
-            <span>Target: <code>${p.config_target}</code></span>
+            <a href="guides.html#${guideId}" style="color:var(--accent-blue);text-decoration:none;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px;" title="Read architectural guide and troubleshooting for ${p.name}">
+              <span>Guide & Docs →</span>
+            </a>
           </div>
         `;
 
         grid.appendChild(card);
       });
+    }
+
+    // ─── Plugin Guide Mapping & Requirement Info Helpers ───
+    function getPluginGuideId(id) {
+      const map = {
+        'rea': 'rea',
+        'code-review-graph': 'code-review-graph',
+        'ponytail': 'ponytail',
+        'OmniRoute': 'omniroute',
+        'graphify': 'graphify',
+        'zipai-optimizer': 'zipai',
+        'getshitdone': 'gsd',
+        'gemini-prompt-cache': 'prompt-caching',
+        'typesafe-mcp': 'typesafe-mcp',
+        'impeccable': 'impeccable'
+      };
+      return map[id] || 'intro';
+    }
+
+    function getPluginRequirementInfo(id) {
+      switch (id) {
+        case 'rea':
+          return {
+            badge: '📦 Repo Required',
+            badgeClass: 'pl-badge-attention',
+            text: 'Needs local repo at Desktop/Tools/REA (npm run build:cached) or npx rea mcp',
+            needsRepo: true,
+            trigger: 'AI IDE calls rea_* tools, or CLI: node scripts/rea.mjs <file>'
+          };
+        case 'code-review-graph':
+          return {
+            badge: '🐍 Python CLI (No Repo)',
+            badgeClass: 'pl-badge-success',
+            text: 'Zero git repo needed! Only requires pip install code-review-graph (v2.3.3 installed)',
+            needsRepo: false,
+            trigger: 'AI IDE calls get_minimal_context_tool, or CLI: code-review-graph query <path>'
+          };
+        case 'gemini-prompt-cache':
+          return {
+            badge: '☁️ Cloud Hardware (Zero Install)',
+            badgeClass: 'pl-badge-purple',
+            text: 'Zero repo & zero install. Native Google TPU RAM caching active for prefixes > 1,024 tokens',
+            needsRepo: false,
+            trigger: 'Active automatically on prompt turns with consistent system instruction prefixes'
+          };
+        default:
+          return {
+            badge: '⚡ Pure Skill Rule (No Repo)',
+            badgeClass: 'pl-badge-blue',
+            text: 'Zero git repo needed! Plain Markdown instructions active in active-skills.md & .agents/skills/',
+            needsRepo: false,
+            trigger: 'Active in system prompt when toggled ON. Trigger with keyword \'' + id + '\''
+          };
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function copyTriggerText(id) {
+      const req = getPluginRequirementInfo(id);
+      if (req && req.trigger) {
+        navigator.clipboard.writeText(req.trigger);
+        showToast('Trigger command copied to clipboard!');
+      }
     }
 
     function getPluginIcon(id) {

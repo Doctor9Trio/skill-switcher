@@ -255,7 +255,7 @@
     .btn-preset {
       font-size: 12px;
       font-weight: 600;
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 6px;
       border: 1px solid var(--border-default);
       background: var(--bg-subtle);
@@ -264,24 +264,63 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.15s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      position: relative;
     }
 
-    .btn-preset:hover {
+    .btn-preset:hover:not(:disabled) {
       background: var(--bg-canvas);
       border-color: var(--border-muted);
       transform: translateY(-1px);
     }
 
-    .btn-preset.primary-saver {
-      background: #2ea043;
-      color: #ffffff;
-      border-color: #2ea043;
+    .btn-preset:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
     }
 
-    .btn-preset.primary-saver:hover {
-      background: #2c974b;
-      box-shadow: 0 2px 6px rgba(46, 160, 67, 0.3);
+    /* Active preset styles */
+    .btn-preset.active-ultra {
+      background: #2ea043 !important;
+      color: #ffffff !important;
+      border-color: #2ea043 !important;
+      box-shadow: 0 2px 8px rgba(46, 160, 67, 0.35);
+    }
+    .btn-preset.active-ultra:hover:not(:disabled) {
+      background: #2c974b !important;
+    }
+
+    .btn-preset.active-balanced {
+      background: #0969da !important;
+      color: #ffffff !important;
+      border-color: #0969da !important;
+      box-shadow: 0 2px 8px rgba(9, 105, 218, 0.35);
+    }
+    .btn-preset.active-balanced:hover:not(:disabled) {
+      background: #0860ca !important;
+    }
+
+    .btn-preset.active-minimal {
+      background: #8250df !important;
+      color: #ffffff !important;
+      border-color: #8250df !important;
+      box-shadow: 0 2px 8px rgba(130, 80, 223, 0.35);
+    }
+    .btn-preset.active-minimal:hover:not(:disabled) {
+      background: #7645d1 !important;
+    }
+
+    .preset-active-tag {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      margin-left: 4px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
     }
 
     /* Filter Strip */
@@ -830,6 +869,15 @@
         <span class="counter-bubble" id="subnav-saver-count" style="background:#2ea043;color:#fff;">Active</span>
       </button>
 
+      <!-- 3b. Guides & Documentation -->
+      <a href="guides.html" class="subnav-tab" style="text-decoration:none;" title="Comprehensive Guides & Documentation Hub">
+        <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.006 1h4.244a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.244a2.25 2.25 0 0 0-1.756.843l-.5.625a.75.75 0 0 1-1.172 0l-.5-.625A2.25 2.25 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75Zm1.5.75v9h3.503c.896 0 1.733.375 2.333 1.018A3.731 3.731 0 0 1 8.836 11.5H14.5v-9h-3.494a2.25 2.25 0 0 0-1.756.843l-.5.625a.75.75 0 0 1-1.172 0l-.5-.625A2.25 2.25 0 0 0 5.003 2.5H1.5Z"></path>
+        </svg>
+        <span>Guides & Docs</span>
+        <span class="counter-bubble" style="background:#2ea043;color:#fff;">17</span>
+      </a>
+
       <!-- 4. Discovery Library -->
       <a href="../index.html?open=shelf" class="subnav-tab" style="text-decoration:none;" title="Discovery Library — Personal Technology & Inspiration Graph">
         <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
@@ -887,6 +935,12 @@
         </p>
       </div>
       <div class="pl-header-actions">
+        <button class="btn-preset" id="btn-guide" onclick="openArchGuideModal()" style="border-color:var(--border-accent);color:var(--fg-accent,#0969da);">
+          <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.006 1h4.244a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.244a2.25 2.25 0 0 0-1.748.832l-.248.31a.75.75 0 0 1-1.016 0l-.248-.31A2.25 2.25 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75ZM1.5 2.5v9h3.503c.806 0 1.543.374 2.019.988l.478.621.478-.621c.476-.614 1.213-.988 2.019-.988H13.5v-9h-3.494a2.25 2.25 0 0 0-2.006 1.25V5.5a.75.75 0 0 1-1.5 0V3.75A2.25 2.25 0 0 0 4.494 2.5H1.5Z"></path>
+          </svg>
+          Architecture & Dynamic Guide
+        </button>
         <button class="btn-preset" id="btn-refresh" onclick="fetchPlugins()">
           <svg class="octicon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
             <path
@@ -973,13 +1027,13 @@
         </div>
       </div>
       <div class="pl-preset-buttons">
-        <button class="btn-preset primary-saver" onclick="applyPreset('ultra-saver')">
+        <button id="btn-preset-ultra-saver" class="btn-preset" onclick="applyPreset('ultra-saver')" title="Enables all 6 token-reduction engines for 70%+ token burn reduction">
           ⚡ Ultra-Low Token Mode
         </button>
-        <button class="btn-preset" onclick="applyPreset('balanced')">
+        <button id="btn-preset-balanced" class="btn-preset" onclick="applyPreset('balanced')" title="Balanced mode with AST context slicing, YAGNI diffs, and schema validation">
           ⚖️ Balanced Precision
         </button>
-        <button class="btn-preset" onclick="applyPreset('minimal')">
+        <button id="btn-preset-minimal" class="btn-preset" onclick="applyPreset('minimal')" title="Baseline standard mode with minimal AST context slicing">
           🚀 Baseline Standard
         </button>
       </div>
@@ -998,7 +1052,7 @@
           (<span id="tab-count-quality">2</span>)</button>
       </div>
       <div style="font-size:12px;color:var(--fg-muted);">
-        Synced with <code>C:\Users\1000859\.gemini\config\rules\active-skills.md</code>
+        Synced with <code id="active-rules-path-display">active-skills.md</code>
       </div>
     </div>
 
@@ -1100,13 +1154,61 @@
       }
     }
 
-    // ─── State & Data Management ───
+    // ─── State & Data Management & Dynamic Port Resolution ───
     let currentPluginsData = null;
     let currentFilter = 'all';
+    let apiBaseUrl = (window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null')
+      ? window.location.origin
+      : (localStorage.getItem('tm_custom_api_base') || 'http://localhost:7891');
+
+    async function resolveLiveApiBase() {
+      // 1. If currently served via HTTP(S), test origin first
+      if (window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null') {
+        try {
+          const res = await fetch(`${window.location.origin}/env`, { cache: 'no-store' });
+          if (res.ok) {
+            apiBaseUrl = window.location.origin;
+            localStorage.setItem('tm_custom_api_base', apiBaseUrl);
+            return apiBaseUrl;
+          }
+        } catch (e) { }
+      }
+
+      // 2. Check localStorage saved API base
+      const saved = localStorage.getItem('tm_custom_api_base');
+      if (saved) {
+        try {
+          const res = await fetch(`${saved}/env`, { cache: 'no-store' });
+          if (res.ok) {
+            apiBaseUrl = saved;
+            return apiBaseUrl;
+          }
+        } catch (e) { }
+      }
+
+      // 3. Scan candidate backend ports [7891, 7892, 7893, 7894, 7895]
+      const candidatePorts = [7891, 7892, 7893, 7894, 7895];
+      for (const port of candidatePorts) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 600);
+          const res = await fetch(`http://localhost:${port}/env`, { signal: controller.signal, cache: 'no-store' });
+          clearTimeout(timeoutId);
+          if (res.ok) {
+            apiBaseUrl = `http://localhost:${port}`;
+            localStorage.setItem('tm_custom_api_base', apiBaseUrl);
+            return apiBaseUrl;
+          }
+        } catch (e) { }
+      }
+
+      return apiBaseUrl;
+    }
 
     async function fetchPlugins() {
       try {
-        const res = await fetch('/plugins');
+        await resolveLiveApiBase();
+        const res = await fetch(`${apiBaseUrl}/plugins`, { cache: 'no-store' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         currentPluginsData = data;
@@ -1124,7 +1226,13 @@
       if (dot && text) {
         if (isLive) {
           dot.style.background = '#2ea043';
-          text.textContent = 'Live Sync: 7891';
+          let port = '7891';
+          try {
+            port = new URL(apiBaseUrl).port || (apiBaseUrl.startsWith('https') ? '443' : '80');
+          } catch (e) {
+            if (apiBaseUrl && apiBaseUrl.includes(':')) port = apiBaseUrl.split(':').pop();
+          }
+          text.textContent = `Live Sync: ${port}`;
         } else {
           dot.style.background = '#cf222e';
           text.textContent = 'Offline';
@@ -1142,6 +1250,11 @@
       document.getElementById('kpi-cost-usd-sub').textContent = `${data.cost_saved_usd_fmt || '$0.0000'} USD saved`;
       document.getElementById('kpi-efficiency-boost').textContent = `+${data.efficiency_boost || 72}%`;
 
+      if (data.rules_path) {
+        const displayEl = document.getElementById('active-rules-path-display');
+        if (displayEl) displayEl.textContent = data.rules_path;
+      }
+
       // Update Counts in Filter Tabs
       const saverCount = data.plugins.filter(p => p.is_saver).length;
       const mcpCount = data.plugins.filter(p => p.category === 'mcp').length;
@@ -1151,6 +1264,27 @@
       document.getElementById('tab-count-saver').textContent = saverCount;
       document.getElementById('tab-count-mcp').textContent = mcpCount;
       document.getElementById('tab-count-quality').textContent = qualityCount;
+
+      // Auto-update preset buttons active state
+      let activePreset = data.active_preset;
+      if (!activePreset && data.plugins) {
+        const activeIds = data.plugins.filter(p => p.active).map(p => p.id);
+        const hasCrg = activeIds.includes('code-review-graph');
+        const hasPony = activeIds.includes('ponytail');
+        const hasGsd = activeIds.includes('getshitdone');
+        const hasZipai = activeIds.includes('zipai-optimizer');
+        const hasOmni = activeIds.includes('OmniRoute');
+        const hasGraphify = activeIds.includes('graphify');
+
+        if (hasCrg && hasPony && hasGsd && hasZipai && hasOmni && hasGraphify) {
+          activePreset = 'ultra-saver';
+        } else if (hasCrg && hasPony && hasGsd && !hasZipai && !hasOmni && !hasGraphify) {
+          activePreset = 'balanced';
+        } else if (hasCrg && !hasPony && !hasGsd && !hasZipai && !hasOmni && !hasGraphify) {
+          activePreset = 'minimal';
+        }
+      }
+      updatePresetButtons(activePreset);
 
       renderGrid(data.plugins);
     }
@@ -1211,10 +1345,14 @@
               </div>
             </div>
             <div class="pl-switch-wrap">
-              <label class="pl-switch" title="Toggle plugin on local system">
-                <input type="checkbox" ${p.active ? 'checked' : ''} onchange="togglePlugin('${p.id}', this.checked)">
-                <span class="pl-slider"></span>
-              </label>
+              ${p.id === 'gemini-prompt-cache' ? `
+                <span class="pl-badge pl-badge-purple" style="font-size:11px;font-weight:600;padding:4px 8px;" title="TPU hardware-level RAM caching on Google infrastructure is built-in and permanently active.">⚡ Always Active</span>
+              ` : `
+                <label class="pl-switch" title="Toggle plugin on local system">
+                  <input type="checkbox" id="toggle-${p.id}" ${p.active ? 'checked' : ''} onchange="togglePlugin('${p.id}', this.checked, this)">
+                  <span class="pl-slider"></span>
+                </label>
+              `}
             </div>
           </div>
 
@@ -1271,6 +1409,8 @@
 
     function getPluginIcon(id) {
       switch (id) {
+        case 'rea':
+          return '🔍';
         case 'code-review-graph':
           return '🌳';
         case 'ponytail':
@@ -1313,45 +1453,124 @@
     }
 
     // ─── Real AJAX Toggle Call ───
-    async function togglePlugin(id, enable) {
+    async function togglePlugin(id, enable, inputEl) {
+      if (id === 'gemini-prompt-cache') {
+        showToast('ℹ️ Prompt Caching is a built-in TPU hardware feature on Google Cloud');
+        return;
+      }
+
+      const card = document.getElementById(`card-${id}`);
+      if (card) {
+        card.classList.toggle('active-card', enable);
+      }
+
       try {
-        const res = await fetch('/plugins/toggle', {
+        await resolveLiveApiBase();
+        const res = await fetch(`${apiBaseUrl}/plugins/toggle`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id, enable })
         });
-        const result = await res.json();
-        if (result.ok) {
+
+        let result = null;
+        try {
+          result = await res.json();
+        } catch (parseErr) {
+          throw new Error(res.ok ? 'Invalid response format from server' : `Server HTTP ${res.status}`);
+        }
+
+        if (result && result.ok) {
           showToast(`⚡ ${id} ${enable ? 'Enabled' : 'Disabled'}: Rules synced to disk!`);
           fetchPlugins(); // Reload live metrics
         } else {
-          showToast(`⚠️ Error: ${result.error || 'Failed to update plugin'}`);
+          // Revert checkbox state
+          if (inputEl) inputEl.checked = !enable;
+          if (card) card.classList.toggle('active-card', !enable);
+          showToast(`⚠️ Error: ${(result && result.error) || 'Failed to update plugin'}`);
         }
       } catch (err) {
-        showToast(`⚠️ Server error while toggling plugin`);
+        console.error('[togglePlugin Error]', err);
+        // Revert checkbox state on failure
+        if (inputEl) inputEl.checked = !enable;
+        if (card) card.classList.toggle('active-card', !enable);
+        showToast(`⚠️ Failed to toggle ${id}: ${err.message || 'Cannot reach backend'}`);
+      }
+    }
+
+    // ─── Preset UI State Sync ───
+    function updatePresetButtons(activePreset) {
+      const bUltra = document.getElementById('btn-preset-ultra-saver');
+      const bBalanced = document.getElementById('btn-preset-balanced');
+      const bMinimal = document.getElementById('btn-preset-minimal');
+      if (!bUltra || !bBalanced || !bMinimal) return;
+
+      [bUltra, bBalanced, bMinimal].forEach(b => {
+        b.classList.remove('active-ultra', 'active-balanced', 'active-minimal');
+      });
+
+      bUltra.innerHTML = `⚡ Ultra-Low Token Mode${activePreset === 'ultra-saver' ? ' <span class="preset-active-tag">Active</span>' : ''}`;
+      bBalanced.innerHTML = `⚖️ Balanced Precision${activePreset === 'balanced' ? ' <span class="preset-active-tag">Active</span>' : ''}`;
+      bMinimal.innerHTML = `🚀 Baseline Standard${activePreset === 'minimal' ? ' <span class="preset-active-tag">Active</span>' : ''}`;
+
+      if (activePreset === 'ultra-saver') {
+        bUltra.classList.add('active-ultra');
+      } else if (activePreset === 'balanced') {
+        bBalanced.classList.add('active-balanced');
+      } else if (activePreset === 'minimal') {
+        bMinimal.classList.add('active-minimal');
       }
     }
 
     // ─── Apply Preset ───
     async function applyPreset(preset) {
+      const bUltra = document.getElementById('btn-preset-ultra-saver');
+      const bBalanced = document.getElementById('btn-preset-balanced');
+      const bMinimal = document.getElementById('btn-preset-minimal');
+      const allBtns = [bUltra, bBalanced, bMinimal].filter(Boolean);
+
+      // Disable buttons and show applying state
+      allBtns.forEach(b => b.disabled = true);
+      const clickedBtn = document.getElementById(`btn-preset-${preset}`);
+      const originalHtml = clickedBtn ? clickedBtn.innerHTML : '';
+      if (clickedBtn) {
+        clickedBtn.innerHTML = `⏳ Applying ${preset === 'ultra-saver' ? 'Ultra-Low' : preset === 'balanced' ? 'Balanced' : 'Baseline'}...`;
+      }
+
       try {
-        const res = await fetch('/plugins/preset', {
+        await resolveLiveApiBase();
+        const res = await fetch(`${apiBaseUrl}/plugins/preset`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ preset })
         });
-        const result = await res.json();
-        if (result.ok) {
+
+        let result = null;
+        try {
+          result = await res.json();
+        } catch (parseErr) {
+          throw new Error(res.ok ? 'Invalid preset response' : `Server HTTP ${res.status}`);
+        }
+
+        if (result && result.ok) {
           const names = {
             'ultra-saver': '⚡ Ultra-Low Token Mode Applied (70%+ Savings)',
             'balanced': '⚖️ Balanced Precision Mode Applied',
             'minimal': '🚀 Baseline Standard Profile Restored'
           };
           showToast(names[preset] || 'Preset applied successfully');
-          fetchPlugins();
+          updatePresetButtons(preset);
+          currentPluginsData = result;
+          renderDashboard(result);
+        } else {
+          showToast(`⚠️ Error: ${(result && result.error) || 'Failed to apply preset'}`);
+          if (clickedBtn) clickedBtn.innerHTML = originalHtml;
         }
       } catch (err) {
-        showToast('⚠️ Failed to apply preset');
+        console.error('[applyPreset Error]', err);
+        showToast(`⚠️ Failed to apply preset: ${err.message || 'Cannot reach backend'}`);
+        if (clickedBtn) clickedBtn.innerHTML = originalHtml;
+      } finally {
+        allBtns.forEach(b => b.disabled = false);
       }
     }
 
@@ -1366,6 +1585,16 @@
       listContainer.innerHTML = '';
 
       const toolDescriptions = {
+        'analyze_javascript_application': 'Extracts and analyzes Electron ASAR packages and JavaScript directories; maps IPC routes and modules.',
+        'recover_javascript_sources': 'Recovers clean JavaScript/TypeScript source files from minified bundles using sourcemap provenance.',
+        'inspect_managed_artifact': 'Static inspection of .NET assemblies (DLL/EXE); decodes PE/CLI headers and dependencies without execution.',
+        'inspect_managed_members': 'Decompiles .NET CIL bytecode and inspects type members for targeted classes without native engines.',
+        'inspect_go_binary': 'Inspects embedded Go compiler version, module graph, build flags, and package dependencies.',
+        'inspect_web_page': 'Passive inspection of live browser pages via Chrome DevTools Protocol (CDP); captures DOM and network listeners.',
+        'binary_overview': 'Provides entry points, architecture, section mappings, and high-level structure of native binary targets.',
+        'decompile': 'Decompiles native binary functions to pseudo-C code using Ghidra, Hopper, or IDA backend.',
+        'xrefs': 'Lists cross-references and caller hierarchies for analyzed binary addresses.',
+        'search': 'Searches analyzed procedure names, strings, and symbols across the entire binary.',
         'get_minimal_context_tool': 'Get ultra-compact context for any task (~100 tokens). Always called first to summarize symbols and risk without loading full files.',
         'get_impact_radius_tool': 'Calculates the exact blast radius and dependent call hierarchy of a change without scanning all callers.',
         'build_or_update_graph_tool': 'Constructs or refreshes AST node and edge graphs for repository symbols.',
@@ -1436,6 +1665,106 @@
       setInterval(fetchPlugins, 12000);
     });
   </script>
+  <!-- Architecture & Dynamic Portability Modal -->
+  <div class="pl-modal-overlay" id="arch-guide-modal-overlay" onclick="closeArchModalOnOverlay(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
+    <div class="pl-modal" style="background:var(--bg-default,#ffffff);border:1px solid var(--border-default,#d0d7de);border-radius:12px;width:90%;max-width:880px;max-height:86vh;box-shadow:0 8px 32px rgba(0,0,0,0.28);display:flex;flex-direction:column;overflow:hidden;">
+      <div class="pl-modal-header" style="padding:16px 20px;border-bottom:1px solid var(--border-default,#d0d7de);display:flex;align-items:center;justify-content:space-between;background:var(--bg-subtle,#f6f8fa);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg class="octicon" width="18" height="18" viewBox="0 0 16 16" fill="#0969da">
+            <path d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.006 1h4.244a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.244a2.25 2.25 0 0 0-1.748.832l-.248.31a.75.75 0 0 1-1.016 0l-.248-.31A2.25 2.25 0 0 0 5.003 13H.75a.75.75 0 0 1-.75-.75V1.75ZM1.5 2.5v9h3.503c.806 0 1.543.374 2.019.988l.478.621.478-.621c.476-.614 1.213-.988 2.019-.988H13.5v-9h-3.494a2.25 2.25 0 0 0-2.006 1.25V5.5a.75.75 0 0 1-1.5 0V3.75A2.25 2.25 0 0 0 4.494 2.5H1.5Z"></path>
+          </svg>
+          <span style="font-weight:700;font-size:15px;color:var(--fg-default);">Skill Switcher — Architecture, MCP & Dynamic Users Guide</span>
+        </div>
+        <button class="btn-preset" onclick="closeArchGuideModal()" style="padding:4px 10px;cursor:pointer;">✕</button>
+      </div>
+      <div class="pl-modal-body" style="font-size:13px;line-height:1.65;color:var(--fg-default);overflow-y:auto;padding:24px;flex:1;">
+        
+        <div style="background:var(--bg-subtle,#f6f8fa);border-left:4px solid #0969da;padding:12px 16px;border-radius:4px;margin-bottom:20px;">
+          <strong>Universal Portability Standard:</strong> All skills and MCP plugins in Skill Switcher are engineered to run across <em>any developer machine</em> without hardcoded user directories.
+        </div>
+
+        <h3 style="font-size:16px;margin:16px 0 8px;color:var(--fg-default);">1. The 3 Plugin & Skill Archetypes</h3>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:12px;">
+          <thead>
+            <tr style="background:var(--bg-subtle,#f6f8fa);border-bottom:2px solid var(--border-default,#d0d7de);text-align:left;">
+              <th style="padding:8px 10px;">Archetype</th>
+              <th style="padding:8px 10px;">Examples</th>
+              <th style="padding:8px 10px;">How It Executes</th>
+              <th style="padding:8px 10px;">Portability & Requirements</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border-default,#d0d7de);">
+              <td style="padding:8px 10px;font-weight:600;">Type 1: Pure Prompt Skills</td>
+              <td style="padding:8px 10px;"><code>ponytail</code>, <code>impeccable</code>, <code>antislop</code>, <code>gsap</code></td>
+              <td style="padding:8px 10px;">Injects markdown into <code>active-skills.md</code></td>
+              <td style="padding:8px 10px;color:#2da44e;">100% Zero-install. Works immediately on any machine.</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border-default,#d0d7de);">
+              <td style="padding:8px 10px;font-weight:600;">Type 2: MCP Tool Servers</td>
+              <td style="padding:8px 10px;"><code>rea</code> (173 tools), <code>code-review-graph</code></td>
+              <td style="padding:8px 10px;">Launched by IDE as JSON-RPC stdio daemon</td>
+              <td style="padding:8px 10px;color:#0969da;">3-Tier Resolution (Local dev -> Global CLI -> Zero-install npx/uvx).</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border-default,#d0d7de);">
+              <td style="padding:8px 10px;font-weight:600;">Type 3: Static Pre-Indexers</td>
+              <td style="padding:8px 10px;"><code>graphify</code>, <code>zipai-optimizer</code></td>
+              <td style="padding:8px 10px;">Generates local cached map (<code>GRAPH_REPORT.md</code>)</td>
+              <td style="padding:8px 10px;color:#8250df;">Offline execution; eliminates repeated file greps.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 style="font-size:16px;margin:16px 0 8px;color:var(--fg-default);">2. The 3-Tier Dynamic Portability Ladder</h3>
+        <p style="color:var(--fg-muted);margin-bottom:12px;">When a user toggles an MCP server like <strong>REA</strong> or <strong>Code Review Graph</strong>, the server resolves execution dynamically:</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+          <div style="border:1px solid var(--border-default,#d0d7de);border-radius:6px;padding:12px;background:var(--bg-subtle,#f6f8fa);">
+            <div style="font-weight:600;color:var(--fg-default);margin-bottom:4px;">Tier 1: Local Dev Repo</div>
+            <div style="font-size:11px;color:var(--fg-muted);">If <code>Tools/REA/scripts/rea.mjs</code> exists locally on disk, runs the compiled source script.</div>
+          </div>
+          <div style="border:1px solid var(--border-default,#d0d7de);border-radius:6px;padding:12px;background:var(--bg-subtle,#f6f8fa);">
+            <div style="font-weight:600;color:var(--fg-default);margin-bottom:4px;">Tier 2: Global CLI</div>
+            <div style="font-size:11px;color:var(--fg-muted);">If <code>rea</code> or <code>code-review-graph</code> is installed globally on <code>PATH</code>, invokes it directly.</div>
+          </div>
+          <div style="border:1px solid #2da44e;border-radius:6px;padding:12px;background:rgba(46,164,79,0.06);">
+            <div style="font-weight:600;color:#2da44e;margin-bottom:4px;">Tier 3: Universal npx/uvx</div>
+            <div style="font-size:11px;color:var(--fg-muted);">If no clone exists, automatically registers <code>npx -y rea-agents@latest mcp</code>. Zero manual setup required!</div>
+          </div>
+        </div>
+
+        <h3 style="font-size:16px;margin:16px 0 8px;color:var(--fg-default);">3. How to Add a New Skill or MCP Plugin</h3>
+        <ol style="margin-left:20px;margin-bottom:16px;display:flex;flex-direction:column;gap:8px;">
+          <li><strong>Step 1 (Skill File):</strong> Create <code>.agents/skills/&lt;skill-id&gt;/SKILL.md</code> inside the repo.</li>
+          <li><strong>Step 2 (Catalog Entry):</strong> Add entry to <code>js/data/repos-catalog.js</code> under <code>REPOS</code> with triggers, keywords, and action prompt directives.</li>
+          <li><strong>Step 3 (Server Toggle):</strong> In <code>skill-gui-server.ps1</code>, register in <code>Get-PluginRegistry</code> and add 3-tier fallback to <code>Set-PluginToggle</code>.</li>
+          <li><strong>Step 4 (Card Icon):</strong> Add icon to <code>getPluginIcon(id)</code> in <code>pages/plugins.html</code>.</li>
+        </ol>
+
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-default,#d0d7de);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:var(--fg-muted);">Full Markdown Guide available at <code>docs/ARCHITECTURE_AND_MCP_GUIDE.md</code></span>
+          <button class="btn-preset" onclick="closeArchGuideModal()" style="padding:6px 16px;font-weight:600;">Close Guide</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openArchGuideModal() {
+      const modal = document.getElementById('arch-guide-modal-overlay');
+      if (modal) modal.style.display = 'flex';
+    }
+    function closeArchGuideModal() {
+      const modal = document.getElementById('arch-guide-modal-overlay');
+      if (modal) modal.style.display = 'none';
+    }
+    function closeArchModalOnOverlay(e) {
+      if (e.target && e.target.id === 'arch-guide-modal-overlay') {
+        closeArchGuideModal();
+      }
+    }
+  </script>
+
 </body>
 
 </html>
