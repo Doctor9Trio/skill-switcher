@@ -1,4 +1,4 @@
-﻿---
+---
 name: map-to-poster
 description: Generate beautiful map-based poster art using OpenStreetMap data with 20+ themes. Use when creating geographic poster designs, city map art, or location-based print designs.
 ---

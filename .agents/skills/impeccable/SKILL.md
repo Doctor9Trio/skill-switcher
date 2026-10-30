@@ -1,3 +1,10 @@
+---
+name: impeccable
+description: >
+  Design guidance for AI coding agents. 1 skill, 24 commands, live browser iteration,
+  and 61 deterministic detector rules for AI-generated frontend design.
+---
+
 # Impeccable
 
 Design guidance for AI coding agents. 1 skill, 24 commands, live browser iteration, and 61 deterministic detector rules for AI-generated frontend design.

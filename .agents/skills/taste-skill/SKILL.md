@@ -1,3 +1,8 @@
+---
+name: taste-skill
+description: Anti-slop frontend design framework for AI agents with curated rules for typography, layout, color systems, and micro-interactions.
+---
+
 <p align="center">
   <img src="assets/readme-banner.webp" alt="Taste Skill - Anti-slop Agent Skills for premium frontends" width="100%" />
 </p>
