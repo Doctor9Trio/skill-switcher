@@ -16,3 +16,14 @@ Desktop.ini
 # Python cache (if scripts run locally)
 __pycache__/
 *.pyc
+
+# Google Antigravity and User Credentials (Never Commit)
+.gemini/
+saved_accounts/
+*accounts*.json
+*creds*.json
+oauth_creds.json
+google_accounts.json
+manifest.json
+*.vscdb*
+*.bak

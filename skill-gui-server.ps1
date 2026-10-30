@@ -1582,6 +1582,347 @@ function Apply-PluginPreset($presetName) {
     return $reg
 }
 
+
+# =====================================================================
+# ANTIGRAVITY GOOGLE ACCOUNT SWITCHER & PROFILE VAULT
+# =====================================================================
+
+$ACCOUNTS_DIR = Join-Path $USER_HOME ".gemini\saved_accounts"
+$ACCOUNTS_MANIFEST = Join-Path $ACCOUNTS_DIR "manifest.json"
+$OAUTH_CREDS_PATH = Join-Path $USER_HOME ".gemini\oauth_creds.json"
+$GOOGLE_ACCOUNTS_PATH = Join-Path $USER_HOME ".gemini\google_accounts.json"
+
+function Ensure-AccountsStorage() {
+    if (-not (Test-Path $ACCOUNTS_DIR)) {
+        New-Item -ItemType Directory -Path $ACCOUNTS_DIR -Force | Out-Null
+    }
+    if (-not (Test-Path $ACCOUNTS_MANIFEST)) {
+        Set-Content -Path $ACCOUNTS_MANIFEST -Value "[]" -Encoding UTF8
+    }
+}
+
+function Get-AccountsManifest() {
+    Ensure-AccountsStorage
+    try {
+        $raw = Get-Content $ACCOUNTS_MANIFEST -Raw -Encoding UTF8 -ErrorAction Stop
+        if ([string]::IsNullOrWhiteSpace($raw)) { return @() }
+        $list = $raw | ConvertFrom-Json
+        if ($null -eq $list) { return @() }
+        return @($list)
+    } catch {
+        return @()
+    }
+}
+
+function Save-AccountsManifest($manifestList) {
+    Ensure-AccountsStorage
+    $json = ConvertTo-Json -InputObject @($manifestList) -Depth 6
+    [System.IO.File]::WriteAllText($ACCOUNTS_MANIFEST, $json, (New-Object System.Text.UTF8Encoding($false)))
+}
+
+function Get-AntigravityAccountStatus() {
+    Ensure-AccountsStorage
+    $activeEmail = ""
+    $hasCreds = Test-Path $OAUTH_CREDS_PATH
+    $hasGAcc = Test-Path $GOOGLE_ACCOUNTS_PATH
+    $expiryMs = 0
+    $expiryStr = ""
+    $isExpired = $false
+    $scope = ""
+    $refreshTokenPresent = $false
+
+    if ($hasGAcc) {
+        try {
+            $gacc = Get-Content $GOOGLE_ACCOUNTS_PATH -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($gacc -and $gacc.active) {
+                $activeEmail = $gacc.active.Trim()
+            }
+        } catch {}
+    }
+
+    if ($hasCreds) {
+        try {
+            $creds = Get-Content $OAUTH_CREDS_PATH -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($creds) {
+                if ($creds.scope) { $scope = $creds.scope }
+                if ($creds.refresh_token) { $refreshTokenPresent = [bool]$creds.refresh_token }
+                if ($creds.expiry_date) {
+                    $expiryMs = [int64]$creds.expiry_date
+                    $dt = [DateTimeOffset]::FromUnixTimeMilliseconds($expiryMs).ToLocalTime()
+                    $expiryStr = $dt.ToString("yyyy-MM-dd HH:mm:ss")
+                    $isExpired = ($dt -lt [DateTimeOffset]::Now)
+                }
+
+                if ([string]::IsNullOrWhiteSpace($activeEmail) -and $creds.id_token) {
+                    $parts = $creds.id_token.Split('.')
+                    if ($parts.Length -ge 2) {
+                        $payload = $parts[1]
+                        while ($payload.Length % 4 -ne 0) { $payload += "=" }
+                        $bytes = [System.Convert]::FromBase64String($payload.Replace('-', '+').Replace('_', '/'))
+                        $jwt = [System.Text.Encoding]::UTF8.GetString($bytes) | ConvertFrom-Json
+                        if ($jwt -and $jwt.email) {
+                            $activeEmail = $jwt.email.Trim()
+                        }
+                    }
+                }
+            }
+        } catch {}
+    }
+
+    $isLoggedIn = [bool](-not [string]::IsNullOrWhiteSpace($activeEmail) -and $hasCreds)
+
+    $ideProcs = Get-Process -Name "*antigravity*" -ErrorAction SilentlyContinue
+    $ideRunning = ($null -ne $ideProcs -and $ideProcs.Count -gt 0)
+    $idePid = if ($ideRunning) { $ideProcs[0].Id } else { $null }
+
+    $saved = Get-AccountsManifest
+    $savedDecorated = @()
+    foreach ($item in $saved) {
+        $profileDir = Join-Path $ACCOUNTS_DIR $item.id
+        $profileHasCreds = Test-Path (Join-Path $profileDir "oauth_creds.json")
+        $isActive = ($isLoggedIn -and $item.email -and ($item.email.ToLower() -eq $activeEmail.ToLower()))
+        
+        $savedDecorated += @{
+            id          = $item.id
+            email       = $item.email
+            label       = if ($item.label) { $item.label } else { $item.email }
+            notes       = if ($item.notes) { $item.notes } else { "" }
+            created_at  = $item.created_at
+            last_used   = $item.last_used
+            is_active   = $isActive
+            has_creds   = $profileHasCreds
+        }
+    }
+
+    return @{
+        ok             = $true
+        is_logged_in   = $isLoggedIn
+        active_account = @{
+            email            = $activeEmail
+            expiry_date_ms   = $expiryMs
+            expiry_date_str  = $expiryStr
+            is_expired       = $isExpired
+            refresh_ready    = $refreshTokenPresent
+            scope            = $scope
+        }
+        saved_accounts = $savedDecorated
+        saved_count    = $savedDecorated.Count
+        ide_status     = @{
+            running = $ideRunning
+            pid     = $idePid
+            app_dir = (Join-Path $USER_HOME ".gemini")
+        }
+    }
+}
+
+function Save-CurrentAntigravityAccount($label, $notes = "") {
+    Ensure-AccountsStorage
+    $status = Get-AntigravityAccountStatus
+    if (-not $status.is_logged_in -or [string]::IsNullOrWhiteSpace($status.active_account.email)) {
+        return @{ ok = $false; error = "No active Google account session found in Antigravity. Please sign in via Antigravity IDE first." }
+    }
+
+    $email = $status.active_account.email.Trim()
+    $slug = ($email -replace "[^a-zA-Z0-9_-]", "_").ToLower()
+    $profileDir = Join-Path $ACCOUNTS_DIR $slug
+
+    if (-not (Test-Path $profileDir)) {
+        New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
+    }
+
+    if (Test-Path $OAUTH_CREDS_PATH) {
+        Copy-Item -Path $OAUTH_CREDS_PATH -Destination (Join-Path $profileDir "oauth_creds.json") -Force
+    }
+    if (Test-Path $GOOGLE_ACCOUNTS_PATH) {
+        Copy-Item -Path $GOOGLE_ACCOUNTS_PATH -Destination (Join-Path $profileDir "google_accounts.json") -Force
+    }
+
+    # Backup Antigravity IDE 2.0+ internal database session
+    $pyExport = Join-Path $PSScriptRoot "scripts\export-vscdb-session.py"
+    if (Test-Path $pyExport) {
+        try {
+            $sessJson = python -c "import sys, json; sys.path.append('scripts'); from export_vscdb_session import export_vscdb_session; d = export_vscdb_session(); print(json.dumps(d) if d else '{}')"
+            if ($sessJson -and $sessJson.Length -gt 15) {
+                Set-Content -Path (Join-Path $profileDir "vscdb_session.json") -Value $sessJson -Encoding UTF8
+            }
+        } catch {}
+    }
+
+    $manifest = Get-AccountsManifest
+    $nowStr = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    $userLabel = if ([string]::IsNullOrWhiteSpace($label)) { $email } else { $label.Trim() }
+
+    $entry = @{
+        id         = $slug
+        email      = $email
+        label      = $userLabel
+        notes      = $notes
+        created_at = $nowStr
+        last_used  = $nowStr
+    }
+
+    $cleanManifest = @()
+    $updated = $false
+    foreach ($m in $manifest) {
+        if ($m.id -eq $slug -or ($m.email -and $m.email.ToLower() -eq $email.ToLower())) {
+            if (-not $updated) {
+                $entry.created_at = $m.created_at
+                $cleanManifest += [PSCustomObject]$entry
+                $updated = $true
+            }
+        } else {
+            $cleanManifest += $m
+        }
+    }
+    if (-not $updated) {
+        $cleanManifest += [PSCustomObject]$entry
+    }
+
+    Save-AccountsManifest $cleanManifest
+    return @{
+        ok      = $true
+        message = "Successfully saved '$email' ($userLabel) to rotation vault!"
+        account = $entry
+    }
+}
+
+function Switch-AntigravityAccount($targetId) {
+    Ensure-AccountsStorage
+    if ([string]::IsNullOrWhiteSpace($targetId)) {
+        return @{ ok = $false; error = "Target account id or email is required." }
+    }
+
+    $manifest = Get-AccountsManifest
+    $target = $null
+    $targetIndex = -1
+    for ($i = 0; $i -lt $manifest.Count; $i++) {
+        if ($manifest[$i].id -eq $targetId -or $manifest[$i].email.ToLower() -eq $targetId.ToLower()) {
+            $target = $manifest[$i]
+            $targetIndex = $i
+            break
+        }
+    }
+
+    if ($null -eq $target) {
+        return @{ ok = $false; error = "Account profile '$targetId' not found in saved vault." }
+    }
+
+    $profileDir = Join-Path $ACCOUNTS_DIR $target.id
+    $targetOauth = Join-Path $profileDir "oauth_creds.json"
+    $targetGacc  = Join-Path $profileDir "google_accounts.json"
+
+    if (-not (Test-Path $targetOauth)) {
+        return @{ ok = $false; error = "Credentials file for '$($target.email)' is missing in vault." }
+    }
+
+    $currStatus = Get-AntigravityAccountStatus
+    if ($currStatus.is_logged_in -and $currStatus.active_account.email -and ($currStatus.active_account.email.ToLower() -ne $target.email.ToLower())) {
+        Save-CurrentAntigravityAccount -label ("Auto-saved " + $currStatus.active_account.email) -notes "Automatic backup before switching" | Out-Null
+    }
+
+    Copy-Item -Path $targetOauth -Destination $OAUTH_CREDS_PATH -Force
+    if (Test-Path $targetGacc) {
+        Copy-Item -Path $targetGacc -Destination $GOOGLE_ACCOUNTS_PATH -Force
+    } else {
+        $newGacc = @{ active = $target.email; old = @() } | ConvertTo-Json
+        Set-Content -Path $GOOGLE_ACCOUNTS_PATH -Value $newGacc -Encoding UTF8
+    }
+
+    # Restore Antigravity IDE 2.0+ internal database session if available
+    $targetVscdb = Join-Path $profileDir "vscdb_session.json"
+    if (Test-Path $targetVscdb) {
+        $pyImport = Join-Path $PSScriptRoot "scripts\import-vscdb-session.py"
+        if (Test-Path $pyImport) {
+            try {
+                python $pyImport $targetVscdb *>$null
+            } catch {}
+        }
+    }
+
+    $nowStr = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    $target.last_used = $nowStr
+    $manifest[$targetIndex] = $target
+    Save-AccountsManifest $manifest
+
+    return @{
+        ok           = $true
+        message      = "Switched active Antigravity account to $($target.email) ($($target.label))! Simply send a prompt in Antigravity IDE or press Ctrl+R to continue with this account."
+        active_email = $target.email
+        active_label = $target.label
+    }
+}
+
+function Logout-AntigravityAccount($backupFirst = $true, $backupLabel = "") {
+    Ensure-AccountsStorage
+    $currStatus = Get-AntigravityAccountStatus
+
+    if ($backupFirst -and $currStatus.is_logged_in -and $currStatus.active_account.email) {
+        $lbl = if ([string]::IsNullOrWhiteSpace($backupLabel)) { "Saved prior to Sign Out" } else { $backupLabel }
+        Save-CurrentAntigravityAccount -label $lbl -notes "Preserved during Sign Out" | Out-Null
+    }
+
+    if (Test-Path $OAUTH_CREDS_PATH) {
+        Remove-Item -Path $OAUTH_CREDS_PATH -Force -ErrorAction SilentlyContinue
+    }
+
+    if (Test-Path $GOOGLE_ACCOUNTS_PATH) {
+        try {
+            $gacc = Get-Content $GOOGLE_ACCOUNTS_PATH -Raw -Encoding UTF8 | ConvertFrom-Json
+            $oldList = @()
+            if ($gacc -and $gacc.old) { $oldList = @($gacc.old) }
+            if ($currStatus.active_account.email -and -not ($oldList -contains $currStatus.active_account.email)) {
+                $oldList += $currStatus.active_account.email
+            }
+            $cleanGacc = @{ active = ""; old = $oldList } | ConvertTo-Json
+            Set-Content -Path $GOOGLE_ACCOUNTS_PATH -Value $cleanGacc -Encoding UTF8
+        } catch {
+            Set-Content -Path $GOOGLE_ACCOUNTS_PATH -Value '{"active":"","old":[]}' -Encoding UTF8
+        }
+    }
+
+    # Clean Antigravity IDE 2.0+ internal database session from state.vscdb
+    $pyClear = Join-Path $PSScriptRoot "scripts\clear-ide-session.py"
+    if (Test-Path $pyClear) {
+        try {
+            python $pyClear *>$null
+        } catch {}
+    }
+
+    return @{
+        ok      = $true
+        message = "Antigravity Google session signed out cleanly! Your VS Code workspace and settings are 100% preserved. Antigravity IDE will now show the clean Sign In button."
+    }
+}
+
+function Delete-AntigravityAccount($targetId) {
+    Ensure-AccountsStorage
+    $manifest = Get-AccountsManifest
+    $newManifest = @()
+    $found = $false
+
+    foreach ($item in $manifest) {
+        if ($item.id -eq $targetId -or $item.email.ToLower() -eq $targetId.ToLower()) {
+            $found = $true
+            $profileDir = Join-Path $ACCOUNTS_DIR $item.id
+            if (Test-Path $profileDir) {
+                Remove-Item -Path $profileDir -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        } else {
+            $newManifest += $item
+        }
+    }
+
+    if (-not $found) {
+        return @{ ok = $false; error = "Account profile '$targetId' not found." }
+    }
+
+    Save-AccountsManifest $newManifest
+    return @{
+        ok      = $true
+        message = "Account profile deleted from rotation vault."
+    }
+}
+
 while ($listener.IsListening) {
     try {
         $ctx    = $listener.GetContext()
@@ -1993,6 +2334,64 @@ while ($listener.IsListening) {
                 $reader.Close()
                 $data   = $body | ConvertFrom-Json
                 $resData= Apply-PluginPreset $data.preset
+                Send-Json $res $resData
+            } catch {
+                Send-Json $res @{ ok = $false; error = $_.Exception.Message } 500
+            }
+        }
+        elseif ($method -eq "GET" -and $path -eq "/accounts") {
+            $data = Get-AntigravityAccountStatus
+            Send-Json $res $data
+        }
+        elseif ($method -eq "POST" -and $path -eq "/accounts/save") {
+            try {
+                $reader = New-Object System.IO.StreamReader($req.InputStream, [System.Text.Encoding]::UTF8)
+                $body   = $reader.ReadToEnd()
+                $reader.Close()
+                $data   = if ([string]::IsNullOrWhiteSpace($body)) { @{} } else { $body | ConvertFrom-Json }
+                $label  = if ($data.label) { $data.label } else { "" }
+                $notes  = if ($data.notes) { $data.notes } else { "" }
+                $resData = Save-CurrentAntigravityAccount $label $notes
+                Send-Json $res $resData
+            } catch {
+                Send-Json $res @{ ok = $false; error = $_.Exception.Message } 500
+            }
+        }
+        elseif ($method -eq "POST" -and $path -eq "/accounts/switch") {
+            try {
+                $reader = New-Object System.IO.StreamReader($req.InputStream, [System.Text.Encoding]::UTF8)
+                $body   = $reader.ReadToEnd()
+                $reader.Close()
+                $data   = if ([string]::IsNullOrWhiteSpace($body)) { @{} } else { $body | ConvertFrom-Json }
+                $targetId = if ($data.id) { $data.id } else { $data.email }
+                $resData  = Switch-AntigravityAccount $targetId
+                Send-Json $res $resData
+            } catch {
+                Send-Json $res @{ ok = $false; error = $_.Exception.Message } 500
+            }
+        }
+        elseif ($method -eq "POST" -and $path -eq "/accounts/logout") {
+            try {
+                $reader = New-Object System.IO.StreamReader($req.InputStream, [System.Text.Encoding]::UTF8)
+                $body   = $reader.ReadToEnd()
+                $reader.Close()
+                $data   = if ([string]::IsNullOrWhiteSpace($body)) { @{} } else { $body | ConvertFrom-Json }
+                $backup = if ($null -ne $data.backup_first) { [bool]$data.backup_first } else { $true }
+                $label  = if ($data.label) { $data.label } else { "Saved prior to Logout" }
+                $resData = Logout-AntigravityAccount $backup $label
+                Send-Json $res $resData
+            } catch {
+                Send-Json $res @{ ok = $false; error = $_.Exception.Message } 500
+            }
+        }
+        elseif ($method -eq "POST" -and $path -eq "/accounts/delete") {
+            try {
+                $reader = New-Object System.IO.StreamReader($req.InputStream, [System.Text.Encoding]::UTF8)
+                $body   = $reader.ReadToEnd()
+                $reader.Close()
+                $data   = if ([string]::IsNullOrWhiteSpace($body)) { @{} } else { $body | ConvertFrom-Json }
+                $targetId = if ($data.id) { $data.id } else { $data.email }
+                $resData  = Delete-AntigravityAccount $targetId
                 Send-Json $res $resData
             } catch {
                 Send-Json $res @{ ok = $false; error = $_.Exception.Message } 500

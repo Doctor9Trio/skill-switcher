@@ -229,6 +229,22 @@ High-speed engineering repository and design inspiration graph:
 
 ---
 
+## 🔄 Antigravity Account Switcher & Quota Hub (`pages/accounts.html`)
+
+In latest Antigravity IDE updates (2.0+), Google decoupled the **VS Code editor shell** (managing GitHub/Microsoft logins) from the **Antigravity AI Agent runtime** (managing Google account quotas and Gemini models). 
+
+This caused major confusion:
+1. **The bottom-left account icon only switches GitHub**: It does not touch your Google AI quota.
+2. **Slash command `/logout` fails in chat**: `/logout` is not an Antigravity agent slash command (agent commands are `/plan`, `/goal`, etc.).
+3. **Deleting `state.vscdb` is destructive**: It wipes open editor tabs, recent workspaces, and IDE settings.
+
+### Solution Provided by Skill Switcher:
+- **1-Click Token Vault**: Save multiple Google account profiles (`~/.gemini/saved_accounts/`) and switch between them instantly with 1 click when rate limits or quotas are reached.
+- **Clean Sign Out**: Drop active OAuth sessions safely without losing any VS Code settings or project workspaces.
+- **Native UI Guidance**: Exact navigation paths (`Ctrl + Shift + P` &rarr; `Antigravity: Open Antigravity Settings` &rarr; `Account` tab &rarr; `Sign Out`).
+
+---
+
 ## 🌐 Dynamic Universal Path Resolution
 
 Skill Switcher is **100% portable** across any PC, username, or operating system:

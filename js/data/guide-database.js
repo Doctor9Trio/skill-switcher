@@ -849,6 +849,50 @@ const GUIDE_DATABASE = {
       }
     ],
     "promptRecipe": "Review and rewrite this technical document using the Anti-Slop style guide: eliminate all AI clichés, conversational preamble, and generic filler. Keep sentences active, concise, and focused on verifiable technical facts."
+  },
+  "antigravity-account-switching": {
+    "id": "antigravity-account-switching",
+    "title": "Antigravity IDE 2.0+ Account Switching & Quota Guide",
+    "subtitle": "Complete architectural walkthrough on why the bottom-left gear only shows GitHub, where Google OAuth lives, and how to swap quota pools seamlessly.",
+    "icon": "🔄",
+    "badges": [
+      {
+        "text": "Antigravity 2.0+",
+        "type": "purple"
+      },
+      {
+        "text": "Auth Architecture",
+        "type": "blue"
+      },
+      {
+        "text": "Quota Rotation",
+        "type": "green"
+      }
+    ],
+    "calloutTitle": "Why Did Account Switching Move?",
+    "calloutText": "In Google Antigravity IDE, Google accounts (which power the AI agent models and quota) are decoupled from the VS Code editor shell (which manages Git & GitHub). The bottom-left gear icon manages editor sync, while Antigravity agent authentication is managed in ~/.gemini/oauth_creds.json and the Antigravity Settings panel.",
+    "diagrams": [
+      {
+        "title": "Antigravity IDE Dual Authentication Architecture",
+        "description": "Understanding why the editor gear menu doesn't show your Google account.",
+        "chart": "flowchart TD\n  IDE[\"Antigravity IDE Window\"]\n  IDE --> EditorShell[\"VS Code Shell (Gear Icon)\"]\n  IDE --> AgentRuntime[\"Antigravity Agent Runtime (Jetski)\"]\n  EditorShell --> GitHubAuth[\"GitHub / Microsoft Sync (state.vscdb)\"]\n  AgentRuntime --> GoogleAuth[\"Google OAuth Token (~/.gemini/oauth_creds.json)\"]\n  AgentRuntime --> QuotaPool[\"Model Quota Pool (Gemini 3.8 / Pro)\"]\n  SkillSwitcher[\"Skill Switcher Vault\"] -->|\"1-Click Swap\"| GoogleAuth"
+      }
+    ],
+    "sections": [
+      {
+        "heading": "1. Why Did the Bottom-Left Gear Only Show GitHub?",
+        "bodyHtml": "<p>When you click the gear or account avatar in the bottom-left corner of Antigravity IDE, you are interacting with standard VS Code settings:</p><ul><li><b>VS Code Profile:</b> Manages editor extensions, settings sync, and GitHub account tokens.</li><li><b>Antigravity Agent Runtime:</b> Runs independently in a background process (<code>cloudcode_cli</code> / <code>jetskiAgent</code>) and loads its Google identity from <code>~/.gemini/oauth_creds.json</code>.</li><li><b>Why /logout Failed:</b> In Antigravity IDE, slash commands are specifically agent prompt workflows (such as <code>/plan</code>, <code>/goal</code>, <code>/boost</code>). Typing <code>/logout</code> in chat sends prompt text to the model instead of triggering a CLI command.</li></ul>"
+      },
+      {
+        "heading": "2. Native Method: Where Sign Out Lives in Official UI",
+        "bodyHtml": "<p>If you prefer signing out directly within the Antigravity IDE application:</p><ol><li>Press <code>Ctrl + Shift + P</code> (or <code>Cmd + Shift + P</code> on macOS) to open the Command Palette.</li><li>Type <b><code>Antigravity: Open Antigravity Settings</code></b> and press <b>Enter</b>.</li><li>In the sidebar panel, click on the <b>Account</b> section.</li><li>Under <b>Email</b>, your active Google account email is listed with a clean <b>Sign Out</b> button.</li><li>Click <b>Sign Out</b>. The IDE will disconnect your session and prompt you with a browser login button to sign into your alternate Google account.</li></ol>"
+      },
+      {
+        "heading": "3. The Recommended Solution: Skill Switcher 1-Click Vault",
+        "bodyHtml": "<p>Instead of manually logging in and out via browser windows every time you exhaust your daily rate limit:</p><ul><li>Open the new <b>Account Switcher</b> tab in Skill Switcher (<code>pages/accounts.html</code>).</li><li>Click <b>Save Current Account</b> to register your active profile into the rotation vault.</li><li>When your quota runs out, simply click <b>Switch to this Account</b> on any saved profile.</li><li>Skill Switcher instantly swaps <code>oauth_creds.json</code> with zero downtime and without wiping your open workspace files or tabs!</li></ul>"
+      }
+    ],
+    "promptRecipe": "Explain how Antigravity manages Google OAuth tokens in ~/.gemini/oauth_creds.json versus VS Code settings, and verify the currently active account session."
   }
 };
 
